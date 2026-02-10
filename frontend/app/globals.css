@@ -1,0 +1,178 @@
+/* Thiết lập cơ bản */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  background-color: #0a0f1a; /* Màu xanh đen Luxury */
+  color: #f8fafc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
+
+.main-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Sidebar bên trái */
+.sidebar {
+  width: 80px;
+  background-color: #0d1321;
+  border-right: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  gap: 40px;
+}
+
+.sidebar-icon {
+  color: #475569;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar-icon.active {
+  color: #3b82f6;
+}
+
+/* Nội dung chính */
+.content-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 40px;
+  position: relative;
+}
+
+.header h1 {
+  font-size: 64px;
+  font-weight: 900;
+  background: linear-gradient(to right, #60a5fa, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -2px;
+  font-style: italic;
+}
+
+.header p {
+  color: #64748b;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Vòng tròn Micro trung tâm */
+.micro-zone {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.micro-button {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: #111827;
+  border: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  z-index: 10;
+}
+
+.micro-button:hover {
+  border-color: #3b82f6;
+}
+
+.status-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #3b82f6;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+}
+
+/* Hiệu ứng phát sáng khi đang nghe */
+.glow-effect {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(59, 130, 246, 0.15);
+  filter: blur(60px);
+  border-radius: 50%;
+  opacity: 0;
+  transition: 0.5s;
+}
+
+.listening .glow-effect {
+  opacity: 1;
+}
+
+.listening .micro-icon {
+  color: #ef4444;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Khối tin nhắn */
+.message-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+.message-box {
+  padding: 30px;
+  border-radius: 40px;
+  background: rgba(13, 19, 33, 0.8);
+  border: 1px solid rgba(30, 41, 59, 0.5);
+  min-height: 180px;
+}
+
+.message-box.ai {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.1);
+}
+
+.box-label {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.user-label { color: #3b82f6; }
+.ai-label { color: #10b981; }
+
+.message-text {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #cbd5e1;
+  font-style: italic;
+}
