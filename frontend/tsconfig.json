@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
-    "baseUrl": ".", 
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     },
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -27,7 +33,10 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": ["node_modules"]
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+, "tailwind.config.js"  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
