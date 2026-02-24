@@ -14,27 +14,31 @@ export const chatWithAI = async (text: string, jd: string, voice: string, mode: 
   return res;
 };
 
-// Kết thúc & Chấm điểm
-export const endInterview = async (history: string, jd: string) => {
+// --- END INTERVIEW ---
+export const endInterview = async (history: string, jdText: string, position: string) => {
+  const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/end-interview`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ history, jd_text: jd }),
+    headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ history, jd_text: jdText, position }),
   });
   return res.json();
 };
 
-// Lấy gợi ý
-export const getHint = async (lastQuestion: string, jd: string) => {
+// --- GET HINT ---
+export const getHint = async (lastQuestion: string, jdText: string) => {
   const res = await fetch(`${API_URL}/hint`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ last_question: lastQuestion, jd_text: jd }),
+    body: JSON.stringify({ last_question: lastQuestion, jd_text: jdText }),
   });
   return res.json();
 };
 
-// Hàm tạo CV (Thêm tham số template)
+// --- GENERATE CV ---
 export const generateCV = async (userProfile: any, position: string, company: string, templateId: string) => {
     // Tạo prompt cho AI dựa trên template
     const templateInstruction = templateId === 'itviec' 
@@ -57,7 +61,7 @@ export const generateCV = async (userProfile: any, position: string, company: st
     return res.json();
 };
 
-// Hàm Review CV (Dùng FormData)
+// --- REVIEW CV ---
 export const reviewCV = async (file: File, company: string) => {
     const formData = new FormData();
     formData.append("file", file); // Key 'file' phải khớp với backend (file: UploadFile)
@@ -141,5 +145,14 @@ export const deleteExperience = async (id: number) => {
         headers: getAuthHeaders()
     });
     if (!res.ok) throw new Error("Lỗi xóa");
+    return res.json();
+};
+
+// --- GET HISTORY ---
+export const getHistory = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/history`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
     return res.json();
 };

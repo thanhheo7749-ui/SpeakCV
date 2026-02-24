@@ -4,6 +4,7 @@ from datetime import date
 
 # --- 1. MODEL CHO PROFILE ---
 class ProfileUpdate(BaseModel):
+    full_name: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
     website: Optional[str] = None
@@ -11,6 +12,7 @@ class ProfileUpdate(BaseModel):
     linkedin: Optional[str] = None
     summary: Optional[str] = None
     skills: Optional[str] = None
+    avatar: Optional[str] = None
 
 # --- 2. MODEL CHO KINH NGHIỆM ---
 class ExperienceCreate(BaseModel):
@@ -43,11 +45,13 @@ class HintRequest(BaseModel):
 class ReportRequest(BaseModel):
     history: str
     jd_text: str = ""
+    position: str = "Chưa xác định"
 
 class CVGenRequest(BaseModel):
     user_info: str
     position: str
     company: str
+    style_instruction: str = ""
 
 # --- THÊM MODEL MỚI CHO AUTH ---
 class UserCreate(BaseModel):

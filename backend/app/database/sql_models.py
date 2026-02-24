@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, Date, ForeignKey, JSON
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey, JSON, Date, Boolean
+from sqlalchemy.sql import func
 from .database import Base
 
 # 1. Bảng Users (Chỉ chứa thông tin đăng nhập)
@@ -17,14 +17,15 @@ class UserProfile(Base):
     __tablename__ = "user_profiles"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True) # Lưu ý: Map thủ công, không dùng ForeignKey để tránh lỗi ràng buộc chặt nếu chưa cần thiết
+    user_id = Column(Integer, index=True)
     phone = Column(String(20), nullable=True)
     address = Column(String(255), nullable=True)
     website = Column(String(255), nullable=True)
     github = Column(String(255), nullable=True)
     linkedin = Column(String(255), nullable=True)
     summary = Column(Text, nullable=True)
-    skills = Column(Text, nullable=True)  # <--- Cột skills nằm ở đây
+    skills = Column(Text, nullable=True)
+    avatar = Column(Text, nullable=True)
 
 # 3. Bảng Kinh nghiệm (Experience)
 class Experience(Base):
@@ -50,3 +51,15 @@ class Education(Base):
     major = Column(String(255))
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
+
+# 5. Bảng Lịch sử phỏng vấn
+class InterviewHistory(Base):
+    __tablename__ = "interview_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    position = Column(String(255))
+    score = Column(Float)
+    overall_feedback = Column(Text)
+    details = Column(JSON)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

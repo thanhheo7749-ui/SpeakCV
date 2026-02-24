@@ -41,8 +41,17 @@ body {
     @apply p-3 rounded-xl cursor-pointer text-slate-400 hover:bg-slate-800 transition-all duration-200;
   }
   
-  /* Class riêng cho nút "Kết thúc" màu đỏ đặc biệt */
   .end-btn {
     @apply mt-auto mb-6 p-3 bg-red-500/10 rounded-full cursor-pointer hover:bg-red-500/20 hover:scale-110 transition-all duration-300 group;
+  }
+}
+
+/* --- IN CV --- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #root > div, .fixed { 
+    visibility: visible; 
   }
 }

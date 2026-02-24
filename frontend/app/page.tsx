@@ -1,281 +1,206 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import {
   Mic,
-  User,
-  Sparkles,
   FileText,
-  Settings,
-  Flag,
-  Lightbulb,
-  X,
-  LogIn,
-  LogOut,
+  Target,
+  BrainCircuit,
+  Sparkles,
+  ChevronRight,
+  CheckCircle2,
 } from "lucide-react";
 
-// Components
-import {
-  SettingsModal,
-  ReportModal,
-  ProfileModal,
-  GenCVModal,
-  ReviewCVModal,
-  AuthModal,
-} from "@/components/Modals";
-import { MicroButton } from "@/components/Interview/MicroButton";
-import { ChatBox } from "@/components/Interview/ChatBox";
+export default function LandingPage() {
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
 
-// API & Hooks
-import { endInterview, getHint } from "@/services/api";
-import { useMicrophone } from "@/hooks/useMicrophone";
-import { useChat } from "@/hooks/useChat";
-import { useAudioQueue } from "@/hooks/useAudioQueue";
-
-export default function Home() {
-  // --- 1. SETUP STATE & HOOKS ---
-  const [modals, setModals] = useState({
-    settings: false,
-    report: false,
-    profile: false,
-    cv: false,
-    review: false,
-    auth: false,
-  });
-  const toggleModal = (key: string, val: boolean) =>
-    setModals((prev) => ({ ...prev, [key]: val }));
-
-  const [user, setUser] = useState<string | null>(null);
-  // Check login lúc mới vào
-  useEffect(() => {
-    const name = localStorage.getItem("userName");
-    if (name) setUser(name);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    setUser(null);
-  };
-
-  const [config, setConfig] = useState({
-    jd: "",
-    voice: "en-US-AndrewMultilingualNeural",
-    mode: "general",
-    userProfile: { name: "", email: "", phone: "", skills: "" },
-  });
-
-  // Custom Hooks
-  const micLang = config.mode === "english" ? "en-US" : "vi-VN";
-  const {
-    text: userText,
-    setText: setUserText,
-    temp: tempText,
-    isListening,
-    toggleMic,
-    resetText,
-    setIsListening,
-  } = useMicrophone(micLang);
-  const { isPlaying, playAudio, stopAudio } = useAudioQueue();
-  const {
-    status,
-    setStatus,
-    aiText,
-    history,
-    sendMessage,
-    resetChat,
-    interrupt: interruptChat,
-  } = useChat();
-
-  // State phụ
-  const [reportHtml, setReportHtml] = useState("");
-  const [hint, setHint] = useState({ show: false, content: "" });
-
-  // --- 2. HANDLERS ---
-
-  // Xử lý khi AI nói xong (đồng bộ trạng thái Audio và Chat)
-  // Mẹo: Khi Audio hết playing mà status vẫn là "AI đang nói" -> chuyển về "Sẵn sàng"
-  if (!isPlaying && status === "AI đang nói") {
-    setStatus("Sẵn sàng");
-  }
-
-  const handleSend = () => {
-    const input = (userText + " " + tempText).trim();
-    if (!input) return;
-
-    resetText(); // Xóa text input
-    setIsListening(false); // Tắt mic
-
-    // Gọi hàm send từ useChat, truyền hàm playAudio vào để chạy khi có kết quả
-    sendMessage(input, config.jd, config.voice, config.mode, (blob) => {
-      playAudio(blob);
-    });
-  };
-
-  const handleInterrupt = () => {
-    interruptChat(); // Ngắt API
-    stopAudio(); // Ngắt Loa
-    if (isListening) toggleMic(); // Ngắt Mic
-    setStatus("Sẵn sàng");
-  };
-
-  const onMicClick = () => {
-    if (status === "Đang xử lý" || status === "AI đang nói") {
-      handleInterrupt();
+  const handleStart = () => {
+    if (user) {
+      router.push("/interview");
     } else {
-      toggleMic();
-      // Chỉ update status hiển thị nếu mic bật
-      if (!isListening) setStatus("Đang nghe");
-      else setStatus("Sẵn sàng");
+      router.push("/login");
     }
   };
 
-  const handleRetry = () => {
-    toggleModal("report", false);
-    resetChat(); // Reset lịch sử chat
-    stopAudio();
-  };
+  if (isLoading) return <div className="h-screen bg-slate-950"></div>;
 
-  // --- 3. RENDER UI ---
   return (
-    <div className="flex h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      {/* Sidebar */}
-      <nav className="w-20 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-6 gap-5 z-20 shadow-2xl">
-        <div className="p-3 bg-blue-600/20 rounded-xl mb-2">
-          <Mic className="text-blue-500" size={28} />
-        </div>
-        <div onClick={() => toggleModal("profile", true)} className="icon-btn">
-          <User size={24} />
-        </div>
-        <div onClick={() => toggleModal("cv", true)} className="icon-btn">
-          <Sparkles size={24} />
-        </div>
-        <div onClick={() => toggleModal("review", true)} className="icon-btn">
-          <FileText size={24} />
-        </div>
-        <div onClick={() => toggleModal("settings", true)} className="icon-btn">
-          <Settings size={24} />
-        </div>
-        <div
-          onClick={() => (user ? handleLogout() : toggleModal("auth", true))}
-          className="icon-btn mb-4"
-          title={user ? "Đăng xuất" : "Đăng nhập"}
-        >
-          {user ? (
-            <LogOut size={24} className="text-red-400" />
-          ) : (
-            <LogIn size={24} className="text-green-400" />
-          )}
-        </div>
-        <div
-          onClick={async () => {
-            handleInterrupt();
-            toggleModal("report", true);
-            const d = await endInterview(history, config.jd);
-            setReportHtml(d.report);
-          }}
-          className="mt-auto mb-6 p-3 bg-red-500/10 rounded-full cursor-pointer"
-        >
-          <Flag className="text-red-500" />
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
+      {/* NAVBAR */}
+      <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => window.scrollTo(0, 0)}
+          >
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Mic className="text-white" size={24} />
+            </div>
+            <span className="text-2xl font-black italic tracking-tight text-white">
+              Speak<span className="text-blue-400">CV</span>
+            </span>
+          </div>
+          <div className="flex gap-4 items-center">
+            {user ? (
+              <button
+                onClick={() => router.push("/interview")}
+                className="text-sm font-bold text-white hover:text-blue-400 transition-colors"
+              >
+                Chào, {user}
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/login")}
+                className="text-sm font-bold text-slate-300 hover:text-white transition-colors"
+              >
+                Đăng nhập
+              </button>
+            )}
+            <button
+              onClick={handleStart}
+              className="bg-white text-slate-900 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-slate-200 transition-transform active:scale-95 flex items-center gap-2"
+            >
+              Vào Phòng Phỏng Vấn <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-between py-8 px-6 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
-        <header className="text-center z-10">
-          <h1 className="text-6xl font-black italic bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-            SpeakCV
-          </h1>
-          {user && (
-            <div className="absolute top-4 right-6 text-slate-500 text-sm font-bold">
-              Xin chào, {user}
-            </div>
-          )}
-        </header>
+      {/* HERO SECTION */}
+      <section className="relative pt-40 pb-20 overflow-hidden">
+        {/* Background glow effects */}
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none"></div>
 
-        <div className="relative group z-10">
-          <MicroButton
-            status={status}
-            onClick={onMicClick}
-            langLabel={micLang === "en-US" ? "Tiếng Anh" : "Tiếng Việt"}
-          />
-          <div className="absolute -right-28 top-0 flex flex-col gap-4">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-sm font-medium text-blue-400 mb-8 animate-in slide-in-from-bottom-4 fade-in duration-700">
+            <Sparkles size={16} /> Công nghệ AI GPT-4o mới nhất
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] tracking-tight mb-8 animate-in slide-in-from-bottom-6 fade-in duration-700 delay-100">
+            Vượt qua mọi kỳ phỏng vấn <br />
+            với{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+              AI HR Chuyên Nghiệp
+            </span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200">
+            Trải nghiệm cảm giác phỏng vấn thực tế 1-1 bằng giọng nói. Hệ thống
+            sẽ chấm điểm, chỉ ra lỗi sai và gợi ý cách trả lời hoàn hảo nhất để
+            bạn tự tin lấy trọn điểm từ nhà tuyển dụng.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-300">
             <button
-              onClick={async () => {
-                setHint({ show: true, content: "..." });
-                const d = await getHint(aiText, config.jd);
-                setHint({ show: true, content: d.hint });
-              }}
-              className="w-14 h-14 rounded-full bg-yellow-500/10 flex items-center justify-center hover:scale-110 transition-transform"
+              onClick={handleStart}
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-lg shadow-[0_0_40px_rgba(37,99,235,0.4)] hover:shadow-[0_0_60px_rgba(37,99,235,0.6)] transition-all hover:-translate-y-1 flex items-center justify-center gap-3"
             >
-              <Lightbulb className="text-yellow-400" />
+              <Mic size={24} /> Bắt đầu luyện tập miễn phí
+            </button>
+            <button
+              onClick={() => router.push("/login")}
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-lg border border-slate-700 transition-all flex items-center justify-center gap-3"
+            >
+              <FileText size={24} /> Tạo CV
             </button>
           </div>
         </div>
+      </section>
 
-        {hint.show && (
-          <div className="absolute top-[28%] z-50 bg-slate-900/90 p-4 rounded-xl border border-yellow-500/30 max-w-lg animate-in fade-in">
-            <button
-              onClick={() => setHint({ show: false, content: "" })}
-              className="absolute top-2 right-2"
-            >
-              <X size={16} />
-            </button>
-            <p>{hint.content}</p>
+      {/* FEATURES SECTION */}
+      <section className="py-24 bg-slate-900/50 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Hệ sinh thái chuẩn bị việc làm toàn diện
+            </h2>
+            <p className="text-slate-400">
+              Không chỉ là phỏng vấn, SpeakCV mang đến cho bạn mọi công cụ cần
+              thiết.
+            </p>
           </div>
-        )}
 
-        <ChatBox
-          userText={userText}
-          tempText={tempText}
-          aiText={aiText}
-          status={status}
-          onUserTextChange={setUserText}
-          onSend={handleSend}
-          onClear={resetText}
-          onRefresh={() => {
-            resetText();
-            onMicClick();
-          }}
-        />
-      </main>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 hover:border-blue-500/50 transition-colors group">
+              <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <BrainCircuit className="text-blue-400" size={28} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">
+                Phỏng vấn Voice AI
+              </h3>
+              <p className="text-slate-400 leading-relaxed mb-6">
+                Tương tác bằng giọng nói thời gian thực. AI có khả năng phân
+                tích JD và tùy chỉnh câu hỏi độ khó cao như một HR thực thụ.
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-slate-300">
+                  <CheckCircle2 size={16} className="text-emerald-400" /> Không
+                  giới hạn ngành nghề
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-300">
+                  <CheckCircle2 size={16} className="text-emerald-400" /> Chế độ
+                  tính giờ áp lực
+                </li>
+              </ul>
+            </div>
 
-      {/* Modals Injection */}
-      <SettingsModal
-        show={modals.settings}
-        onClose={() => toggleModal("settings", false)}
-        voice={config.voice}
-        setVoice={(v) => setConfig({ ...config, voice: v })}
-        mode={config.mode}
-        setMode={(m) => setConfig({ ...config, mode: m })}
-        jd={config.jd}
-        setJd={(j) => setConfig({ ...config, jd: j })}
-      />
-      <ReportModal
-        show={modals.report}
-        onClose={() => toggleModal("report", false)}
-        result={reportHtml}
-        onRetry={handleRetry}
-      />
-      <ProfileModal
-        show={modals.profile}
-        onClose={() => toggleModal("profile", false)}
-        profile={config.userProfile}
-        setProfile={(p: any) => setConfig({ ...config, userProfile: p })}
-      />
-      <GenCVModal
-        show={modals.cv}
-        onClose={() => toggleModal("cv", false)}
-        userProfile={config.userProfile}
-      />
-      <ReviewCVModal
-        show={modals.review}
-        onClose={() => toggleModal("review", false)}
-      />
-      <AuthModal
-        show={modals.auth}
-        onClose={() => toggleModal("auth", false)}
-        onLoginSuccess={(name: string) => setUser(name)}
-      />
+            {/* Feature 2 */}
+            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 hover:border-purple-500/50 transition-colors group">
+              <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Target className="text-purple-400" size={28} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">
+                Báo cáo chấm điểm sâu
+              </h3>
+              <p className="text-slate-400 leading-relaxed mb-6">
+                Kết thúc phỏng vấn, AI sẽ chấm điểm thang 10, phân tích chi tiết
+                từng câu bạn đã nói và đưa ra câu trả lời mẫu hoàn hảo.
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-slate-300">
+                  <CheckCircle2 size={16} className="text-emerald-400" /> Nhận
+                  xét thái độ, chuyên môn
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-300">
+                  <CheckCircle2 size={16} className="text-emerald-400" /> Lưu
+                  trữ lịch sử tiến bộ
+                </li>
+              </ul>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 hover:border-yellow-500/50 transition-colors group">
+              <div className="w-14 h-14 bg-yellow-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <FileText className="text-yellow-400" size={28} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">
+                Trình tạo CV Tự động
+              </h3>
+              <p className="text-slate-400 leading-relaxed mb-6">
+                Nhập thông tin một lần, xuất ra CV PDF siêu nét với các mẫu
+                thiết kế chuẩn ATS giúp qua vòng hồ sơ dễ dàng.
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-slate-300">
+                  <CheckCircle2 size={16} className="text-emerald-400" /> Gợi ý
+                  viết theo chuẩn STAR
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-300">
+                  <CheckCircle2 size={16} className="text-emerald-400" /> Tích
+                  hợp Review CV bằng AI
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-8 border-t border-slate-900 text-center text-slate-500 text-sm">
+        <p>© 2026 SpeakCV. Phát triển cho tương lai nghề nghiệp của bạn.</p>
+      </footer>
     </div>
   );
 }
