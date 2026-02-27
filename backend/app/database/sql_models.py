@@ -11,6 +11,7 @@ class User(Base):
     full_name = Column(String(255))
     hashed_password = Column(String(255))
     role = Column(String(50), default="user")
+    credits = Column(Integer, default=10)
 
 # 2. Bảng UserProfile (Thông tin chi tiết)
 class UserProfile(Base):
@@ -58,8 +59,41 @@ class InterviewHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
+    title = Column(String(255), nullable=True)
     position = Column(String(255))
     score = Column(Float)
     overall_feedback = Column(Text)
     details = Column(JSON)
+    interview_type = Column(String(50), default="free")
+    question_limit = Column(Integer, default=0)
+    time_limit = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# 6. BẢNG QUẢN LÝ JD MẪU
+class JDTemplate(Base):
+    __tablename__ = "jd_templates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), index=True)
+    description = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# 7. BẢNG CẤU HÌNH HỆ THỐNG
+class SystemConfig(Base):
+    __tablename__ = "system_config"
+
+    id = Column(Integer, primary_key=True, index=True)
+    setting_key = Column(String(100), unique=True, index=True)
+    setting_value = Column(Text)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+# 8. BẢNG LỊCH SỬ GIAO DỊCH (CREDIT)
+class TransactionHistory(Base):
+    __tablename__ = "transaction_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    amount = Column(Integer)
+    transaction_type = Column(String(50)) # VD: 'add_credits', 'consume_credits'
+    note = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

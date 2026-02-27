@@ -37,6 +37,7 @@ class ChatRequest(BaseModel):
     jd_text: str = "" 
     voice_id: str = "en-US-AndrewMultilingualNeural"
     mode: str = "general"
+    chat_history: list = []
 
 class HintRequest(BaseModel):
     last_question: str
@@ -46,6 +47,10 @@ class ReportRequest(BaseModel):
     history: str
     jd_text: str = ""
     position: str = "Chưa xác định"
+    history_id: Optional[int] = None
+    interview_type: str = "free"
+    question_limit: int = 0
+    time_limit: int = 0
 
 class CVGenRequest(BaseModel):
     user_info: str
@@ -58,6 +63,7 @@ class UserCreate(BaseModel):
     email: str
     password: str
     full_name: str
+    credits: int = 100
 
 class UserLogin(BaseModel):
     email: str
@@ -67,3 +73,19 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     user_name: str
+
+class RenameRequest(BaseModel):
+    title: str
+
+class JDTemplateRequest(BaseModel):
+    title: str
+    description: str
+
+# --- MODEL CHO ADMIN CỘNG CREDIT ---
+class AddCreditRequest(BaseModel):
+    amount: int
+
+# --- MODEL CHO CẤU HÌNH HỆ THỐNG ---
+class SystemConfigUpdate(BaseModel):
+    system_prompt: str
+    temperature: float

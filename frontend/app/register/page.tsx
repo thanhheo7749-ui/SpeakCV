@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { UserPlus, Loader2 } from "lucide-react";
+import { UserPlus, Loader2, ArrowLeft } from "lucide-react";
 import { registerUser } from "@/services/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const [ho, setHo] = useState("");
@@ -23,7 +24,9 @@ export default function RegisterPage() {
 
     try {
       await registerUser(email, password, fullName);
-      alert("Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...");
+      toast.success(
+        "Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...",
+      );
       router.push("/login");
     } catch (err: any) {
       setError(err.message || "Email này đã được sử dụng hoặc có lỗi xảy ra!");
@@ -35,6 +38,10 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-800 p-8 shadow-2xl">
+        <button className="absolute top-6 left-6 text-slate-400 hover:text-white flex items-center gap-2 font-bold transition-colors bg-slate-800/50 px-4 py-2 rounded-xl">
+          <ArrowLeft size={20} />
+          <Link href="/">Thoát</Link>
+        </button>
         <h2 className="text-3xl font-bold text-white mb-6 text-center">
           Tạo Tài Khoản
         </h2>

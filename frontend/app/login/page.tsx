@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { LogIn, Loader2 } from "lucide-react";
+import { LogIn, Loader2, ArrowLeft } from "lucide-react";
 import { loginUser } from "@/services/api";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +21,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const data = await loginUser(email, password);
+      // Lưu token vào Context
       login(data.access_token, data.user_name, data.role || "user");
+      router.push("/interview");
     } catch (err: any) {
       setError(err.message || "Sai email hoặc mật khẩu!");
     } finally {
@@ -28,8 +32,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-800 p-8 shadow-2xl">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative">
+      <Link
+        href="/"
+        className="absolute top-6 left-6 text-slate-400 hover:text-white flex items-center gap-2 font-bold transition-colors bg-slate-800/50 hover:bg-slate-700 px-4 py-2 rounded-xl"
+      >
+        <ArrowLeft size={20} /> Thoát ra
+      </Link>
+
+      <div className="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-800 p-8 shadow-2xl relative z-10">
         <h2 className="text-3xl font-bold text-white mb-6 text-center">
           Đăng Nhập
         </h2>
@@ -64,7 +75,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm bg-red-400/10 p-3 rounded-lg">
+            <p className="text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-500/20">
               {error}
             </p>
           )}
@@ -72,7 +83,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98]"
+            className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? (
               <Loader2 className="animate-spin" />

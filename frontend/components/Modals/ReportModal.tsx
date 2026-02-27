@@ -103,10 +103,10 @@ export default function ReportModal({
               </div>
               <p className="text-sm font-medium mt-2 opacity-80 text-center">
                 {report.score >= 8
-                  ? "🌟 Xuất sắc! Bạn đã sẵn sàng."
+                  ? "Xuất sắc! Bạn đã sẵn sàng."
                   : report.score >= 5
-                    ? "👍 Khá ổn, cần cải thiện thêm."
-                    : "⚠️ Cần luyện tập nhiều hơn."}
+                    ? "Khá ổn, cần cải thiện thêm."
+                    : "Cần luyện tập nhiều hơn."}
               </p>
             </div>
 

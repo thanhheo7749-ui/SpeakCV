@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { X, Check, Upload, Loader2, FileText, AlertCircle } from "lucide-react";
 import { reviewCV } from "@/services/api";
+import toast from "react-hot-toast";
+import ReactMarkdown from "react-markdown";
 
 export default function ReviewCVModal({ show, onClose }: any) {
   const [file, setFile] = useState<File | null>(null);
@@ -12,13 +14,19 @@ export default function ReviewCVModal({ show, onClose }: any) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      // Kiểm tra loại file (chỉ nhận PDF hoặc Ảnh)
+      const fileName = selectedFile.name.toLowerCase();
+      // Kiểm tra loại file (chỉ nhận PDF hoặc Word)
       if (
-        !selectedFile.type.includes("pdf") &&
-        !selectedFile.type.includes("image")
+        !fileName.endsWith(".pdf") &&
+        !fileName.endsWith(".doc") &&
+        !fileName.endsWith(".docx")
       ) {
-        setError("Vui lòng chỉ tải lên file PDF hoặc Ảnh (JPG/PNG).");
+        toast.error(
+          "Hệ thống ATS chỉ chấp nhận định dạng PDF hoặc Word (DOCX) để đảm bảo độ chính xác!",
+        );
+        setError("Vui lòng chỉ tải lên file PDF hoặc Word (DOC/DOCX).");
         setFile(null);
+        e.target.value = "";
         return;
       }
       setError("");
@@ -34,11 +42,24 @@ export default function ReviewCVModal({ show, onClose }: any) {
     setError("");
 
     try {
-      const d = await reviewCV(file, com); // Gọi API
-      if (d && d.review) {
-        setRes(d.review);
-      } else {
+      const response = await reviewCV(file, com);
+      if (!response || !response.body) {
         setError("Không nhận được phản hồi từ Server.");
+        setLoading(false);
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      let done = false;
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          setRes((prev) => prev + chunk);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -68,7 +89,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
 
         {/* Body */}
         <div className="flex-1 overflow-hidden flex flex-col">
-          {!res ? (
+          {!res && !loading ? (
             <div className="flex flex-col items-center justify-center h-full space-y-6 animate-in zoom-in-95 duration-300">
               <div className="w-full max-w-md space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase">
@@ -87,7 +108,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
                 <input
                   type="file"
                   onChange={handleFileChange}
-                  accept=".pdf, .jpg, .jpeg, .png"
+                  accept=".pdf,application/pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
 
@@ -114,7 +135,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
                       Kéo thả hoặc bấm để tải CV
                     </p>
                     <p className="text-slate-500 text-sm mt-1">
-                      Hỗ trợ PDF, JPG, PNG (Max 5MB)
+                      Hỗ trợ PDF, DOCX (Max 5MB)
                     </p>
                   </>
                 )}
@@ -140,10 +161,9 @@ export default function ReviewCVModal({ show, onClose }: any) {
             // Kết quả Review
             <div className="flex flex-col h-full">
               <div className="flex-1 overflow-auto bg-slate-950 p-8 rounded-2xl border border-slate-800 custom-scrollbar shadow-inner">
-                <div
-                  className="prose prose-invert max-w-none prose-headings:text-blue-400 prose-strong:text-white"
-                  dangerouslySetInnerHTML={{ __html: res }}
-                />
+                <div className="prose prose-invert max-w-none prose-headings:text-blue-400 prose-strong:text-white">
+                  <ReactMarkdown>{res || "Đang phân tích..."}</ReactMarkdown>
+                </div>
               </div>
               <div className="pt-4 flex justify-end">
                 <button
@@ -152,8 +172,9 @@ export default function ReviewCVModal({ show, onClose }: any) {
                     setFile(null);
                   }}
                   className="text-slate-400 hover:text-white underline text-sm"
+                  disabled={loading}
                 >
-                  Review CV khác
+                  {loading ? "Vui lòng chờ..." : "Review CV khác"}
                 </button>
               </div>
             </div>

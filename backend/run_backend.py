@@ -28,7 +28,7 @@ def run_server():
     kill_process_on_port(8000)
 
     while True:
-        print("\n🚀 Đang khởi động Backend Server (http://127.0.0.1:8000)...")
+        print("\n[+] Dang khoi dong Backend Server (http://127.0.0.1:8000)...")
         
         # Lệnh chạy server
         # Lưu ý: "app.main:app" nghĩa là vào thư mục app -> file main.py -> biến app
@@ -46,7 +46,7 @@ def run_server():
             break
         
         # Nếu process bị thoát (do crash), in thông báo và chạy lại
-        print("\n⚠️  CẢNH BÁO: Server vừa bị Crash! Đang tự động hồi sinh sau 2 giây...")
+        print("\n[!] CANH BAO: Server vua bi Crash! Dang tu dong hoi sinh sau 2 giay...")
         
         # Dọn dẹp lại port phòng khi process cũ chưa nhả
         kill_process_on_port(8000) 

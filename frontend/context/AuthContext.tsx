@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(storedUser);
-      setRole(storedRole || "user"); // Mặc định là user nếu không có role
+      setRole(storedRole || "user");
     }
 
     setIsLoading(false);

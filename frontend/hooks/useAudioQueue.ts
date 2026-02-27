@@ -4,10 +4,8 @@ export const useAudioQueue = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Khởi tạo Audio khi mount
   useEffect(() => {
     audioRef.current = new Audio();
-    // Cleanup khi unmount
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -16,11 +14,9 @@ export const useAudioQueue = () => {
     };
   }, []);
 
-  // Hàm phát âm thanh từ Blob
   const playAudio = useCallback((blob: Blob) => {
     if (!audioRef.current) return;
 
-    // Dừng âm thanh cũ nếu đang phát
     stopAudio();
 
     const url = URL.createObjectURL(blob);
@@ -30,11 +26,10 @@ export const useAudioQueue = () => {
 
     audioRef.current.onended = () => {
       setIsPlaying(false);
-      URL.revokeObjectURL(url); // Dọn dẹp bộ nhớ
+      URL.revokeObjectURL(url); 
     };
   }, []);
 
-  // Hàm dừng âm thanh khẩn cấp
   const stopAudio = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();

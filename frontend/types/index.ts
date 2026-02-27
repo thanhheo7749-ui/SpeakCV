@@ -9,5 +9,5 @@ export interface ChatState {
   status: string;
   aiText: string;
   userText: string;
-  tempText: string; // Text đang nói dở
+  tempText: string;
 }

@@ -3,12 +3,13 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   Mic,
+  BarChart,
   FileText,
-  Target,
-  BrainCircuit,
-  Sparkles,
+  Star,
   ChevronRight,
+  PlayCircle,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -16,190 +17,393 @@ export default function LandingPage() {
   const { user, isLoading } = useAuth();
 
   const handleStart = () => {
-    if (user) {
-      router.push("/interview");
-    } else {
-      router.push("/login");
-    }
+    router.push("/interview");
   };
 
-  if (isLoading) return <div className="h-screen bg-slate-950"></div>;
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
+  if (isLoading) return <div className="min-h-screen bg-slate-950"></div>;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
-      {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30 overflow-x-hidden">
+      {/* 1. NAVBAR (Sticky & Glassmorphism) */}
+      <nav className="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl border-b border-slate-800/50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer group"
             onClick={() => window.scrollTo(0, 0)}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
               <Mic className="text-white" size={24} />
             </div>
-            <span className="text-2xl font-black italic tracking-tight text-white">
-              Speak<span className="text-blue-400">CV</span>
+            <span className="text-2xl font-black italic tracking-tight text-white group-hover:text-blue-400 transition-colors duration-300">
+              Speak<span className="text-blue-500">CV</span>
             </span>
           </div>
+
+          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
+            <a href="#features" className="hover:text-white transition-colors">
+              Features
+            </a>
+            <a
+              href="#testimonials"
+              className="hover:text-white transition-colors"
+            >
+              Testimonials
+            </a>
+            <a href="#pricing" className="hover:text-white transition-colors">
+              Pricing
+            </a>
+          </div>
+
           <div className="flex gap-4 items-center">
             {user ? (
               <button
                 onClick={() => router.push("/interview")}
-                className="text-sm font-bold text-white hover:text-blue-400 transition-colors"
+                className="text-sm font-bold text-slate-300 hover:text-white transition-colors hidden sm:block"
               >
-                Chào, {user}
+                Hi, {user}
               </button>
             ) : (
               <button
-                onClick={() => router.push("/login")}
-                className="text-sm font-bold text-slate-300 hover:text-white transition-colors"
+                onClick={handleLogin}
+                className="text-sm font-bold text-slate-300 hover:text-white transition-colors hidden sm:block"
               >
-                Đăng nhập
+                Login
               </button>
             )}
             <button
               onClick={handleStart}
-              className="bg-white text-slate-900 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-slate-200 transition-transform active:scale-95 flex items-center gap-2"
+              className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-2.5 rounded-full font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-blue-500/30 active:scale-95 flex items-center gap-2"
             >
-              Vào Phòng Phỏng Vấn <ChevronRight size={16} />
+              Get Started <ChevronRight size={16} />
             </button>
           </div>
         </div>
       </nav>
 
-      {/* HERO SECTION */}
-      <section className="relative pt-40 pb-20 overflow-hidden">
-        {/* Background glow effects */}
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+      {/* 2. HERO SECTION */}
+      <section className="relative pt-40 pb-24 overflow-hidden">
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] sm:w-[800px] h-[400px] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none"></div>
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-sm font-medium text-blue-400 mb-8 animate-in slide-in-from-bottom-4 fade-in duration-700">
-            <Sparkles size={16} /> Công nghệ AI GPT-4o mới nhất
+        <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 text-sm font-medium text-cyan-400 mb-8 animate-in slide-in-from-bottom-4 fade-in duration-700">
+            <Sparkles size={16} /> The ultimate AI Mock Interview platform
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] tracking-tight mb-8 animate-in slide-in-from-bottom-6 fade-in duration-700 delay-100">
-            Vượt qua mọi kỳ phỏng vấn <br />
-            với{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-              AI HR Chuyên Nghiệp
+          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[1.1] tracking-tight mb-8 animate-in slide-in-from-bottom-6 fade-in duration-700 delay-100 max-w-5xl">
+            Master Your Next IT Interview with{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-cyan-400 to-emerald-400">
+              AI
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200">
-            Trải nghiệm cảm giác phỏng vấn thực tế 1-1 bằng giọng nói. Hệ thống
-            sẽ chấm điểm, chỉ ra lỗi sai và gợi ý cách trả lời hoàn hảo nhất để
-            bạn tự tin lấy trọn điểm từ nhà tuyển dụng.
+          <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200">
+            Practice realistic interviews, get instant detailed scoring, and
+            generate a professional CV automatically. Stop guessing, start
+            passing.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-300">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-300 w-full sm:w-auto">
             <button
               onClick={handleStart}
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-lg shadow-[0_0_40px_rgba(37,99,235,0.4)] hover:shadow-[0_0_60px_rgba(37,99,235,0.6)] transition-all hover:-translate-y-1 flex items-center justify-center gap-3"
+              className="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-slate-900 font-bold text-lg hover:bg-slate-100 transition-all flex items-center justify-center gap-3 active:scale-95"
             >
-              <Mic size={24} /> Bắt đầu luyện tập miễn phí
+              <Mic size={22} className="text-blue-600" /> Start Free Interview
             </button>
             <button
-              onClick={() => router.push("/login")}
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-lg border border-slate-700 transition-all flex items-center justify-center gap-3"
+              onClick={() => router.push("/#pricing")}
+              className="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-800/80 hover:bg-slate-800 text-white font-bold text-lg border border-slate-700/50 transition-all flex items-center justify-center gap-3 backdrop-blur-md active:scale-95"
             >
-              <FileText size={24} /> Tạo CV
+              See Pricing
             </button>
+          </div>
+
+          {/* Hero Visual Mockup */}
+          <div className="relative w-full max-w-4xl mx-auto animate-in slide-in-from-bottom-12 fade-in duration-1000 delay-500">
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10 w-full h-full pointer-events-none"></div>
+            <div className="bg-slate-900/80 backdrop-blur-2xl border border-slate-700/60 rounded-3xl p-6 sm:p-10 shadow-[0_0_50px_rgba(59,130,246,0.15)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[80px] rounded-full"></div>
+
+              <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-8 relative z-10">
+                <div className="text-left flex-1">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <Mic className="text-blue-400" size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-xl">
+                        React Native Developer
+                      </h3>
+                      <p className="text-slate-400 text-sm">
+                        TechCorp Inc. • Timed Mode
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-blue-400">
+                          AI
+                        </span>
+                      </div>
+                      <div className="bg-slate-800/50 p-4 rounded-2xl rounded-tl-sm text-sm text-slate-300 border border-slate-700/50">
+                        Can you explain the difference between useMemo and
+                        useCallback in React?
+                      </div>
+                    </div>
+                    <div className="flex gap-3 flex-row-reverse">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-white">
+                          You
+                        </span>
+                      </div>
+                      <div className="bg-blue-600/20 p-4 rounded-2xl rounded-tr-sm text-sm text-blue-100 border border-blue-500/30">
+                        Sure! useMemo is used to memoize values, while
+                        useCallback memoizes functions...
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-full sm:w-64 bg-slate-950/80 p-6 rounded-2xl border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.15)] flex flex-col items-center justify-center text-center shrink-0">
+                  <p className="text-slate-400 text-sm font-bold mb-2 uppercase tracking-wider">
+                    Interview Score
+                  </p>
+                  <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-cyan-400 mb-2">
+                    95<span className="text-2xl text-slate-500">/100</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-emerald-400 text-sm font-medium mt-2 bg-emerald-500/10 px-3 py-1.5 rounded-full">
+                    <CheckCircle2 size={16} /> Excellent Answer
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
-      <section className="py-24 bg-slate-900/50 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* 3. FEATURES SECTION (Grid of 3 Cards) */}
+      <section
+        id="features"
+        className="py-24 bg-slate-900/30 border-y border-slate-800/50 relative"
+      >
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Hệ sinh thái chuẩn bị việc làm toàn diện
+            <h2 className="text-3xl sm:text-5xl font-black text-white mb-6">
+              Why Choose SpeakCV?
             </h2>
-            <p className="text-slate-400">
-              Không chỉ là phỏng vấn, SpeakCV mang đến cho bạn mọi công cụ cần
-              thiết.
+            <p className="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto">
+              Everything you need to confidently ace your next technical
+              interview and land the offer.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 hover:border-blue-500/50 transition-colors group">
-              <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <BrainCircuit className="text-blue-400" size={28} />
+            {/* Card 1 */}
+            <div className="bg-slate-900/80 p-8 rounded-3xl border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2 group shadow-xl">
+              <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-300">
+                <Mic className="text-blue-400" size={32} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">
-                Phỏng vấn Voice AI
+              <h3 className="text-2xl font-bold text-white mb-4">
+                Real-time AI Voice Interviews
               </h3>
-              <p className="text-slate-400 leading-relaxed mb-6">
-                Tương tác bằng giọng nói thời gian thực. AI có khả năng phân
-                tích JD và tùy chỉnh câu hỏi độ khó cao như một HR thực thụ.
+              <p className="text-slate-400 leading-relaxed">
+                Talk naturally with our low-latency AI interviewer. It listens,
+                processes context, and adapts questions dynamically based on
+                your specific industry and previous answers.
               </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2 text-sm text-slate-300">
-                  <CheckCircle2 size={16} className="text-emerald-400" /> Không
-                  giới hạn ngành nghề
-                </li>
-                <li className="flex items-center gap-2 text-sm text-slate-300">
-                  <CheckCircle2 size={16} className="text-emerald-400" /> Chế độ
-                  tính giờ áp lực
-                </li>
-              </ul>
             </div>
 
-            {/* Feature 2 */}
-            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 hover:border-purple-500/50 transition-colors group">
-              <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Target className="text-purple-400" size={28} />
+            {/* Card 2 */}
+            <div className="bg-slate-900/80 p-8 rounded-3xl border border-slate-700/50 hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-2 group shadow-xl">
+              <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-purple-500/20 transition-all duration-300">
+                <BarChart className="text-purple-400" size={32} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">
-                Báo cáo chấm điểm sâu
+              <h3 className="text-2xl font-bold text-white mb-4">
+                Deep Analytics & Scoring
               </h3>
-              <p className="text-slate-400 leading-relaxed mb-6">
-                Kết thúc phỏng vấn, AI sẽ chấm điểm thang 10, phân tích chi tiết
-                từng câu bạn đã nói và đưa ra câu trả lời mẫu hoàn hảo.
+              <p className="text-slate-400 leading-relaxed">
+                Get instantly graded on technical accuracy, soft skills, and
+                communication style. Review detailed feedback, transcript
+                histories, and ideal model answers.
               </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2 text-sm text-slate-300">
-                  <CheckCircle2 size={16} className="text-emerald-400" /> Nhận
-                  xét thái độ, chuyên môn
-                </li>
-                <li className="flex items-center gap-2 text-sm text-slate-300">
-                  <CheckCircle2 size={16} className="text-emerald-400" /> Lưu
-                  trữ lịch sử tiến bộ
-                </li>
-              </ul>
             </div>
 
-            {/* Feature 3 */}
-            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 hover:border-yellow-500/50 transition-colors group">
-              <div className="w-14 h-14 bg-yellow-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <FileText className="text-yellow-400" size={28} />
+            {/* Card 3 */}
+            <div className="bg-slate-900/80 p-8 rounded-3xl border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-300 hover:-translate-y-2 group shadow-xl">
+              <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all duration-300">
+                <FileText className="text-emerald-400" size={32} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">
-                Trình tạo CV Tự động
+              <h3 className="text-2xl font-bold text-white mb-4">
+                1-Click Auto CV Builder
               </h3>
-              <p className="text-slate-400 leading-relaxed mb-6">
-                Nhập thông tin một lần, xuất ra CV PDF siêu nét với các mẫu
-                thiết kế chuẩn ATS giúp qua vòng hồ sơ dễ dàng.
+              <p className="text-slate-400 leading-relaxed">
+                Turn your brilliant interview answers into a polished,
+                ATS-friendly CV automatically. We extract your skills and
+                experiences to generate a ready-to-download PDF.
               </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2 text-sm text-slate-300">
-                  <CheckCircle2 size={16} className="text-emerald-400" /> Gợi ý
-                  viết theo chuẩn STAR
-                </li>
-                <li className="flex items-center gap-2 text-sm text-slate-300">
-                  <CheckCircle2 size={16} className="text-emerald-400" /> Tích
-                  hợp Review CV bằng AI
-                </li>
-              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-8 border-t border-slate-900 text-center text-slate-500 text-sm">
-        <p>© 2026 SpeakCV. Phát triển cho tương lai nghề nghiệp của bạn.</p>
+      {/* 4. SOCIAL PROOF / TESTIMONIALS SECTION */}
+      <section
+        id="testimonials"
+        className="py-24 bg-slate-950 relative overflow-hidden"
+      >
+        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none -translate-y-1/2"></div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-5xl font-black text-white mb-6">
+              Loved by thousands of candidates
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl relative">
+              <div className="flex gap-1 mb-6">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star
+                    key={i}
+                    size={18}
+                    className="fill-yellow-500 text-yellow-500"
+                  />
+                ))}
+              </div>
+              <p className="text-slate-300 mb-8 italic leading-relaxed text-lg">
+                "I was extremely nervous about my first React Native interview.
+                SpeakCV's timed mode helped me get used to the pressure. The
+                feedback was spot on, and I landed the job!"
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  M
+                </div>
+                <div>
+                  <h4 className="text-white font-bold">Minh Pham</h4>
+                  <p className="text-slate-500 text-sm">
+                    Frontend Developer at VNG
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl relative">
+              <div className="flex gap-1 mb-6">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star
+                    key={i}
+                    size={18}
+                    className="fill-yellow-500 text-yellow-500"
+                  />
+                ))}
+              </div>
+              <p className="text-slate-300 mb-8 italic leading-relaxed text-lg">
+                "The AI asks incredibly relevant questions based on the JD. It
+                caught me off guard initially, but practicing with it made the
+                actual Shopee interview feel like a breeze."
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  T
+                </div>
+                <div>
+                  <h4 className="text-white font-bold">Trang Nguyen</h4>
+                  <p className="text-slate-500 text-sm">
+                    Data Analyst at Shopee
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl relative">
+              <div className="flex gap-1 mb-6">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star
+                    key={i}
+                    size={18}
+                    className="fill-yellow-500 text-yellow-500"
+                  />
+                ))}
+              </div>
+              <p className="text-slate-300 mb-8 italic leading-relaxed text-lg">
+                "What amazed me most was the auto CV builder. It took all my
+                answers from the mock interviews and structured them perfectly
+                using the STAR method. Save me hours!"
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  D
+                </div>
+                <div>
+                  <h4 className="text-white font-bold">Duc Tran</h4>
+                  <p className="text-slate-500 text-sm">
+                    Backend Engineer at FPT
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. FINAL CALL TO ACTION & FOOTER */}
+      <section className="py-24 relative px-6">
+        <div className="max-w-5xl mx-auto bg-gradient-to-br from-slate-900 to-slate-950 p-1 md:p-[1px] rounded-[2.5rem] relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-500 opacity-20"></div>
+
+          <div className="bg-slate-950 rounded-[2.4rem] p-10 md:p-20 text-center relative z-10">
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+              Ready to land your dream job?
+            </h2>
+            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+              Join thousands of developers who have leveled up their interview
+              skills. Claim your{" "}
+              <span className="text-cyan-400 font-bold">100 free credits</span>{" "}
+              today.
+            </p>
+            <button
+              onClick={handleStart}
+              className="px-10 py-5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black text-xl hover:scale-105 transition-transform shadow-[0_0_40px_rgba(59,130,246,0.4)] flex items-center justify-center gap-3 mx-auto"
+            >
+              Get Started Now <ChevronRight size={24} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-800/60 bg-slate-950 py-12">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <Mic className="text-blue-500" size={20} />
+            <span className="text-xl font-black italic tracking-tight text-white">
+              Speak<span className="text-blue-500">CV</span>
+            </span>
+          </div>
+          <div className="flex gap-6 text-sm text-slate-500 font-medium">
+            <a href="#" className="hover:text-white transition-colors">
+              Privacy Policy
+            </a>
+            <a href="#" className="hover:text-white transition-colors">
+              Terms of Service
+            </a>
+            <a href="#" className="hover:text-white transition-colors">
+              Contact Support
+            </a>
+          </div>
+          <p className="text-slate-600 text-sm">
+            © {new Date().getFullYear()} SpeakCV. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );

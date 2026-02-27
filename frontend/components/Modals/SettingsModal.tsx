@@ -1,4 +1,6 @@
-import { X, Settings2, Sliders, Clock, Target } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Settings2, Sliders, Clock, Target, Briefcase } from "lucide-react";
+import { getJdTemplates } from "@/services/api";
 
 export default function SettingsModal({
   show,
@@ -16,6 +18,26 @@ export default function SettingsModal({
   timeLimit,
   setTimeLimit,
 }: any) {
+  const [templates, setTemplates] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (show) {
+      getJdTemplates()
+        .then((data) => setTemplates(data.templates || []))
+        .catch((err) => console.log("Lỗi tải JD mẫu:", err));
+    }
+  }, [show]);
+
+  const handleSelectTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = parseInt(e.target.value);
+    const selectedTemplate = templates.find((t) => t.id === selectedId);
+    if (selectedTemplate) {
+      setJd(selectedTemplate.description);
+    } else {
+      setJd("");
+    }
+  };
+
   if (!show) return null;
 
   return (
@@ -34,7 +56,7 @@ export default function SettingsModal({
         </div>
 
         <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
-          {/* CÀI ĐẶT LUẬT CHƠI (CHẾ ĐỘ) */}
+          {/* CÀI ĐẶT CHẾ ĐỘ */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
               <Target size={16} /> Hình thức Phỏng vấn
@@ -42,19 +64,27 @@ export default function SettingsModal({
             <div className="flex gap-3">
               <button
                 onClick={() => setInterviewType("free")}
-                className={`flex-1 py-3 px-4 rounded-xl border font-bold transition-all ${interviewType === "free" ? "bg-blue-600/20 border-blue-500 text-blue-400" : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500"}`}
+                className={`flex-1 py-3 px-4 rounded-xl border font-bold transition-all ${
+                  interviewType === "free"
+                    ? "bg-blue-600/20 border-blue-500 text-blue-400"
+                    : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500"
+                }`}
               >
-                Tự do (Không áp lực)
+                Tự do
               </button>
               <button
                 onClick={() => setInterviewType("timed")}
-                className={`flex-1 py-3 px-4 rounded-xl border font-bold transition-all ${interviewType === "timed" ? "bg-red-600/20 border-red-500 text-red-400" : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500"}`}
+                className={`flex-1 py-3 px-4 rounded-xl border font-bold transition-all ${
+                  interviewType === "timed"
+                    ? "bg-red-600/20 border-red-500 text-red-400"
+                    : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500"
+                }`}
               >
                 Áp lực (Tính giờ)
               </button>
             </div>
 
-            {/* Chỉ hiện khi chọn chế độ Tính giờ */}
+            {/* chế độ Tính giờ */}
             {interviewType === "timed" && (
               <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-5 animate-in slide-in-from-top-2">
                 <div>
@@ -100,52 +130,78 @@ export default function SettingsModal({
 
           <hr className="border-slate-800" />
 
-          {/* CÁC CÀI ĐẶT CŨ CỦA BẠN (GIỮ NGUYÊN) */}
-          <div className="space-y-3">
+          {/* CẤU HÌNH AI */}
+          <div className="space-y-4">
             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
               <Sliders size={16} /> Cấu hình AI
             </h3>
-            <div>
-              <label className="text-sm text-slate-400 mb-1 block">
-                Ngôn ngữ & Giọng đọc
-              </label>
-              <select
-                className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
-                value={voice}
-                onChange={(e) => setVoice(e.target.value)}
-              >
-                <option value="en-US-AndrewMultilingualNeural">
-                  Tiếng Anh (Andrew - Nam)
-                </option>
-                <option value="vi-VN-HoaiMyNeural">
-                  Tiếng Việt (Hoài My - Nữ)
-                </option>
-                <option value="vi-VN-NamMinhNeural">
-                  Tiếng Việt (Nam Minh - Nam)
-                </option>
-              </select>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-400 mb-1 block">
+                  Giọng đọc AI
+                </label>
+                <select
+                  className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                  value={voice}
+                  onChange={(e) => setVoice(e.target.value)}
+                >
+                  <option value="en-US-AndrewMultilingualNeural">
+                    Tiếng Anh (Andrew - Nam)
+                  </option>
+                  <option value="vi-VN-HoaiMyNeural">
+                    Tiếng Việt (Hoài My - Nữ)
+                  </option>
+                  <option value="vi-VN-NamMinhNeural">
+                    Tiếng Việt (Nam Minh - Nam)
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-slate-400 mb-1 block">
+                  Phong cách hỏi
+                </label>
+                <select
+                  className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                  value={mode}
+                  onChange={(e) => setMode(e.target.value)}
+                >
+                  <option value="general">Thân thiện, tổng quan</option>
+                  <option value="technical">Kỹ thuật, chuyên sâu</option>
+                  <option value="behavioral">Tình huống (Behavioral)</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label className="text-sm text-slate-400 mb-1 block">
-                Phong cách hỏi
-              </label>
+
+            <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                  <Briefcase size={16} className="text-yellow-500" />
+                  Mô tả công việc (JD)
+                </label>
+              </div>
+
+              {/* Dropdown chọn JD mẫu */}
               <select
-                className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
-                value={mode}
-                onChange={(e) => setMode(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 outline-none focus:border-yellow-500 cursor-pointer"
+                onChange={handleSelectTemplate}
+                defaultValue=""
               >
-                <option value="general">Thân thiện, tổng quan</option>
-                <option value="technical">Kỹ thuật, chuyên sâu</option>
-                <option value="behavioral">Tình huống (Behavioral)</option>
+                <option value="" disabled>
+                  -- Chọn JD mẫu có sẵn (Tùy chọn) --
+                </option>
+                <option value="">Tự nhập</option>
+                {templates.map((tpl) => (
+                  <option key={tpl.id} value={tpl.id}>
+                    {tpl.title}
+                  </option>
+                ))}
               </select>
-            </div>
-            <div>
-              <label className="text-sm text-slate-400 mb-1 block">
-                Mô tả công việc (JD)
-              </label>
+
+              {/* Ô Textarea */}
               <textarea
-                className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white h-24 outline-none focus:border-blue-500 custom-scrollbar"
-                placeholder="Dán nội dung JD vào đây để AI hỏi sát thực tế..."
+                className="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-white h-32 outline-none focus:border-yellow-500 custom-scrollbar text-sm leading-relaxed placeholder:text-slate-600"
+                placeholder="Dán nội dung JD vào đây hoặc chọn từ mẫu có sẵn ở trên để AI phỏng vấn sát thực tế nhất..."
                 value={jd}
                 onChange={(e) => setJd(e.target.value)}
               />
@@ -155,7 +211,7 @@ export default function SettingsModal({
         <div className="p-4 bg-slate-800/50 border-t border-slate-800 flex justify-end">
           <button
             onClick={onClose}
-            className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-white font-bold transition-all"
+            className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-white font-bold transition-all shadow-lg shadow-blue-600/20"
           >
             Lưu Cài Đặt
           </button>

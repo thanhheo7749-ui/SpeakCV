@@ -5,7 +5,9 @@ import {
   updateProfileInfo,
   addExperience,
   deleteExperience,
+  getHistory,
 } from "@/services/api";
+import { ReportModal } from "@/components/Modals";
 import {
   Save,
   Plus,
@@ -30,6 +32,9 @@ export default function ProfilePage() {
   // Dữ liệu chung
   const [info, setInfo] = useState<any>({});
   const [exps, setExps] = useState<any[]>([]);
+  const [histories, setHistories] = useState<any[]>([]);
+  const [showReport, setShowReport] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<any>(null);
 
   // Form thêm kinh nghiệm
   const [newExp, setNewExp] = useState({
@@ -47,10 +52,11 @@ export default function ProfilePage() {
       return;
     }
 
-    getMyProfile()
-      .then((data) => {
+    Promise.all([getMyProfile(), getHistory()])
+      .then(([data, historyData]) => {
         setInfo({ ...data.info, full_name: data.full_name, email: data.email });
         setExps(data.experiences || []);
+        setHistories(historyData.histories || []);
       })
       .catch(() => alert("Lỗi tải dữ liệu!"))
       .finally(() => setLoading(false));
@@ -162,7 +168,7 @@ export default function ProfilePage() {
 
           {/* NÚT QUAY LẠI TRANG CHỦ */}
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/interview")}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-all font-medium"
           >
             <ArrowLeft size={18} /> Quay lại Trang chủ
@@ -407,7 +413,77 @@ export default function ProfilePage() {
             </button>
           </div>
         </div>
+
+        {/* --- PHẦN 3: LỊCH SỬ PHỎNG VẤN --- */}
+        <div className="bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-800 shadow-xl">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-emerald-400">
+            <span className="text-xl">📊</span> Lịch sử phỏng vấn
+          </h2>
+
+          <div className="space-y-4">
+            {histories.length === 0 ? (
+              <div className="p-8 border-2 border-dashed border-slate-800 rounded-2xl text-center text-slate-500">
+                Chưa có bài phỏng vấn nào. Hãy bắt đầu ngay!
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {histories.map((h: any) => (
+                  <div
+                    key={h.id}
+                    onClick={() => {
+                      setSelectedReport(h);
+                      setShowReport(true);
+                    }}
+                    className="bg-slate-950 p-5 rounded-2xl border border-slate-800 flex justify-between items-center group hover:border-blue-500/50 hover:bg-slate-800 transition-all cursor-pointer shadow-sm relative overflow-hidden"
+                  >
+                    <div
+                      className="absolute top-0 left-0 w-1 h-full"
+                      style={{
+                        backgroundColor:
+                          h.score >= 8
+                            ? "#10b981"
+                            : h.score >= 5
+                              ? "#eab308"
+                              : "#ef4444",
+                      }}
+                    ></div>
+                    <div className="pl-3">
+                      <h3 className="font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">
+                        {h.title || h.position || "Phỏng vấn tự do"}
+                      </h3>
+                      <p className="text-xs text-slate-500 flex items-center gap-1">
+                        {new Date(h.created_at).toLocaleDateString("vi-VN", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                    <div
+                      className={`text-xl font-black px-3 py-1.5 rounded-lg border ${h.score >= 8 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : h.score >= 5 ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}
+                    >
+                      {h.score}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      <ReportModal
+        show={showReport}
+        onClose={() => setShowReport(false)}
+        result={selectedReport}
+        hasHistory={selectedReport?.details?.length > 0}
+        onRetry={() => {
+          setShowReport(false);
+          router.push("/interview");
+        }}
+      />
     </div>
   );
 }
