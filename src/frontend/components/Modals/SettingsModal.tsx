@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 SpeakCV Team
+ * This project is licensed under the MIT License.
+ * See the LICENSE file in the project root for more information.
+ */
+
 import { useState, useEffect } from "react";
 import { X, Settings2, Sliders, Clock, Target, Briefcase } from "lucide-react";
 import { getJdTemplates } from "@/services/api";

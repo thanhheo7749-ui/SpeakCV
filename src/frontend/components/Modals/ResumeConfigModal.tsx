@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 SpeakCV Team
+ * This project is licensed under the MIT License.
+ * See the LICENSE file in the project root for more information.
+ */
+
 import React, { useState, useEffect } from "react";
 import { Play, Settings, X, Clock, HelpCircle } from "lucide-react";
 
