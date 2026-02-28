@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 SpeakCV Team
+ * This project is licensed under the MIT License.
+ * See the LICENSE file in the project root for more information.
+ */
+
 import { useState } from "react";
 import { X, Check, Upload, Loader2, FileText, AlertCircle } from "lucide-react";
 import { reviewCV } from "@/services/api";

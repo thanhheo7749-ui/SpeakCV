@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 SpeakCV Team
+ * This project is licensed under the MIT License.
+ * See the LICENSE file in the project root for more information.
+ */
+
 export const API_URL = "http://127.0.0.1:8000/api";
 
 export const chatWithAI = async (text: string, jd: string, voice: string, mode: string, chatHistory: any[], signal: AbortSignal) => {

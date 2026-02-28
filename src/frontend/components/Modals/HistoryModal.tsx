@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 SpeakCV Team
+ * This project is licensed under the MIT License.
+ * See the LICENSE file in the project root for more information.
+ */
+
 import { X, History, Trophy, Calendar, Briefcase } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getHistory } from "@/services/api";

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 SpeakCV Team
+ * This project is licensed under the MIT License.
+ * See the LICENSE file in the project root for more information.
+ */
+
 export { default as SettingsModal } from "./SettingsModal";
 export { default as ReportModal } from "./ReportModal";
 export { default as ProfileModal } from "./ProfileModal";

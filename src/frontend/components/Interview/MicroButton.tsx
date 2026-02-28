@@ -1,4 +1,10 @@
-import { AudioWave } from "./AudioWave"; // Nhớ đảm bảo AudioWave nằm cùng thư mục
+/*
+ * Copyright (c) 2026 SpeakCV Team
+ * This project is licensed under the MIT License.
+ * See the LICENSE file in the project root for more information.
+ */
+
+import { AudioWave } from "./AudioWave";
 import { StopCircle } from "lucide-react";
 
 interface MicroButtonProps {
