@@ -3,40 +3,30 @@
 # See the LICENSE file in the project root for more information.
 
 services:
-  # --- FRONTEND ---
-  frontend:
-    container_name: speakcv_frontend
-    build:
-      context: ./src/frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-
   # --- BACKEND ---
   backend:
+    build: ./src/backend
     container_name: speakcv_backend
-    build:
-      context: ./src/backend
-      dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    restart: unless-stopped
-
-  # --- DATABASE ---
-  db:
-    image: mysql:8.0
-    container_name: speakcv_mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: speakcv_db
-    ports:
-      - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
-    restart: always
+      - ./src/backend:/app
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:thanhhoang%40123@host.docker.internal:3306/speakcv
+
+  # --- FRONTEND ---
+  frontend:
+    build: ./src/frontend
+    container_name: speakcv_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src/frontend:/app
+      - frontend_node_modules:/app/node_modules
+    command: sh -c "rm -rf /app/.next && npm install && npx next dev -H 0.0.0.0"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NODE_ENV=development
 
 volumes:
-  mysql_data:
+  frontend_node_modules:

@@ -2,30 +2,17 @@
 # This project is licensed under the MIT License.
 # See the LICENSE file in the project root for more information.
 
-# Stage 1: Download dependencies
-FROM node:20-alpine AS deps
+FROM node:20-alpine
 WORKDIR /app
+
+# Copy package files and install dependencies
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm install
 
-# Stage 2: Build App
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copy source code
 COPY . .
-RUN npm run build
-
-# Stage 3: Run App (Production Environment)
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
-ENV PORT 3000
+ENV PORT=3000
 
-CMD ["node", "server.js"]
+CMD ["npx", "next", "dev", "-H", "0.0.0.0"]

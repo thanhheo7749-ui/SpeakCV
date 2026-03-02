@@ -1,0 +1,25 @@
+# 1. CORE WEB SERVER & API
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+
+# 2. DATABASE & ORM
+sqlalchemy
+pymysql
+
+# 3. Authentication & Security
+passlib[argon2]     
+argon2-cffi         
+python-jose[cryptography]
+
+# 4. System Utilities
+python-dotenv       
+
+# 5. CV & AI Processing
+PyPDF2            
+pdfplumber        
+python-docx       
+openai            
+google-generativeai 
+edge-tts
