@@ -15,7 +15,9 @@ import {
   CreditCard,
   FileClock,
   LayoutDashboard,
+  MessageCircle,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -24,6 +26,33 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ activeTab, setActiveTab }: AdminSidebarProps) {
   const router = useRouter();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+        const res = await fetch(`${apiUrl}/api/support/active-chats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const count = data.reduce(
+            (acc: number, chat: any) => acc + chat.unread_count,
+            0,
+          );
+          setUnreadCount(count);
+        }
+      } catch (e) {}
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col p-6 shadow-2xl z-10">
@@ -99,6 +128,24 @@ export function AdminSidebar({ activeTab, setActiveTab }: AdminSidebarProps) {
           }`}
         >
           <Briefcase size={20} /> Thư viện JD
+        </button>
+
+        <button
+          onClick={() => setActiveTab("support")}
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all ${
+            activeTab === "support"
+              ? "bg-pink-500/20 border border-pink-500/30 text-pink-400 shadow-lg shadow-pink-900/20"
+              : "text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <MessageCircle size={20} /> Live Support
+          </div>
+          {unreadCount > 0 && (
+            <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm shadow-red-500/50 animate-pulse">
+              {unreadCount}
+            </span>
+          )}
         </button>
       </div>
 

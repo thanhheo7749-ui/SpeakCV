@@ -8,6 +8,7 @@ import "@/components/css/globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { Toaster } from "react-hot-toast";
+import SupportChatWidget from "@/components/SupportChatWidget";
 
 export default function RootLayout({
   children,
@@ -21,6 +22,7 @@ export default function RootLayout({
           <SubscriptionProvider>
             <Toaster position="top-right" />
             {children}
+            <SupportChatWidget />
           </SubscriptionProvider>
         </AuthProvider>
       </body>

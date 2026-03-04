@@ -93,3 +93,20 @@ class AddCreditRequest(BaseModel):
 class SystemConfigUpdate(BaseModel):
     system_prompt: str
     temperature: float
+
+# --- MODEL CHO SUPPORT CHAT ---
+class SupportMessageCreate(BaseModel):
+    message: str
+
+class SupportMessageResponse(BaseModel):
+    id: int
+    user_id: int
+    admin_id: Optional[int] = None
+    message: str
+    sender_type: str
+    is_read: bool
+    created_at: str # Dùng str để tránh lỗi parse khi gửi qua WebSocket
+
+    class Config:
+        from_attributes = True
+

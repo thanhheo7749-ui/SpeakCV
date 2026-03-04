@@ -102,3 +102,15 @@ class TransactionHistory(Base):
     transaction_type = Column(String(50)) # VD: 'add_credits', 'consume_credits'
     note = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# 9. BẢNG TIN NHẮN HỖ TRỢ TRỰC TIẾP (LIVE SUPPORT)
+class SupportMessage(Base):
+    __tablename__ = "support_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    admin_id = Column(Integer, nullable=True) # ID của admin trả lời, nếu có
+    message = Column(Text)
+    sender_type = Column(String(20)) # 'user' hoặc 'admin'
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

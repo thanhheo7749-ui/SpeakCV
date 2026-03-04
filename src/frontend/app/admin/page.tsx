@@ -18,6 +18,7 @@ import { TemplatesTab } from "@/components/Admin/TemplatesTab";
 import { SystemLogsTab } from "@/components/Admin/SystemLogsTab";
 import { PromptConfigTab } from "@/components/Admin/PromptConfigTab";
 import { TransactionsTab } from "@/components/Admin/TransactionsTab";
+import { SupportTab } from "@/components/Admin/SupportTab";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -73,6 +74,7 @@ export default function AdminPage() {
         {activeTab === "transactions" && <TransactionsTab />}
         {activeTab === "config" && <PromptConfigTab />}
         {activeTab === "templates" && <TemplatesTab />}
+        {activeTab === "support" && <SupportTab />}
       </div>
     </div>
   );
