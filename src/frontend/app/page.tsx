@@ -36,6 +36,15 @@ export default function LandingPage() {
     router.push("/login");
   };
 
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const href = e.currentTarget.getAttribute("href");
+    if (href && href.startsWith("#") && href.length > 1) {
+      const id = href.substring(1);
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   if (isLoading) return <div className="min-h-screen bg-slate-950"></div>;
 
   return (
@@ -56,16 +65,25 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a href="#features" className="hover:text-white transition-colors">
+            <a
+              href="#features"
+              onClick={handleSmoothScroll}
+              className="hover:text-white transition-colors"
+            >
               Features
             </a>
             <a
               href="#testimonials"
+              onClick={handleSmoothScroll}
               className="hover:text-white transition-colors"
             >
               Testimonials
             </a>
-            <a href="#pricing" className="hover:text-white transition-colors">
+            <a
+              href="#pricing"
+              onClick={handleSmoothScroll}
+              className="hover:text-white transition-colors"
+            >
               Pricing
             </a>
           </div>
@@ -126,7 +144,11 @@ export default function LandingPage() {
               <Mic size={22} className="text-blue-600" /> Start Free Interview
             </button>
             <button
-              onClick={() => router.push("/#pricing")}
+              onClick={() =>
+                document
+                  .getElementById("pricing")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
               className="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-800/80 hover:bg-slate-800 text-white font-bold text-lg border border-slate-700/50 transition-all flex items-center justify-center gap-3 backdrop-blur-md active:scale-95"
             >
               See Pricing
