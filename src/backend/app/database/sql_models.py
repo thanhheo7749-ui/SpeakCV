@@ -15,7 +15,7 @@ class User(Base):
     full_name = Column(String(255))
     hashed_password = Column(String(255))
     role = Column(String(50), default="user")
-    credits = Column(Integer, default=50) # Đổi default thành 50 cho khớp với logic Free
+    credits = Column(Integer, default=50)
     last_token_reset_date = Column(Date, default=func.current_date())
 
 # 2. Bảng UserProfile (Thông tin chi tiết)
