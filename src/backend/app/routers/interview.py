@@ -99,6 +99,7 @@ async def transcribe_audio(
 async def chat(request: models.ChatRequest, http_req: Request, db: Session = Depends(get_db)):
     client_ip = http_req.client.host
 
+    user = None
     auth_header = http_req.headers.get("Authorization")
     if not auth_header or auth_header == "Bearer null":
         current_count = guest_ip_tracker.get(client_ip, 0)
@@ -109,6 +110,21 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
             
         guest_ip_tracker[client_ip] = current_count + 1
         print(f"👁️ IP {client_ip} đang dùng lượt thứ {guest_ip_tracker[client_ip]}/20")
+    else:
+        token_str = auth_header.replace("Bearer ", "").strip()
+        try:
+            from ..auth import security
+            email = security.verify_token(token_str)
+            if email:
+                user = db.query(sql_models.User).filter(sql_models.User.email == email).first()
+                if user:
+                    from ..utils import sync_user_tokens
+                    sync_user_tokens(user, db)
+                    
+                    if user.credits < 1:
+                        raise HTTPException(status_code=403, detail="Bạn đã hết số lượng token trong ngày. Vui lòng thử lại vào ngày mai hoặc nâng cấp Pro.")
+        except Exception as e:
+            print(f"Lỗi Auth trong chat: {e}")
     print(f"\n📩 User: {request.user_text} | Voice: {request.voice_id}")
     
     if not api_key: 
@@ -164,6 +180,9 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
             if res.status_code == 200:
                 ai_text = res.json()["choices"][0]["message"]["content"]
                 if ai_text: 
+                    if user:
+                        user.credits -= 1
+                        db.commit()
                     break
             else:
                 print(f"⚠️ Lỗi từ Server AI (Mã {res.status_code}): {res.text}")

@@ -5,6 +5,7 @@ from typing import List
 from ..database import database, sql_models   
 from .. import models                         
 from ..auth import security                   
+from ..utils import sync_user_tokens
 
 router = APIRouter(prefix="/api", tags=["profile"])
 
@@ -17,6 +18,9 @@ def get_current_user(token: str = Depends(security.oauth2_scheme), db: Session =
     user = db.query(sql_models.User).filter(sql_models.User.email == email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User không tồn tại")
+        
+    # Lazy token sync cho bất kỳ endpoint nào dùng get_current_user
+    sync_user_tokens(user, db)
     return user
 
 # --- 1. LẤY FULL PROFILE ---
@@ -35,6 +39,8 @@ def get_my_profile(current_user: sql_models.User = Depends(get_current_user), db
     return {
         "full_name": current_user.full_name,
         "email": current_user.email,
+        "role": current_user.role,
+        "credits": current_user.credits,
         "info": profile, 
         "experiences": exps, 
         "educations": edus
