@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
  */
 
-export const API_URL = "http://127.0.0.1:8000/api";
+export const API_URL = `${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"}/api`;
 
 export const chatWithAI = async (text: string, jd: string, voice: string, mode: string, chatHistory: any[], signal: AbortSignal) => {
   const res = await fetch(`${API_URL}/chat`, {
