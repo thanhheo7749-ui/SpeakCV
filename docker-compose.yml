@@ -7,12 +7,11 @@ services:
   backend:
     build: ./src/backend
     container_name: speakcv_backend
+    restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
       - "8000:8000"
-    volumes:
-      - ./src/backend:/app
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -20,17 +19,17 @@ services:
 
   # --- FRONTEND ---
   frontend:
-    build: ./src/frontend
+    build: 
+      context: ./src/frontend
+      args:
+        - NEXT_PUBLIC_API_URL=http://hoangthanhzzz.id.vn:8000
     container_name: speakcv_frontend
+    restart: unless-stopped
     ports:
       - "3000:3000"
-    volumes:
-      - ./src/frontend:/app
-      - frontend_node_modules:/app/node_modules
-    command: sh -c "rm -rf /app/.next && npm install && npx next dev -H 0.0.0.0"
     environment:
       - NEXT_PUBLIC_API_URL=http://hoangthanhzzz.id.vn:8000
-      - NODE_ENV=development
+      - NODE_ENV=production
 
   # --- DATABASE ---
   db:
@@ -44,5 +43,4 @@ services:
       - db_data:/var/lib/mysql
 
 volumes:
-  frontend_node_modules:
   db_data:
