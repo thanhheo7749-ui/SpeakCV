@@ -10,3 +10,5 @@ export { default as ProfileModal } from "./ProfileModal";
 export { default as GenCVModal } from "./GenCVModal";
 export { default as ReviewCVModal } from "./ReviewCVModal";
 export { ResumeConfigModal } from "./ResumeConfigModal";
+export { default as CheckoutModal } from "./CheckoutModal";
+export { default as SubscriptionModal } from "./SubscriptionModal";

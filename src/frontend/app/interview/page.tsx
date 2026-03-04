@@ -17,6 +17,8 @@ import {
   GenCVModal,
   ReviewCVModal,
   ResumeConfigModal,
+  SubscriptionModal,
+  CheckoutModal,
 } from "@/components/Modals";
 import { MicroButton } from "@/components/Interview/MicroButton";
 import { ChatBox } from "@/components/Interview/ChatBox";
@@ -35,6 +37,7 @@ import { useMicrophone } from "@/hooks/useMicrophone";
 import { useChat } from "@/hooks/useChat";
 import { useAudioQueue } from "@/hooks/useAudioQueue";
 import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/context/SubscriptionContext";
 
 import { useInterviewTimer } from "@/hooks/useInterviewTimer";
 import { useInterviewState } from "@/hooks/useInterviewState";
@@ -42,6 +45,9 @@ import { useInterviewState } from "@/hooks/useInterviewState";
 export default function InterviewRoom() {
   const router = useRouter();
   const { user, logout, isLoading } = useAuth();
+  const { upgradeToPro } = useSubscription();
+  const [showSubscription, setShowSubscription] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const {
     modals,
@@ -398,6 +404,7 @@ export default function InterviewRoom() {
         currentHistoryId={currentHistoryId}
         handleNewChat={handleNewChat}
         isGeneratingReport={isGeneratingReport}
+        onOpenSubscription={() => setShowSubscription(true)}
       />
 
       <main className="flex-1 flex flex-col items-center justify-between py-8 px-6 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
@@ -530,6 +537,19 @@ export default function InterviewRoom() {
         }}
         onConfirm={handleConfirmResume}
         initialConfig={pendingResumeData}
+      />
+      <SubscriptionModal
+        show={showSubscription}
+        onClose={() => setShowSubscription(false)}
+        onUpgrade={() => {
+          setShowSubscription(false);
+          setShowCheckout(true);
+        }}
+      />
+      <CheckoutModal
+        show={showCheckout}
+        onClose={() => setShowCheckout(false)}
+        onSuccess={upgradeToPro}
       />
     </div>
   );

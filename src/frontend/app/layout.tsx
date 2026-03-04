@@ -6,6 +6,7 @@
 
 import "@/components/css/globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
@@ -17,8 +18,10 @@ export default function RootLayout({
     <html lang="vi">
       <body>
         <AuthProvider>
-          <Toaster position="top-right" />
-          {children}
+          <SubscriptionProvider>
+            <Toaster position="top-right" />
+            {children}
+          </SubscriptionProvider>
         </AuthProvider>
       </body>
     </html>

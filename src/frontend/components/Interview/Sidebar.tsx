@@ -25,6 +25,7 @@ import {
   MoreVertical,
   Edit2,
   Trash2,
+  CreditCard,
 } from "lucide-react";
 
 import { renameInterview, deleteInterview } from "@/services/api";
@@ -44,6 +45,7 @@ interface SidebarProps {
   currentHistoryId?: number | null;
   handleNewChat: () => void;
   isGeneratingReport?: boolean;
+  onOpenSubscription?: () => void;
 }
 
 export function Sidebar({
@@ -59,6 +61,7 @@ export function Sidebar({
   setInterviewHistories,
   currentHistoryId,
   isGeneratingReport,
+  onOpenSubscription,
 }: SidebarProps) {
   const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -148,6 +151,15 @@ export function Sidebar({
                   className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700 hover:text-white rounded-lg flex items-center gap-3"
                 >
                   <User size={16} /> Hồ sơ cá nhân
+                </button>
+                <button
+                  onClick={() => {
+                    if (onOpenSubscription) onOpenSubscription();
+                    setShowUserMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700 hover:text-cyan-400 rounded-lg flex items-center gap-3"
+                >
+                  <CreditCard size={16} /> Gói cước của tôi
                 </button>
                 <button
                   onClick={() => {

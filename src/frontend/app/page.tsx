@@ -5,8 +5,12 @@
  */
 
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/context/SubscriptionContext";
+import PricingSection from "@/components/Landing/PricingSection";
+import { CheckoutModal } from "@/components/Modals";
 import {
   Mic,
   BarChart,
@@ -21,6 +25,8 @@ import {
 export default function LandingPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  const { upgradeToPro } = useSubscription();
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const handleStart = () => {
     router.push("/interview");
@@ -361,7 +367,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. FINAL CALL TO ACTION & FOOTER */}
+      {/* 5. PRICING SECTION */}
+      <PricingSection onUpgrade={() => setShowCheckout(true)} />
+
+      {/* 6. FINAL CALL TO ACTION & FOOTER */}
       <section className="py-24 relative px-6">
         <div className="max-w-5xl mx-auto bg-gradient-to-br from-slate-900 to-slate-950 p-1 md:p-[1px] rounded-[2.5rem] relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-500 opacity-20"></div>
@@ -411,6 +420,13 @@ export default function LandingPage() {
           </p>
         </div>
       </footer>
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        show={showCheckout}
+        onClose={() => setShowCheckout(false)}
+        onSuccess={upgradeToPro}
+      />
     </div>
   );
 }
