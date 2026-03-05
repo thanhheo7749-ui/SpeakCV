@@ -26,4 +26,4 @@ def login(user_data: models.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
     access_token = security.create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer", "user_name": user.full_name}
+    return {"access_token": access_token, "token_type": "bearer", "user_name": user.full_name, "role": user.role}

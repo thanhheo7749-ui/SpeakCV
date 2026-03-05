@@ -54,14 +54,20 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     refreshSubscription();
 
-    // Listen for login/logout events (storage changes from AuthContext)
+    // Listen for login/logout events
     const handleStorage = (e: StorageEvent) => {
       if (e.key === "token") {
         refreshSubscription();
       }
     };
+    // auth-changed fires in the same tab (StorageEvent only fires in other tabs)
+    const handleAuthChanged = () => refreshSubscription();
+    window.addEventListener("auth-changed", handleAuthChanged);
     window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("auth-changed", handleAuthChanged);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, [refreshSubscription]);
 
   const upgradeToPro = async () => {

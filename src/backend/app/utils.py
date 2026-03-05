@@ -39,7 +39,7 @@ def sync_user_tokens(user, db: Session):
         user.last_token_reset_date = current_date
         
         # Reset based on user role/package
-        if user.role == "pro":
+        if user.plan == "pro":
             user.credits = 2000
         else:
             user.credits = 50

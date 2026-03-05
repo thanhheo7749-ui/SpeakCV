@@ -24,14 +24,23 @@ export default function SupportChatWidget() {
   const [userId, setUserId] = useState<number | null>(null);
   const ws = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // If the user is an admin, they should use the /admin/support page instead
-  if (role === "admin") return null;
+  const isOpenRef = useRef(false);
+  const reconnectAttempts = useRef(0);
+  const MAX_RECONNECT = 3;
 
   useEffect(() => {
+    isOpenRef.current = isOpen;
     // Only fetch profile and connect WS if the chat is opened and user is pro
     if (isOpen && token && plan === "pro") {
+      reconnectAttempts.current = 0;
       fetchUserIdAndConnect();
+    }
+
+    // Cleanup WebSocket when widget is closed
+    if (!isOpen && ws.current) {
+      ws.current.onclose = null; // prevent reconnect
+      ws.current.close();
+      ws.current = null;
     }
   }, [isOpen, token, plan]);
 
@@ -41,6 +50,9 @@ export default function SupportChatWidget() {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  // If the user is an admin, they should use the /admin/support page instead
+  if (role === "admin") return null;
 
   const fetchUserIdAndConnect = async () => {
     try {
@@ -59,11 +71,17 @@ export default function SupportChatWidget() {
         fetchHistory(uId);
       }
     } catch (e) {
-      console.error("Lỗi khi kết nối support chat:", e);
+      console.error("Error connecting to support chat:", e);
     }
   };
 
   const connectWebSocket = (uId: number) => {
+    // Clean up existing connection
+    if (ws.current) {
+      ws.current.onclose = null;
+      ws.current.close();
+    }
+
     const wsUrl = process.env.NEXT_PUBLIC_API_URL
       ? process.env.NEXT_PUBLIC_API_URL.replace("http", "ws")
       : "ws://127.0.0.1:8000";
@@ -75,16 +93,19 @@ export default function SupportChatWidget() {
         const msg: ChatMessage = JSON.parse(event.data);
         setMessages((prev) => [...prev, msg]);
       } catch (e) {
-        console.error("Lỗi parse tin nhắn ws", e);
+        console.error("Error parsing ws message", e);
       }
     };
 
     socket.onclose = () => {
-      console.log("WebSocket Disconnected. Reconnecting...");
-      // Reconnect logic
-      setTimeout(() => {
-        if (isOpen) connectWebSocket(uId);
-      }, 3000);
+      // Only reconnect if widget is still open and under max attempts
+      if (isOpenRef.current && reconnectAttempts.current < MAX_RECONNECT) {
+        reconnectAttempts.current += 1;
+        console.log(
+          `WebSocket reconnecting (${reconnectAttempts.current}/${MAX_RECONNECT})...`,
+        );
+        setTimeout(() => connectWebSocket(uId), 3000);
+      }
     };
 
     ws.current = socket;
