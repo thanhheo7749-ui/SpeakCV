@@ -27,7 +27,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const data = await loginUser(email, password);
-      // Lưu token vào Context
+      // Save token to Context
       login(data.access_token, data.user_name, data.role || "user");
       router.push("/interview");
     } catch (err: any) {

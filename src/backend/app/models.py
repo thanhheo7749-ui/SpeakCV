@@ -6,7 +6,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 from datetime import date
 
-# --- 1. MODEL CHO PROFILE ---
 class ProfileUpdate(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
@@ -18,7 +17,6 @@ class ProfileUpdate(BaseModel):
     skills: Optional[str] = None
     avatar: Optional[str] = None
 
-# --- 2. MODEL CHO KINH NGHIỆM ---
 class ExperienceCreate(BaseModel):
     company_name: str
     position: str
@@ -27,7 +25,6 @@ class ExperienceCreate(BaseModel):
     is_current: bool = False
     description: Optional[str] = None
 
-# --- 3. MODEL CHO HỌC VẤN ---
 class EducationCreate(BaseModel):
     school_name: str
     degree: str
@@ -35,7 +32,6 @@ class EducationCreate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
 
-# --- CÁC MODEL CŨ ---
 class ChatRequest(BaseModel):
     user_text: str
     jd_text: str = "" 
@@ -62,7 +58,6 @@ class CVGenRequest(BaseModel):
     company: str
     style_instruction: str = ""
 
-# --- THÊM MODEL MỚI CHO AUTH ---
 class UserCreate(BaseModel):
     email: str
     password: str
@@ -85,16 +80,13 @@ class JDTemplateRequest(BaseModel):
     title: str
     description: str
 
-# --- MODEL CHO ADMIN CỘNG CREDIT ---
 class AddCreditRequest(BaseModel):
     amount: int
 
-# --- MODEL CHO CẤU HÌNH HỆ THỐNG ---
 class SystemConfigUpdate(BaseModel):
     system_prompt: str
     temperature: float
 
-# --- MODEL CHO SUPPORT CHAT ---
 class SupportMessageCreate(BaseModel):
     message: str
 
@@ -105,8 +97,7 @@ class SupportMessageResponse(BaseModel):
     message: str
     sender_type: str
     is_read: bool
-    created_at: str # Dùng str để tránh lỗi parse khi gửi qua WebSocket
+    created_at: str  
 
     class Config:
         from_attributes = True
-

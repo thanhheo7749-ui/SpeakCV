@@ -22,7 +22,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       const fileName = selectedFile.name.toLowerCase();
-      // Kiểm tra loại file (chỉ nhận PDF hoặc Word)
+      // Validate file type (only PDF or Word accepted)
       if (
         !fileName.endsWith(".pdf") &&
         !fileName.endsWith(".doc") &&
@@ -110,7 +110,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
                 />
               </div>
 
-              {/* Vùng nhập JD */}
+              {/* JD Input Area */}
               <div className="w-full max-w-md space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   Mô tả công việc (JD) - Dán JD vào đây để AI chấm điểm chuẩn
@@ -124,7 +124,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
                 />
               </div>
 
-              {/* Vùng Upload File */}
+              {/* File Upload Area */}
               <div className="relative w-full max-w-md h-64 border-2 border-dashed border-slate-700 hover:border-blue-500 hover:bg-slate-800/30 rounded-2xl flex flex-col items-center justify-center transition-all group cursor-pointer bg-slate-900">
                 <input
                   type="file"
@@ -162,7 +162,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
                 )}
               </div>
 
-              {/* Thông báo lỗi */}
+              {/* Error Message */}
               {error && (
                 <div className="flex items-center gap-2 text-red-400 bg-red-400/10 px-4 py-2 rounded-lg text-sm">
                   <AlertCircle size={16} /> {error}
@@ -179,7 +179,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
               </button>
             </div>
           ) : (
-            // Kết quả Review
+            // Review Results
             <div className="flex flex-col h-full">
               <div className="flex-1 overflow-auto bg-slate-950 p-8 rounded-2xl border border-slate-800 custom-scrollbar shadow-inner">
                 <div className="prose prose-invert max-w-none prose-headings:text-blue-400 prose-strong:text-white">

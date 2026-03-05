@@ -15,7 +15,7 @@ export function OverviewTab({ stats }: { stats: any }) {
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        {/* Card 1: Tổng User */}
+        {/* Card 1: Total Users */}
         <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 p-8 rounded-3xl flex items-center gap-6 shadow-xl hover:border-blue-500/50 transition-colors">
           <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center shrink-0">
             <Users className="text-blue-400" size={32} />
@@ -30,7 +30,7 @@ export function OverviewTab({ stats }: { stats: any }) {
           </div>
         </div>
 
-        {/* Card 2: Lượt Phỏng vấn */}
+        {/* Card 2: Interview Count */}
         <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 p-8 rounded-3xl flex items-center gap-6 shadow-xl hover:border-emerald-500/50 transition-colors">
           <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center shrink-0">
             <Mic className="text-emerald-400" size={32} />
@@ -45,7 +45,7 @@ export function OverviewTab({ stats }: { stats: any }) {
           </div>
         </div>
 
-        {/* Card 3: Thống kê Token AI */}
+        {/* Card 3: AI Token Stats */}
         <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 p-8 rounded-3xl flex items-center gap-6 shadow-xl hover:border-purple-500/50 transition-colors">
           <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center shrink-0">
             <Cpu className="text-purple-400" size={32} />

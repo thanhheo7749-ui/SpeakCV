@@ -62,7 +62,6 @@ export const getHint = async (lastQuestion: string, jdText: string) => {
 
 // --- GENERATE CV ---
 export const generateCV = async (userProfile: any, position: string, company: string, templateId: string) => {
-    // Tạo prompt cho AI dựa trên template
     const templateInstruction = templateId === 'itviec' 
         ? "Style: Modern, Clean, focus on Skills & Projects (ITViec style)." 
         : templateId === 'creative' 
@@ -76,7 +75,6 @@ export const generateCV = async (userProfile: any, position: string, company: st
             user_info: JSON.stringify(userProfile),
             position: position,
             company: company,
-            // Gửi style hướng dẫn cho AI
             style_instruction: templateInstruction 
         })
     });
@@ -86,7 +84,7 @@ export const generateCV = async (userProfile: any, position: string, company: st
 // --- REVIEW CV ---
 export const reviewCV = async (file: File, company: string, jdText: string = "") => {
     const formData = new FormData();
-    formData.append("file", file); // Key 'file' phải khớp với backend (file: UploadFile)
+    formData.append("file", file);
     if (company.trim()) {
         formData.append("company", company);
     }
@@ -94,11 +92,10 @@ export const reviewCV = async (file: File, company: string, jdText: string = "")
 
     const res = await fetch(`${API_URL}/review-cv`, {
         method: "POST",
-        // LƯU Ý: Không set Content-Type header khi dùng FormData, browser tự set
         body: formData
     });
     
-    if (!res.ok) throw new Error("Lỗi upload");
+    if (!res.ok) throw new Error("Upload failed");
     return res;
 };
 
@@ -108,7 +105,7 @@ export const registerUser = async (email:string, password:string, fullName:strin
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, full_name: fullName })
     });
-    if (!res.ok) { const d = await res.json(); throw new Error(d.detail || "Lỗi đăng ký"); }
+    if (!res.ok) { const d = await res.json(); throw new Error(d.detail || "Registration failed"); }
     return res.json();
 };
 
@@ -117,59 +114,54 @@ export const loginUser = async (email:string, password:string) => {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
     });
-    if (!res.ok) { const d = await res.json(); throw new Error(d.detail || "Lỗi đăng nhập"); }
-    return res.json(); // Trả về { access_token, user_name }
+    if (!res.ok) { const d = await res.json(); throw new Error(d.detail || "Login failed"); }
+    return res.json();
 };
 
 // --- PROFILE APIs ---
 
-// Hàm lấy Token từ LocalStorage
 const getAuthHeaders = () => {
     const token = localStorage.getItem("token");
     return { 
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}` // Gửi token lên
+        "Authorization": `Bearer ${token}`
     };
 };
 
-// 1. Lấy toàn bộ hồ sơ
 export const getMyProfile = async () => {
     const res = await fetch(`${API_URL}/my-profile`, {
-        headers: getAuthHeaders() // Không cần body, chỉ cần header
+        headers: getAuthHeaders()
     });
-    if (!res.ok) throw new Error("Lỗi tải hồ sơ");
+    if (!res.ok) throw new Error("Failed to load profile");
     return res.json();
 };
 
-// 2. Cập nhật thông tin cơ bản
 export const updateProfileInfo = async (data: any) => {
     const res = await fetch(`${API_URL}/my-profile`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
     });
-    if (!res.ok) throw new Error("Lỗi cập nhật");
+    if (!res.ok) throw new Error("Failed to update profile");
     return res.json();
 };
 
-// 3. Thêm kinh nghiệm
 export const addExperience = async (data: any) => {
     const res = await fetch(`${API_URL}/experience`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
     });
-    if (!res.ok) throw new Error("Lỗi thêm kinh nghiệm");
+    if (!res.ok) throw new Error("Failed to add experience");
     return res.json();
 };
 
-// 4. Xóa kinh nghiệm
 export const deleteExperience = async (id: number) => {
     const res = await fetch(`${API_URL}/experience/${id}`, {
         method: "DELETE",
         headers: getAuthHeaders()
     });
-    if (!res.ok) throw new Error("Lỗi xóa");
+    if (!res.ok) throw new Error("Failed to delete");
     return res.json();
 };
 
@@ -192,7 +184,7 @@ export const renameInterview = async (id: number, title: string) => {
         },
         body: JSON.stringify({ title })
     });
-    if (!res.ok) throw new Error("Lỗi đổi tên");
+    if (!res.ok) throw new Error("Failed to rename");
     return res.json();
 };
 
@@ -202,7 +194,7 @@ export const deleteInterview = async (id: number) => {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) throw new Error("Lỗi xóa lịch sử");
+    if (!res.ok) throw new Error("Failed to delete history");
     return res.json();
 };
 
@@ -212,7 +204,7 @@ export const getAdminDashboard = async () => {
   const res = await fetch(`${API_URL}/admin/dashboard`, {
       headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Không có quyền truy cập");
+  if (!res.ok) throw new Error("Access denied");
   return res.json();
 };
 
@@ -221,7 +213,7 @@ export const getSystemLogs = async () => {
   const res = await fetch(`${API_URL}/admin/interviews`, {
       headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Không có quyền truy cập logs");
+  if (!res.ok) throw new Error("Access denied");
   return res.json();
 };
 
@@ -230,7 +222,7 @@ export const getSystemConfig = async () => {
   const res = await fetch(`${API_URL}/admin/config`, {
       headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Không lấy được cấu hình");
+  if (!res.ok) throw new Error("Failed to load config");
   return res.json();
 };
 
@@ -244,11 +236,11 @@ export const updateSystemConfig = async (systemPrompt: string, temperature: numb
       },
       body: JSON.stringify({ system_prompt: systemPrompt, temperature })
   });
-  if (!res.ok) throw new Error("Cập nhật cấu hình thất bại");
+  if (!res.ok) throw new Error("Failed to update config");
   return res.json();
 };
 
-// Nạp thêm Credit cho người dùng (Chỉ Admin)
+// Add credits for a user (Admin only)
 export const addUserCredits = async (userId: number, amount: number) => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/users/${userId}/add-credits`, {
@@ -261,22 +253,22 @@ export const addUserCredits = async (userId: number, amount: number) => {
   });
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.detail || "Có lỗi xảy ra khi cộng credit.");
+    throw new Error(errorData.detail || "Failed to add credits.");
   }
   return res.json();
 };
 
-// Lấy lịch sử giao dịch (Admin)
+// Get transaction history (Admin)
 export const getTransactionLogs = async () => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/transactions`, {
       headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Không có quyền truy cập lịch sử giao dịch");
+  if (!res.ok) throw new Error("Access denied");
   return res.json();
 };
 
-// --- API DỊCH GIỌNG NÓI ---
+// Speech-to-text transcription
 export const transcribeAudio = async (audioBlob: Blob, position: string = "", lang: string = "vi", currentQuestion: string = "") => { 
   const formData = new FormData();
   formData.append("file", audioBlob, "recording.webm");
@@ -293,16 +285,14 @@ export const transcribeAudio = async (audioBlob: Blob, position: string = "", la
   return res.json();
 };
 
-// API QUẢN LÝ THƯ VIỆN JD MẪU (ADMIN)
-
-// 1. Lấy danh sách
+// Get all JD templates
 export const getJdTemplates = async () => {
   const res = await fetch(`${API_URL}/templates`);
-  if (!res.ok) throw new Error("Lỗi lấy danh sách JD");
+  if (!res.ok) throw new Error("Failed to load JD templates");
   return res.json();
 };
 
-// 2. Tạo mới JD
+// Create a new JD template
 export const createJdTemplate = async (data: { title: string; description: string }) => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/templates`, {
@@ -313,11 +303,11 @@ export const createJdTemplate = async (data: { title: string; description: strin
     },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Lỗi tạo JD");
+  if (!res.ok) throw new Error("Failed to create JD template");
   return res.json();
 };
 
-// 3. Cập nhật JD
+// Update a JD template
 export const updateJdTemplate = async (id: number, data: { title: string; description: string }) => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/templates/${id}`, {
@@ -328,11 +318,11 @@ export const updateJdTemplate = async (id: number, data: { title: string; descri
     },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Lỗi cập nhật JD");
+  if (!res.ok) throw new Error("Failed to update JD template");
   return res.json();
 };
 
-// 4. Xóa JD
+// Delete a JD template
 export const deleteJdTemplate = async (id: number) => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/templates/${id}`, {
@@ -341,11 +331,11 @@ export const deleteJdTemplate = async (id: number) => {
       Authorization: `Bearer ${token}` 
     },
   });
-  if (!res.ok) throw new Error("Lỗi xóa JD");
+  if (!res.ok) throw new Error("Failed to delete JD template");
   return res.json();
 };
 
-// Xóa user
+// Delete a user
 export const deleteUser = async (userId: number) => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/users/${userId}`, {
@@ -354,7 +344,7 @@ export const deleteUser = async (userId: number) => {
   });
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.detail || "Lỗi xóa người dùng");
+    throw new Error(errorData.detail || "Failed to delete user");
   }
   return res.json();
 };

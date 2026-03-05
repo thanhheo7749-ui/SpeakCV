@@ -23,7 +23,7 @@ export const MicroButton = ({
 
   return (
     <div className="relative group z-10">
-      {/* Hiệu ứng nền tỏa sáng */}
+      {/* Glow background effect */}
       <div
         className={`absolute -inset-8 rounded-full blur-3xl transition-opacity duration-500 ${isListening ? "opacity-100 bg-red-500/20" : isActive ? "opacity-100 bg-yellow-500/20" : "opacity-20 bg-blue-500/20"}`}
       ></div>
@@ -49,7 +49,7 @@ export const MicroButton = ({
         )}
       </button>
 
-      {/* Nhãn ngôn ngữ */}
+      {/* Language label */}
       <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap">
         <span
           className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ${langLabel === "Tiếng Anh" ? "border-orange-500 text-orange-400 bg-orange-500/10" : "border-emerald-500 text-emerald-400 bg-emerald-500/10"}`}

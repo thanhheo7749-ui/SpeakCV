@@ -127,7 +127,7 @@ export function SystemLogsTab() {
         </div>
       </div>
 
-      {/* MODAL HIỂN THỊ CHAT HISTORY */}
+      {/* MODAL TO DISPLAY CHAT HISTORY */}
       {selectedLog && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
@@ -156,7 +156,7 @@ export function SystemLogsTab() {
                     key={idx}
                     className="space-y-4 relative pl-6 border-l-2 border-slate-800"
                   >
-                    {/* KHỐI AI HỎI */}
+                    {/* AI QUESTION BLOCK */}
                     <div className="relative">
                       <div className="absolute -left-[35px] top-1 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center border-4 border-slate-900 shadow-md">
                         <span className="text-[10px] font-bold text-white">
@@ -173,7 +173,7 @@ export function SystemLogsTab() {
                       </div>
                     </div>
 
-                    {/* KHỐI NGƯỜI DÙNG TRẢ LỜI */}
+                    {/* USER ANSWER BLOCK */}
                     <div className="relative">
                       <div className="absolute -left-[35px] top-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center border-4 border-slate-900 shadow-md">
                         <User size={12} className="text-white" />

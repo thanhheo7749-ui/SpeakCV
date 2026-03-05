@@ -109,7 +109,7 @@ export function Sidebar({
 
   return (
     <nav className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-20 shadow-2xl transition-all relative">
-      {/* 1. KHU VỰC AVATAR & MENU USER */}
+      {/* 1. AVATAR & USER MENU SECTION */}
       <div className="p-4 border-b border-slate-800 relative z-50">
         {user ? (
           <div>
@@ -183,7 +183,7 @@ export function Sidebar({
         )}
       </div>
 
-      {/* 2. COMBO BOX CÔNG CỤ */}
+      {/* 2. TOOLS COMBO BOX */}
       <div className="p-4 border-b border-slate-800">
         <button
           onClick={() => setShowToolsMenu(!showToolsMenu)}
@@ -225,7 +225,7 @@ export function Sidebar({
         )}
       </div>
 
-      {/* 3. KHU VỰC HIỂN THỊ LỊCH SỬ PHỎNG VẤN */}
+      {/* 3. INTERVIEW HISTORY SECTION */}
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar relative">
         <div className="flex justify-between items-center mb-4 sticky top-0 bg-slate-900 pb-2 z-10 border-b border-slate-800/50">
           <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">
@@ -363,7 +363,7 @@ export function Sidebar({
         )}
       </div>
 
-      {/* 4. CÀI ĐẶT & CHẤM DỨT (Dưới cùng) */}
+      {/* 4. SETTINGS & END SESSION (Bottom) */}
       <div className="p-4 border-t border-slate-800 flex gap-2 bg-slate-900/90 backdrop-blur-md">
         <button
           onClick={() => toggleModal("settings", true)}

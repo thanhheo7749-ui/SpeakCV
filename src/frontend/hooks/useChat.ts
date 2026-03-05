@@ -27,10 +27,7 @@ export const useChat = () => {
     setStatus("Đang xử lý");
     setHistory(prev => prev + `\nỨng viên: ${userText}`);
     
-    // Lưu lại history hiện tại để gửi đi
     const currentChatHistory = [...chatHistory];
-    
-    // Cập nhật state với tin nhắn của user
     setChatHistory(prev => [...prev, { role: "user", content: userText }]);
 
     if (abortCtrl.current) abortCtrl.current.abort();
@@ -49,7 +46,7 @@ export const useChat = () => {
       }
 
       if (!res.ok) {
-        throw new Error(`Server báo lỗi: ${res.status}`);
+        throw new Error(`Server error: ${res.status}`);
       }
 
       const responseText = decodeURIComponent(res.headers.get("X-AI-Response-Text") || "");
@@ -69,7 +66,7 @@ export const useChat = () => {
 
     } catch (e: any) {
       if (e.name !== 'AbortError') {
-        toast.error("Lỗi kết nối hoặc Server quá tải!");
+        toast.error("Connection error or server overloaded!");
         setStatus("Sẵn sàng");
       }
     }

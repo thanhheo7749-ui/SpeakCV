@@ -35,14 +35,14 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Dữ liệu chung
+  // General data
   const [info, setInfo] = useState<any>({});
   const [exps, setExps] = useState<any[]>([]);
   const [histories, setHistories] = useState<any[]>([]);
   const [showReport, setShowReport] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);
 
-  // Form thêm kinh nghiệm
+  // Add experience form
   const [newExp, setNewExp] = useState({
     company_name: "",
     position: "",
@@ -50,7 +50,7 @@ export default function ProfilePage() {
     description: "",
   });
 
-  // Tải dữ liệu khi vào trang
+  // Load data when page opens
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -68,7 +68,7 @@ export default function ProfilePage() {
       .finally(() => setLoading(false));
   }, [router]);
 
-  // HÀM NÉN VÀ LƯU ẢNH AVATAR
+  // COMPRESS AND SAVE AVATAR IMAGE
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -77,7 +77,7 @@ export default function ProfilePage() {
     reader.onload = (event) => {
       const img = new Image();
       img.onload = () => {
-        // Nén ảnh xuống kích thước max 300x300 để lưu Database cho nhẹ
+        // Compress image to max 300x300 for lightweight database storage
         const canvas = document.createElement("canvas");
         const MAX_SIZE = 300;
         let width = img.width;
@@ -99,7 +99,7 @@ export default function ProfilePage() {
         const ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, width, height);
 
-        // Chuyển ảnh thành chuỗi Base64
+        // Convert image to Base64 string
         const base64Url = canvas.toDataURL("image/jpeg", 0.8);
         setInfo({ ...info, avatar: base64Url });
       };
@@ -122,7 +122,7 @@ export default function ProfilePage() {
     }
   };
 
-  // Hàm thêm kinh nghiệm
+  // Add experience handler
   const handleAddExp = async () => {
     if (!newExp.company_name || !newExp.position)
       return alert("Vui lòng điền đủ Tên công ty và Vị trí!");
@@ -141,7 +141,7 @@ export default function ProfilePage() {
     }
   };
 
-  // Hàm xóa kinh nghiệm
+  // Delete experience handler
   const handleDeleteExp = async (id: number) => {
     if (!confirm("Bạn có chắc chắn muốn xóa kinh nghiệm này?")) return;
     try {
@@ -163,7 +163,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white pt-10 pb-10 px-4">
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* --- HEADER CÓ NÚT THOÁT --- */}
+        {/* --- HEADER WITH EXIT BUTTON --- */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end border-b border-slate-800 pb-4 gap-4">
           <div>
             <h1 className="text-3xl font-bold">Hồ sơ của tôi</h1>
@@ -172,7 +172,7 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          {/* NÚT QUAY LẠI TRANG CHỦ */}
+          {/* BACK TO HOME BUTTON */}
           <button
             onClick={() => router.push("/interview")}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-all font-medium"
@@ -181,9 +181,9 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {/* --- PHẦN 1: THÔNG TIN CÁ NHÂN --- */}
+        {/* --- SECTION 1: PERSONAL INFO --- */}
         <div className="bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-800 shadow-xl">
-          {/* KHU VỰC AVATAR MỚI THÊM */}
+          {/* AVATAR SECTION */}
           <div className="flex flex-col md:flex-row items-center gap-6 mb-8 pb-8 border-b border-slate-800">
             <div className="relative w-32 h-32 rounded-full border-4 border-slate-700 overflow-hidden bg-slate-800 group cursor-pointer flex-shrink-0 shadow-lg">
               {info.avatar ? (
@@ -195,12 +195,12 @@ export default function ProfilePage() {
               ) : (
                 <User className="w-full h-full p-6 text-slate-500" />
               )}
-              {/* Lớp phủ mờ khi hover */}
+              {/* Overlay on hover */}
               <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <Camera className="text-white mb-1" size={24} />
                 <span className="text-xs font-bold text-white">Đổi ảnh</span>
               </div>
-              {/* Input ẩn để bấm vào là up ảnh */}
+              {/* Hidden file input for avatar upload */}
               <input
                 type="file"
                 accept="image/*"
@@ -220,7 +220,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Các ô input cũ giữ nguyên */}
+            {/* Existing input fields */}
             <div>
               <label className="text-slate-400 text-sm font-bold uppercase">
                 Họ và tên
@@ -330,7 +330,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* --- PHẦN 2: KINH NGHIỆM LÀM VIỆC --- */}
+        {/* --- SECTION 2: WORK EXPERIENCE --- */}
         <div className="bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-800 shadow-xl">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-yellow-400">
             <Briefcase /> Kinh nghiệm làm việc
@@ -420,7 +420,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* --- PHẦN 3: LỊCH SỬ PHỎNG VẤN --- */}
+        {/* --- SECTION 3: INTERVIEW HISTORY --- */}
         <div className="bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-800 shadow-xl">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-emerald-400">
             <span className="text-xl">📊</span> Lịch sử phỏng vấn

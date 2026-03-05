@@ -20,24 +20,24 @@ import toast from "react-hot-toast";
 import { deleteUser, addUserCredits } from "@/services/api";
 
 export function UsersTab({ users }: { users: any[] }) {
-  // 🌟 State tìm kiếm
+  // Search state
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 🌟 State điều khiển Popup nạp Credit
+  // Credit popup control state
   const [creditModalUser, setCreditModalUser] = useState<{
     id: number;
     name: string;
   } | null>(null);
   const [creditAmount, setCreditAmount] = useState<number>(100);
 
-  // Lọc danh sách người dùng theo Tên hoặc Email
+  // Filter user list by Name or Email
   const filteredUsers = users?.filter(
     (u: any) =>
       (u.full_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (u.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
   );
 
-  // Hàm xử lý khi bấm nút Xóa
+  // Handle delete button click
   const handleDelete = async (userId: number, userName: string) => {
     if (
       !window.confirm(
@@ -58,7 +58,7 @@ export function UsersTab({ users }: { users: any[] }) {
     }
   };
 
-  // Hàm thực thi khi bấm nút "Xác Nhận Nạp" trong Popup
+  // Execute when "Confirm" button is clicked in the credit popup
   const submitAddCredits = async () => {
     if (!creditModalUser) return;
 
@@ -72,7 +72,7 @@ export function UsersTab({ users }: { users: any[] }) {
       toast.success(
         `Đã nạp thành công ${creditAmount} Credit cho ${creditModalUser.name}!`,
       );
-      setCreditModalUser(null); // Đóng popup
+      setCreditModalUser(null); // Close popup
       setTimeout(() => window.location.reload(), 1000);
     } catch (error: any) {
       toast.error(error.message || "Có lỗi xảy ra khi nạp Credit!");
@@ -86,7 +86,7 @@ export function UsersTab({ users }: { users: any[] }) {
           Quản lý Tài khoản Ứng viên
         </h2>
 
-        {/* 🌟 THANH TÌM KIẾM */}
+        {/* SEARCH BAR */}
         <div className="relative group w-full md:w-80">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search
@@ -152,7 +152,7 @@ export function UsersTab({ users }: { users: any[] }) {
                     key={u.id}
                     className="hover:bg-slate-800/40 transition-colors group"
                   >
-                    {/* Cột 1: Thông tin User */}
+                    {/* Column 1: User Info */}
                     <td className="p-5">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
@@ -171,7 +171,7 @@ export function UsersTab({ users }: { users: any[] }) {
                       </div>
                     </td>
 
-                    {/* Cột 2: Vai trò */}
+                    {/* Column 2: Role */}
                     <td className="p-5 text-center">
                       <span
                         className={`px-3 py-1 rounded-full text-[11px] font-black tracking-wider ${
@@ -184,7 +184,7 @@ export function UsersTab({ users }: { users: any[] }) {
                       </span>
                     </td>
 
-                    {/* Cột 3: Lượt phỏng vấn */}
+                    {/* Column 3: Interview count */}
                     <td className="p-5 text-center">
                       <div className="flex items-center justify-center gap-1.5 text-slate-300 font-bold">
                         <Activity
@@ -199,7 +199,7 @@ export function UsersTab({ users }: { users: any[] }) {
                       </div>
                     </td>
 
-                    {/* Cột 4: Token tiêu thụ / Credit */}
+                    {/* Column 4: Credits */}
                     <td className="p-5 text-center">
                       <div className="flex items-center justify-center gap-1.5 text-yellow-400 font-bold bg-yellow-400/10 border border-yellow-400/20 px-3 py-1.5 rounded-xl w-fit mx-auto shadow-sm">
                         <Coins size={16} className="animate-bounce-slow" />
@@ -207,10 +207,10 @@ export function UsersTab({ users }: { users: any[] }) {
                       </div>
                     </td>
 
-                    {/* Cột 5: Nút Thao tác */}
+                    {/* Column 5: Action Buttons */}
                     <td className="p-5 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        {/* NÚT MỞ POPUP BƠM CREDIT */}
+                        {/* OPEN CREDIT POPUP BUTTON */}
                         <button
                           onClick={() => {
                             setCreditModalUser({
@@ -224,7 +224,7 @@ export function UsersTab({ users }: { users: any[] }) {
                         >
                           <PlusCircle size={18} />
                         </button>
-                        {/* Nút Xem (Demo) */}
+                        {/* View Button (Demo) */}
                         <button
                           onClick={() =>
                             toast(
@@ -237,7 +237,7 @@ export function UsersTab({ users }: { users: any[] }) {
                         >
                           <Eye size={18} />
                         </button>
-                        {/* Nút Xóa */}
+                        {/* Delete Button */}
                         <button
                           onClick={() => handleDelete(u.id, u.full_name)}
                           className="p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors"
@@ -255,9 +255,7 @@ export function UsersTab({ users }: { users: any[] }) {
         </div>
       </div>
 
-      {/* ======================================================= */}
-      {/* 🌟 POPUP NẠP CREDIT VIP 🌟 */}
-      {/* ======================================================= */}
+      {/* CREDIT POPUP */}
       {creditModalUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
           <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 duration-200">

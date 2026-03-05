@@ -62,7 +62,7 @@ export default function SettingsModal({
         </div>
 
         <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
-          {/* CÀI ĐẶT CHẾ ĐỘ */}
+          {/* MODE SETTINGS */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
               <Target size={16} /> Hình thức Phỏng vấn
@@ -90,7 +90,7 @@ export default function SettingsModal({
               </button>
             </div>
 
-            {/* chế độ Tính giờ */}
+            {/* Timed mode */}
             {interviewType === "timed" && (
               <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-5 animate-in slide-in-from-top-2">
                 <div>
@@ -136,7 +136,7 @@ export default function SettingsModal({
 
           <hr className="border-slate-800" />
 
-          {/* CẤU HÌNH AI */}
+          {/* AI CONFIGURATION */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
               <Sliders size={16} /> Cấu hình AI
@@ -187,7 +187,7 @@ export default function SettingsModal({
                 </label>
               </div>
 
-              {/* Dropdown chọn JD mẫu */}
+              {/* JD template dropdown */}
               <select
                 className="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 outline-none focus:border-yellow-500 cursor-pointer"
                 onChange={handleSelectTemplate}
@@ -204,7 +204,7 @@ export default function SettingsModal({
                 ))}
               </select>
 
-              {/* Ô Textarea */}
+              {/* Textarea */}
               <textarea
                 className="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-white h-32 outline-none focus:border-yellow-500 custom-scrollbar text-sm leading-relaxed placeholder:text-slate-600"
                 placeholder="Dán nội dung JD vào đây hoặc chọn từ mẫu có sẵn ở trên để AI phỏng vấn sát thực tế nhất..."

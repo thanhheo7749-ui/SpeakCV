@@ -78,7 +78,7 @@ export function PromptConfigTab() {
       </div>
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl relative space-y-8">
-        {/* KHỐI SYSTEM PROMPT */}
+        {/* SYSTEM PROMPT BLOCK */}
         <div>
           <label className="flex items-center gap-2 text-lg font-bold text-slate-200 mb-3">
             <Settings2 size={20} className="text-purple-400" />
@@ -96,7 +96,7 @@ export function PromptConfigTab() {
           />
         </div>
 
-        {/* KHỐI NHIỆT ĐỘ (TEMPERATURE) */}
+        {/* TEMPERATURE BLOCK */}
         <div className="pt-4 border-t border-slate-800/80">
           <label className="flex items-center justify-between text-lg font-bold text-slate-200 mb-4">
             <div className="flex items-center gap-2">

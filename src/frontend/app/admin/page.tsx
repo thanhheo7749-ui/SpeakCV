@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { getAdminDashboard } from "@/services/api";
 import { ShieldAlert, ArrowLeft } from "lucide-react";
 
-// Import các file con vừa tạo
+// Import child components
 import { AdminSidebar } from "@/components/Admin/AdminSidebar";
 import { OverviewTab } from "@/components/Admin/OverviewTab";
 import { UsersTab } from "@/components/Admin/UsersTab";
@@ -66,7 +66,7 @@ export default function AdminPage() {
       {/* SIDEBAR Component */}
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* NỘI DUNG Component */}
+      {/* MAIN CONTENT Component */}
       <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
         {activeTab === "overview" && <OverviewTab stats={data?.stats} />}
         {activeTab === "users" && <UsersTab users={data?.users} />}

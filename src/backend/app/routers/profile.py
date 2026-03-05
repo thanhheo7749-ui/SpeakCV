@@ -9,21 +9,18 @@ from ..utils import sync_user_tokens
 
 router = APIRouter(prefix="/api", tags=["profile"])
 
-# --- HÀM LẤY USER HIỆN TẠI ---
 def get_current_user(token: str = Depends(security.oauth2_scheme), db: Session = Depends(database.get_db)):
     email = security.verify_token(token)
     if not email:
-        raise HTTPException(status_code=401, detail="Token không hợp lệ")
+        raise HTTPException(status_code=401, detail="Invalid token")
     
     user = db.query(sql_models.User).filter(sql_models.User.email == email).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User không tồn tại")
+        raise HTTPException(status_code=404, detail="User not found")
         
-    # Lazy token sync cho bất kỳ endpoint nào dùng get_current_user
     sync_user_tokens(user, db)
     return user
 
-# --- 1. LẤY FULL PROFILE ---
 @router.get("/my-profile")
 def get_my_profile(current_user: sql_models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
     profile = db.query(sql_models.UserProfile).filter(sql_models.UserProfile.user_id == current_user.id).first()
@@ -46,7 +43,6 @@ def get_my_profile(current_user: sql_models.User = Depends(get_current_user), db
         "educations": edus
     }
 
-# --- 2. CẬP NHẬT THÔNG TIN CƠ BẢN ---
 @router.put("/my-profile")
 def update_profile(data: models.ProfileUpdate, current_user: sql_models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
     
@@ -58,7 +54,6 @@ def update_profile(data: models.ProfileUpdate, current_user: sql_models.User = D
         profile = sql_models.UserProfile(user_id=current_user.id)
         db.add(profile)
     
-    # Cập nhật từng trường nếu có dữ liệu gửi lên
     if data.phone is not None: profile.phone = data.phone
     if data.address is not None: profile.address = data.address
     if data.summary is not None: profile.summary = data.summary
@@ -69,9 +64,8 @@ def update_profile(data: models.ProfileUpdate, current_user: sql_models.User = D
     if data.avatar is not None: profile.avatar = data.avatar
     
     db.commit()
-    return {"message": "Cập nhật thành công"}
+    return {"message": "Profile updated successfully"}
 
-# --- 3. THÊM KINH NGHIỆM ---
 @router.post("/experience")
 def add_experience(exp: models.ExperienceCreate, current_user: sql_models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
     new_exp = sql_models.Experience(
@@ -85,9 +79,8 @@ def add_experience(exp: models.ExperienceCreate, current_user: sql_models.User =
     )
     db.add(new_exp)
     db.commit()
-    return {"message": "Đã thêm kinh nghiệm"}
+    return {"message": "Experience added successfully"}
 
-# --- 4. XÓA KINH NGHIỆM ---
 @router.delete("/experience/{exp_id}")
 def delete_experience(exp_id: int, current_user: sql_models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
     exp = db.query(sql_models.Experience).filter(
@@ -98,6 +91,6 @@ def delete_experience(exp_id: int, current_user: sql_models.User = Depends(get_c
     if exp:
         db.delete(exp)
         db.commit()
-        return {"message": "Đã xóa"}
+        return {"message": "Deleted successfully"}
     else:
-        raise HTTPException(status_code=404, detail="Không tìm thấy dữ liệu hoặc không có quyền xóa")
+        raise HTTPException(status_code=404, detail="Data not found or access denied")

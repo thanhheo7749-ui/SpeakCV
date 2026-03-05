@@ -6,30 +6,30 @@ from app.database.database import SessionLocal
 from app.database.sql_models import User
 from app.auth.security import get_password_hash
 
-# Khởi tạo kết nối DB
+# Initialize DB connection
 db = SessionLocal()
 
-# Kiểm tra xem admin đã tồn tại chưa
+# Check if admin already exists
 existing_admin = db.query(User).filter(User.email == "admin@gmail.com").first()
 
 if existing_admin:
-    print("⚠️ Tài khoản Admin này đã tồn tại!")
+    print("⚠️ Admin account already exists!")
 else:
-    # Băm mật khẩu
+    # Hash the password
     hashed_pw = get_password_hash("admin123456")
     
-    # Tạo user mới với role 'admin'
+    # Create new user with 'admin' role
     new_admin = User(
         email="admin@gmail.com",
         full_name="Quản trị viên Hệ thống",
         hashed_password=hashed_pw,
-        role="admin"  # Đảm bảo bảng User của bạn có cột role nhé
+        role="admin"
     )
     
     db.add(new_admin)
     db.commit()
-    print("🎉 Đã tạo thành công tài khoản Admin!")
+    print("🎉 Admin account created successfully!")
     print("Email: admin@gmail.com")
-    print("Mật khẩu: admin123456")
+    print("Password: admin123456")
 
 db.close()

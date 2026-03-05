@@ -28,7 +28,7 @@ export function useInterviewTimer({
 
   useEffect(() => {
     let interval: any;
-    // Timer runs when the AI is not speaking/processing (so "Sẵn sàng" or "Đang nghe")
+    // Timer runs when the AI is not speaking/processing ("Ready" or "Listening" status)
     const isUserTurn = status === "Sẵn sàng" || status === "Đang nghe";
     
     if (interviewType === "timed" && hasStarted && isUserTurn && timeLeft > 0) {

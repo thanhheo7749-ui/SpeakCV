@@ -14,7 +14,6 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 
-// Định nghĩa kiểu dữ liệu cho Context
 interface AuthContextType {
   user: string | null;
   role: string | null;

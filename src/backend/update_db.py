@@ -4,7 +4,7 @@ try:
     connection = pymysql.connect(host='localhost', user='root', password='thanhhoang@123', database='speakcv')
     cursor = connection.cursor()
 
-    # Thêm cột last_token_reset_date nếu thiếu
+    # Add last_token_reset_date column if missing
     cursor.execute("SHOW COLUMNS FROM users LIKE 'last_token_reset_date'")
     res = cursor.fetchone()
     if not res:

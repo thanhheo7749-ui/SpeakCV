@@ -13,7 +13,7 @@ export const useMicrophone = (lang: string = "vi-VN") => {
   
   const recognitionRef = useRef<any>(null); 
 
-  // Khởi tạo bộ nghe duy nhất của trình duyệt
+  // Initialize the browser's speech recognition instance
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -23,13 +23,11 @@ export const useMicrophone = (lang: string = "vi-VN") => {
         recognition.interimResults = true;
         recognition.lang = lang;
 
-        // Xử lý khi có âm thanh vào
         recognition.onresult = (event: any) => {
           let finalTxt = "";
           let interimTxt = "";
 
           for (let i = event.resultIndex; i < event.results.length; ++i) {
-            // Trình duyệt tự biết khi nào bạn nói xong 1 câu (ngắt hơi)
             if (event.results[i].isFinal) {
               finalTxt += event.results[i][0].transcript;
             } else {
@@ -37,18 +35,17 @@ export const useMicrophone = (lang: string = "vi-VN") => {
             }
           }
 
-          // Nếu chốt xong 1 câu -> Đẩy thẳng vào khung chat chính
+          // Finalized sentence -> append to main chat text
           if (finalTxt) {
             setText((prev) => (prev + " " + finalTxt).trim());
           }
-          // Chữ đang nói dở (chưa ngắt hơi) -> Cho làm chữ nháp
+          // Interim text (still speaking) -> show as draft
           setTemp(interimTxt); 
         };
 
-        // Xử lý khi bạn bấm tắt Mic
         recognition.onend = () => {
           setIsListening(false);
-          // Gom nốt chữ nháp còn sót lại đẩy vào khung chat
+          // Flush remaining interim text into the main chat
           setTemp((prevTemp) => {
             if (prevTemp) {
               setText((prevText) => (prevText + " " + prevTemp).trim());
@@ -58,7 +55,7 @@ export const useMicrophone = (lang: string = "vi-VN") => {
         };
 
         recognition.onerror = (event: any) => {
-          console.error("Lỗi mic:", event.error);
+          console.error("Mic error:", event.error);
           setIsListening(false);
         };
 
@@ -74,17 +71,16 @@ export const useMicrophone = (lang: string = "vi-VN") => {
         setIsListening(true);
         setTemp("");
       } catch (e) {
-        console.log("Mic đang bật rồi");
+        console.log("Mic is already active");
       }
     } else {
-      alert("Trình duyệt của bạn không hỗ trợ tính năng này (Hãy dùng Chrome hoặc Edge).");
+      alert("Your browser does not support this feature (please use Chrome or Edge).");
     }
   };
 
   const stopRecording = () => {
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
-      // Không cần setText ở đây nữa, sự kiện 'onend' ở trên sẽ tự động lo việc dọn dẹp!
     }
   };
 

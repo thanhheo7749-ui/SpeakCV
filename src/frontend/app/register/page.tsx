@@ -53,7 +53,7 @@ export default function RegisterPage() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* TÁCH 2 CỘT HỌ VÀ TÊN */}
+          {/* SPLIT FIRST AND LAST NAME INTO 2 COLUMNS */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-2 uppercase">

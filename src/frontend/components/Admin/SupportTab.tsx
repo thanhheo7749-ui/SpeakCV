@@ -51,7 +51,7 @@ export function SupportTab() {
       fetchUserMessages(selectedUser.user_id);
       markMessagesAsRead(selectedUser.user_id);
 
-      // Cập nhật ui unread count
+      // Update UI unread count
       setActiveChats((prev) =>
         prev.map((chat) =>
           chat.user_id === selectedUser.user_id
@@ -81,7 +81,7 @@ export function SupportTab() {
         setActiveChats(data);
       }
     } catch (e) {
-      console.error("Lỗi fetch danh sách chat", e);
+      console.error("Error fetching chat list", e);
     }
   };
 
@@ -96,7 +96,7 @@ export function SupportTab() {
         setMessages(data);
       }
     } catch (e) {
-      console.error("Lỗi fetch lịch sử tin nhắn", e);
+      console.error("Error fetching message history", e);
     }
   };
 
@@ -108,7 +108,7 @@ export function SupportTab() {
         headers: { Authorization: `Bearer ${token}` },
       });
     } catch (e) {
-      console.error("Lỗi cập nhật đã đọc", e);
+      console.error("Error marking messages as read", e);
     }
   };
 
@@ -176,7 +176,7 @@ export function SupportTab() {
           // Note: In a real app, you should check if this message's user_id == current selectedUser.user_id
         });
       } catch (e) {
-        console.error("Lỗi parse tin nhắn ws admin", e);
+        console.error("Error parsing admin WS message", e);
       }
     };
 
@@ -223,7 +223,7 @@ export function SupportTab() {
       </div>
 
       <div className="bg-slate-900 rounded-2xl shadow-xl overflow-hidden flex flex-1 border border-slate-700/50">
-        {/* Lịch sử Chats - Cột trái */}
+        {/* Chat History - Left Column */}
         <div className="w-1/3 border-r border-slate-700 bg-slate-900 flex flex-col">
           <div className="p-4 border-b border-slate-700/50 bg-slate-800/50">
             <h2 className="font-semibold flex items-center gap-2 text-slate-200">
@@ -285,7 +285,7 @@ export function SupportTab() {
           </div>
         </div>
 
-        {/* Khung Chat Chi Tiết - Cột phải */}
+        {/* Chat Detail Panel - Right Column */}
         <div className="w-2/3 flex flex-col bg-slate-950 relative">
           {selectedUser ? (
             <>

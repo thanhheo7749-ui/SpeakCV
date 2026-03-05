@@ -28,7 +28,7 @@ export const ChatBox = ({
 }: ChatBoxProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl h-72 z-10">
-      {/* Ô của User */}
+      {/* User's panel */}
       <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-4 backdrop-blur-md shadow-xl flex flex-col hover:border-blue-500/20 transition-colors relative">
         <div className="flex justify-between items-center mb-2 px-2">
           <span className="text-xs font-bold text-blue-500 uppercase tracking-widest flex items-center gap-2">
@@ -74,7 +74,7 @@ export const ChatBox = ({
         </div>
       </div>
 
-      {/* Ô của AI */}
+      {/* AI's panel */}
       <div className="bg-gradient-to-br from-slate-900/80 to-blue-950/20 border border-slate-700/50 rounded-3xl p-6 backdrop-blur-md shadow-xl flex flex-col">
         <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>{" "}

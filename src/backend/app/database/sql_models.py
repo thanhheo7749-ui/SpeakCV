@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKe
 from sqlalchemy.sql import func
 from .database import Base
 
-# 1. Bảng Users (Chỉ chứa thông tin đăng nhập)
+# 1. Users table (login credentials only)
 class User(Base):
     __tablename__ = "users"
 
@@ -18,7 +18,7 @@ class User(Base):
     credits = Column(Integer, default=50)
     last_token_reset_date = Column(Date, default=func.current_date())
 
-# 2. Bảng UserProfile (Thông tin chi tiết)
+# 2. UserProfile table (detailed user info)
 class UserProfile(Base):
     __tablename__ = "user_profiles"
 
@@ -33,7 +33,7 @@ class UserProfile(Base):
     skills = Column(Text, nullable=True)
     avatar = Column(Text, nullable=True)
 
-# 3. Bảng Kinh nghiệm (Experience)
+# 3. Experience table
 class Experience(Base):
     __tablename__ = "experiences"
 
@@ -46,7 +46,7 @@ class Experience(Base):
     is_current = Column(Boolean, default=False)
     description = Column(Text, nullable=True)
 
-# 4. Bảng Học vấn (Education)
+# 4. Education table
 class Education(Base):
     __tablename__ = "educations"
 
@@ -58,7 +58,7 @@ class Education(Base):
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
 
-# 5. Bảng Lịch sử phỏng vấn
+# 5. Interview history table
 class InterviewHistory(Base):
     __tablename__ = "interview_history"
 
@@ -74,7 +74,7 @@ class InterviewHistory(Base):
     time_limit = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-# 6. BẢNG QUẢN LÝ JD MẪU
+# 6. JD Templates table
 class JDTemplate(Base):
     __tablename__ = "jd_templates"
 
@@ -83,7 +83,7 @@ class JDTemplate(Base):
     description = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-# 7. BẢNG CẤU HÌNH HỆ THỐNG
+# 7. System config table
 class SystemConfig(Base):
     __tablename__ = "system_config"
 
@@ -92,25 +92,25 @@ class SystemConfig(Base):
     setting_value = Column(Text)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-# 8. BẢNG LỊCH SỬ GIAO DỊCH (CREDIT)
+# 8. Transaction history table (credits)
 class TransactionHistory(Base):
     __tablename__ = "transaction_history"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     amount = Column(Integer)
-    transaction_type = Column(String(50)) # VD: 'add_credits', 'consume_credits'
+    transaction_type = Column(String(50)) # e.g. 'add_credits', 'consume_credits'
     note = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-# 9. BẢNG TIN NHẮN HỖ TRỢ TRỰC TIẾP (LIVE SUPPORT)
+# 9. Support messages table (live support)
 class SupportMessage(Base):
     __tablename__ = "support_messages"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), index=True)
-    admin_id = Column(Integer, nullable=True) # ID của admin trả lời, nếu có
+    admin_id = Column(Integer, nullable=True) # ID of the responding admin, if any
     message = Column(Text)
-    sender_type = Column(String(20)) # 'user' hoặc 'admin'
+    sender_type = Column(String(20)) # 'user' or 'admin'
     is_read = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

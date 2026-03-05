@@ -320,7 +320,7 @@ export default function InterviewRoom() {
   const handleLoadOldInterview = (h: any) => {
     if (!h.details || h.details.length === 0) return;
 
-    // Lưu tạm data vào state để popup `ResumeConfigModal` xử lý tiếp
+    // Save data temporarily in state for `ResumeConfigModal` to process
     setPendingResumeData(h);
     toggleModal("resumeConfig", true);
   };
@@ -346,7 +346,7 @@ export default function InterviewRoom() {
       }
     });
 
-    // Cập nhật config mới từ Modal
+    // Apply new config from Modal
     setConfig({
       ...config,
       position: h.position || "Tự do",

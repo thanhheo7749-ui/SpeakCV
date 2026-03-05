@@ -67,7 +67,7 @@ export function ResumeConfigModal({
         </div>
 
         <div className="p-6 space-y-6">
-          {/* CHỌN CHẾ ĐỘ PHỎNG VẤN */}
+          {/* SELECT INTERVIEW MODE */}
           <div className="space-y-3">
             <label className="text-sm font-bold text-slate-300">
               Chế độ Phỏng vấn mới
@@ -105,7 +105,7 @@ export function ResumeConfigModal({
             </div>
           </div>
 
-          {/* CẤU HÌNH CHO CHẾ ĐỘ CÓ TÍNH GIỜ */}
+          {/* TIMED MODE CONFIGURATION */}
           {interviewType === "timed" && (
             <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-4">
               <div className="space-y-2">

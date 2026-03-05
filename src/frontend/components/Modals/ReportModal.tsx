@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-// Thêm prop `hasHistory` vào đây
+// Added `hasHistory` prop
 export default function ReportModal({
   show,
   onClose,
@@ -30,7 +30,7 @@ export default function ReportModal({
 
   if (!show) return null;
 
-  // 1. TRƯỜNG HỢP: CHƯA CÓ LỊCH SỬ PHỎNG VẤN NÀO
+  // 1. CASE: NO INTERVIEW HISTORY YET
   if (!hasHistory) {
     return (
       <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
@@ -56,7 +56,7 @@ export default function ReportModal({
     );
   }
 
-  // 2. TRƯỜNG HỢP: ĐÃ CÓ LỊCH SỬ (VẼ BÁO CÁO NHƯ BÌNH THƯỜNG)
+  // 2. CASE: HAS INTERVIEW HISTORY (RENDER REPORT AS NORMAL)
   const report =
     typeof result === "object" && result !== null
       ? result
@@ -130,7 +130,7 @@ export default function ReportModal({
             </div>
           </div>
 
-          {/* CHI TIẾT CÂU HỎI */}
+          {/* QUESTION DETAILS */}
           <div className="mb-6">
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2 border-b border-slate-800 pb-4">
               <MessageCircle className="text-purple-400" size={24} /> Phân Tích

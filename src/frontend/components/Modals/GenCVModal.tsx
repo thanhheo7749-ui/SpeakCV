@@ -19,7 +19,7 @@ import {
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-// 1. DỮ LIỆU GỢI Ý (SMART HINTS)
+// 1. SMART HINTS DATA
 const HINTS: any = {
   summary: {
     title: "Gợi ý viết Mục tiêu nghề nghiệp",
@@ -56,7 +56,7 @@ const HINTS: any = {
   },
 };
 
-// 2. COMPONENT BỔ TRỢ
+// 2. HELPER COMPONENT
 const EditableText = ({
   value,
   onChange,
@@ -101,7 +101,7 @@ const AvatarDisplay = ({ src }: { src?: string }) => {
   );
 };
 
-// 3. COMPONENT CHÍNH
+// 3. MAIN COMPONENT
 export default function GenCVModal({ show, onClose, userProfile }: any) {
   const [cvData, setCvData] = useState<any>({
     full_name: "",
@@ -168,32 +168,32 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
     }
   }, [show, userProfile]);
 
-  // HÀM TẢI FILE PDF MỚI (1-CLICK)
+  // PDF DOWNLOAD HANDLER (1-CLICK)
   const handleDownloadPDF = () => {
-    setFocusedSection(null); // Tắt viền xanh
+    setFocusedSection(null); // Remove blue border
     setIsDownloading(true);
 
     setTimeout(async () => {
       if (!cvRef.current) return;
       try {
-        // 1. Chụp ảnh khối CV với độ nét cao (scale: 2)
+        // 1. Capture the CV block at high resolution (scale: 2)
         const canvas = await html2canvas(cvRef.current, {
           scale: 2,
           useCORS: true,
           backgroundColor: "#ffffff",
         });
 
-        // 2. Chuyển thành ảnh JPEG
+        // 2. Convert to JPEG image
         const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-        // 3. Tạo file PDF chuẩn A4 và dán ảnh vào
+        // 3. Create A4-sized PDF and paste the image
         const pdf = new jsPDF("p", "mm", "a4");
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
         pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-        // 4. Tự động tải về máy
+        // 4. Auto-download to user's device
         const fileName = `${cvData.full_name.replace(/\s+/g, "_")}_CV.pdf`;
         pdf.save(fileName);
       } catch (error) {
@@ -202,7 +202,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
       } finally {
         setIsDownloading(false);
       }
-    }, 300); // Đợi 0.3s cho UI mất hẳn các viền focus rồi mới chụp
+    }, 300); // Wait 0.3s for UI focus borders to disappear before capturing
   };
 
   const updateExp = (index: number, field: string, val: string) => {
@@ -253,7 +253,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
         </div>
 
         <div className="flex gap-6 h-full overflow-hidden">
-          {/* CỘT ĐIỀU KHIỂN BÊN TRÁI */}
+          {/* LEFT CONTROL COLUMN */}
           <div className="w-[25%] flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
             {focusedSection ? (
               <div className="bg-blue-900/20 border border-blue-500/30 p-5 rounded-2xl animate-in slide-in-from-left-4">
@@ -327,15 +327,15 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
             )}
           </div>
 
-          {/* VÙNG XEM TRƯỚC VÀ CHỈNH SỬA CV (BÊN PHẢI) */}
+          {/* CV PREVIEW AND EDIT AREA (RIGHT SIDE) */}
           <div className="w-[75%] bg-slate-800 rounded-2xl border border-slate-700 overflow-auto p-8 custom-scrollbar relative flex justify-center">
-            {/* VÙNG BAO BỌC ZOOM (Scale chỉ hiển thị) */}
+            {/* ZOOM WRAPPER (Display scale only) */}
             <div className="origin-top scale-[0.80] sm:scale-[0.9] lg:scale-[0.95] transition-transform">
               <div
                 ref={cvRef}
                 className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed"
               >
-                {/* --- CỘT TRÁI --- */}
+                {/* --- LEFT COLUMN --- */}
                 <div
                   className="w-[38%] text-white pt-10 pb-8 px-6 flex flex-col items-center"
                   style={{ backgroundColor: theme.leftBg }}
@@ -493,7 +493,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                   </div>
                 </div>
 
-                {/* --- CỘT PHẢI --- */}
+                {/* --- RIGHT COLUMN --- */}
                 <div className="w-[62%] bg-white pt-10 pb-8 px-8 text-gray-800">
                   <div className="mb-8">
                     <div
