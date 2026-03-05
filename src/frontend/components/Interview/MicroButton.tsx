@@ -52,7 +52,7 @@ export const MicroButton = ({
       {/* Language label */}
       <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap">
         <span
-          className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ${langLabel === "Tiếng Anh" ? "border-orange-500 text-orange-400 bg-orange-500/10" : "border-emerald-500 text-emerald-400 bg-emerald-500/10"}`}
+          className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ${langLabel === "English" ? "border-orange-500 text-orange-400 bg-orange-500/10" : "border-emerald-500 text-emerald-400 bg-emerald-500/10"}`}
         >
           Mic: {langLabel}
         </span>

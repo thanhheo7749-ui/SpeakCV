@@ -75,7 +75,8 @@ export default function InterviewRoom() {
     setPendingResumeData,
   } = useInterviewState();
 
-  const micLang = config.mode === "english" ? "en-US" : "vi-VN";
+  const isEnglish = config.voice?.startsWith("en-");
+  const micLang = isEnglish ? "en-US" : "vi-VN";
 
   const { isPlaying, playAudio, stopAudio } = useAudioQueue();
 
@@ -438,7 +439,7 @@ export default function InterviewRoom() {
               <MicroButton
                 status={status}
                 onClick={onMicClick}
-                langLabel={micLang === "en-US" ? "Tiếng Anh" : "Tiếng Việt"}
+                langLabel={isEnglish ? "English" : "Tiếng Việt"}
               />
               <div className="absolute -right-28 top-0 flex flex-col gap-4">
                 <button

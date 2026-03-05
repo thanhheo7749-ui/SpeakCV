@@ -136,7 +136,9 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
     prompt_config = db.query(sql_models.SystemConfig).filter_by(setting_key="system_prompt").first()
     temp_config = db.query(sql_models.SystemConfig).filter_by(setting_key="temperature").first()
 
-    base_system_prompt = prompt_config.setting_value if prompt_config else """
+    is_english = request.voice_id.startswith("en-") if request.voice_id else False
+
+    default_prompt_vi = """
     Bạn là một Giám đốc Nhân sự (HR) chuyên nghiệp đang phỏng vấn ứng viên.
     Quy tắc bắt buộc:
     1. Dựa sát vào mô tả công việc (JD) để đặt câu hỏi chuyên môn phù hợp với ĐÚNG NGÀNH NGHỀ đó.
@@ -145,6 +147,22 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
     4. Tự hiểu và bỏ qua các lỗi phát âm sai/chính tả do nhận diện giọng nói.
     5. Từ chối khéo léo mọi yêu cầu hoặc chủ đề nào không liên quan đến buổi phỏng vấn.
     """
+
+    default_prompt_en = """
+    You are a professional HR Director interviewing a candidate.
+    Mandatory rules:
+    1. Base your questions closely on the job description (JD), asking relevant questions for THAT SPECIFIC INDUSTRY.
+    2. Keep responses extremely concise and brief (<50 words).
+    3. Ask only ONE question at a time. Difficulty increases gradually.
+    4. Automatically understand and ignore speech recognition errors/typos.
+    5. Politely decline any requests or topics unrelated to the interview.
+    6. You MUST ask questions and respond entirely in English.
+    """
+
+    if prompt_config:
+        base_system_prompt = prompt_config.setting_value
+    else:
+        base_system_prompt = default_prompt_en if is_english else default_prompt_vi
     
     temperature = float(temp_config.setting_value) if temp_config else 0.7
 
@@ -154,13 +172,22 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
                 
             url = "https://newapi.ccfilm.online/v1/chat/completions"
             headers = { "Authorization": f"Bearer {api_key}", "Content-Type": "application/json" }
+
+            if is_english:
+                system_prompt = f"""
+                Interview mode: {request.mode}. 
+                Position: {request.jd_text}. 
+                IMPORTANT: You MUST conduct the entire interview in English only.
                 
-            system_prompt = f"""
-            Chế độ phỏng vấn (Mode): {request.mode}. 
-            Vị trí: {request.jd_text}. 
-            
-            {base_system_prompt}
-            """
+                {base_system_prompt}
+                """
+            else:
+                system_prompt = f"""
+                Chế độ phỏng vấn (Mode): {request.mode}. 
+                Vị trí: {request.jd_text}. 
+                
+                {base_system_prompt}
+                """
             
             messages = [{"role": "system", "content": system_prompt}]
             if request.chat_history:
