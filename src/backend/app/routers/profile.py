@@ -38,6 +38,7 @@ def get_my_profile(current_user: sql_models.User = Depends(get_current_user), db
         "email": current_user.email,
         "role": current_user.role,
         "credits": current_user.credits,
+        "plan": current_user.plan or "free",
         "info": profile, 
         "experiences": exps, 
         "educations": edus
@@ -100,5 +101,6 @@ PRO_CREDITS = 2000
 @router.post("/upgrade-pro")
 def upgrade_to_pro(current_user: sql_models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
     current_user.credits = PRO_CREDITS
+    current_user.plan = "pro"
     db.commit()
-    return {"message": "Upgraded to Pro!", "credits": current_user.credits}
+    return {"message": "Upgraded to Pro!", "credits": current_user.credits, "plan": current_user.plan}

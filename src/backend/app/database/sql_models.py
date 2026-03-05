@@ -16,6 +16,7 @@ class User(Base):
     hashed_password = Column(String(255))
     role = Column(String(50), default="user")
     credits = Column(Integer, default=50)
+    plan = Column(String(20), default="free")
     last_token_reset_date = Column(Date, default=func.current_date())
 
 # 2. UserProfile table (detailed user info)

@@ -10,13 +10,16 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
+import { getMyProfile, upgradeToPro as upgradeApi } from "@/services/api";
 
 interface SubscriptionContextType {
   plan: "free" | "pro";
   tokens: number;
   upgradeToPro: () => void;
+  refreshSubscription: () => void;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType>(
@@ -25,44 +28,56 @@ const SubscriptionContext = createContext<SubscriptionContextType>(
 
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const [plan, setPlan] = useState<"free" | "pro">("free");
-  const [tokens, setTokens] = useState(100);
+  const [tokens, setTokens] = useState(50);
 
-  useEffect(() => {
-    const storedPlan = localStorage.getItem("subscription_plan") as
-      | "free"
-      | "pro"
-      | null;
-    const storedTokens = localStorage.getItem("subscription_tokens");
+  const refreshSubscription = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // Not logged in — reset to free defaults
+      setPlan("free");
+      setTokens(50);
+      return;
+    }
 
-    if (storedPlan) {
-      setPlan(storedPlan);
-      setTokens(
-        storedTokens
-          ? parseInt(storedTokens)
-          : storedPlan === "pro"
-            ? 2000
-            : 100,
-      );
+    try {
+      const profile = await getMyProfile();
+      const userPlan = profile.plan === "pro" ? "pro" : "free";
+      setPlan(userPlan);
+      setTokens(profile.credits ?? (userPlan === "pro" ? 2000 : 50));
+    } catch {
+      setPlan("free");
+      setTokens(50);
     }
   }, []);
 
-  const upgradeToPro = async () => {
-    setPlan("pro");
-    setTokens(2000);
-    localStorage.setItem("subscription_plan", "pro");
-    localStorage.setItem("subscription_tokens", "2000");
+  // Refresh subscription on mount and when auth changes
+  useEffect(() => {
+    refreshSubscription();
 
-    // Sync with backend database
+    // Listen for login/logout events (storage changes from AuthContext)
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "token") {
+        refreshSubscription();
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [refreshSubscription]);
+
+  const upgradeToPro = async () => {
     try {
-      const { upgradeToPro: upgradeApi } = await import("@/services/api");
       await upgradeApi();
+      setPlan("pro");
+      setTokens(2000);
     } catch (e) {
-      console.error("Failed to sync upgrade with backend:", e);
+      console.error("Failed to upgrade:", e);
     }
   };
 
   return (
-    <SubscriptionContext.Provider value={{ plan, tokens, upgradeToPro }}>
+    <SubscriptionContext.Provider
+      value={{ plan, tokens, upgradeToPro, refreshSubscription }}
+    >
       {children}
     </SubscriptionContext.Provider>
   );
