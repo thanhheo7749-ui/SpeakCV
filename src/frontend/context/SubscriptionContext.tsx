@@ -46,11 +46,19 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const upgradeToPro = () => {
+  const upgradeToPro = async () => {
     setPlan("pro");
     setTokens(2000);
     localStorage.setItem("subscription_plan", "pro");
     localStorage.setItem("subscription_tokens", "2000");
+
+    // Sync with backend database
+    try {
+      const { upgradeToPro: upgradeApi } = await import("@/services/api");
+      await upgradeApi();
+    } catch (e) {
+      console.error("Failed to sync upgrade with backend:", e);
+    }
   };
 
   return (

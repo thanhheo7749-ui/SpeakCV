@@ -60,6 +60,15 @@ export const getHint = async (lastQuestion: string, jdText: string) => {
   return res.json();
 };
 
+export const upgradeToPro = async () => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/upgrade-pro`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.json();
+};
+
 // --- GENERATE CV ---
 export const generateCV = async (userProfile: any, position: string, company: string, templateId: string) => {
     const templateInstruction = templateId === 'itviec' 
