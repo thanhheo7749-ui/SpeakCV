@@ -360,11 +360,9 @@ export default function InterviewRoom() {
     setHasStarted(true);
     setCurrentHistoryId(h.id);
 
-    if (h.score > 0 || h.details.length > 0) {
-      setSavedReport(h);
-    } else {
-      setSavedReport(null);
-    }
+    // Don't cache old report — let handleOpenReport always re-evaluate
+    // so new questions added during the resumed session are included
+    setSavedReport(null);
 
     if (resumeSettings.interviewType === "timed") {
       resetTimer();
