@@ -20,6 +20,7 @@ import {
   SubscriptionModal,
   CheckoutModal,
 } from "@/components/Modals";
+import SupportChatWidget from "@/components/SupportChatWidget";
 import { MicroButton } from "@/components/Interview/MicroButton";
 import { ChatBox } from "@/components/Interview/ChatBox";
 import { Sidebar } from "@/components/Interview/Sidebar";
@@ -551,6 +552,7 @@ export default function InterviewRoom() {
         onClose={() => setShowCheckout(false)}
         onSuccess={upgradeToPro}
       />
+      <SupportChatWidget />
     </div>
   );
 }
