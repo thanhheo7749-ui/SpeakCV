@@ -127,6 +127,16 @@ export const loginUser = async (email:string, password:string) => {
     return res.json();
 };
 
+export const loginGoogle = async (token: string) => {
+    const res = await fetch(`${API_URL}/auth/google`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+    });
+    if (!res.ok) { const d = await res.json(); throw new Error(d.detail || "Google Login failed"); }
+    return res.json();
+};
+
+
 // --- PROFILE APIs ---
 
 const getAuthHeaders = () => {

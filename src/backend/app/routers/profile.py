@@ -96,7 +96,7 @@ def delete_experience(exp_id: int, current_user: sql_models.User = Depends(get_c
     else:
         raise HTTPException(status_code=404, detail="Data not found or access denied")
 
-PRO_CREDITS = 2000
+PRO_CREDITS = 10000
 
 @router.post("/upgrade-pro")
 def upgrade_to_pro(current_user: sql_models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):

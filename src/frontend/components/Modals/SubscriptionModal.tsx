@@ -27,7 +27,7 @@ export default function SubscriptionModal({
   if (!show) return null;
 
   const isPro = plan === "pro";
-  const maxTokens = isPro ? 2000 : 100;
+  const maxTokens = isPro ? 10000 : 100;
   const percentage = Math.min((tokens / maxTokens) * 100, 100);
 
   return (

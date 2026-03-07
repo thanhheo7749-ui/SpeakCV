@@ -64,6 +64,9 @@ class UserCreate(BaseModel):
     full_name: str
     credits: int = 100
 
+class GoogleAuthRequest(BaseModel):
+    token: str
+
 class UserLogin(BaseModel):
     email: str
     password: str
