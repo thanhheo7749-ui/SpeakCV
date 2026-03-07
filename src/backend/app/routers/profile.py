@@ -5,7 +5,7 @@ from typing import List
 from ..database import database, sql_models   
 from .. import models                         
 from ..auth import security                   
-from ..utils import sync_user_tokens
+from app.utils import sync_user_tokens
 
 router = APIRouter(prefix="/api", tags=["profile"])
 

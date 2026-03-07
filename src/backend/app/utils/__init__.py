@@ -40,9 +40,9 @@ def sync_user_tokens(user, db: Session):
         
         # Reset based on user role/package
         if user.plan == "pro":
-            user.credits = 2000
+            user.credits = 10000
         else:
-            user.credits = 50
+            user.credits = 100
             
         db.commit()
         db.refresh(user)

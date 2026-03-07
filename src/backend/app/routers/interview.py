@@ -118,7 +118,7 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
             if email:
                 user = db.query(sql_models.User).filter(sql_models.User.email == email).first()
                 if user:
-                    from ..utils import sync_user_tokens
+                    from app.utils import sync_user_tokens
                     sync_user_tokens(user, db)
                     
                     if user.credits < 1:

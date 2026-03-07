@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 from ..database.database import get_db
 from ..database import sql_models
 from .profile import get_current_user
-from ..core.config import settings
-from ..utils.vnpay import VnPay
+from app.core.config import settings
+from app.utils.vnpay import VnPay
 
 router = APIRouter(
     prefix="/api/payment",
