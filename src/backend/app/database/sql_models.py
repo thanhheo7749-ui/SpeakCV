@@ -115,3 +115,15 @@ class SupportMessage(Base):
     sender_type = Column(String(20)) # 'user' or 'admin'
     is_read = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# 10. Transactions table (VNPAY)
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    amount = Column(Integer)
+    txn_ref = Column(String(100), unique=True, index=True)
+    status = Column(String(50), default="pending") # 'pending', 'success', 'failed'
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+

@@ -7,6 +7,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import {
   X,
   Crown,
@@ -31,6 +32,7 @@ export default function CheckoutModal({
   onClose,
   onSuccess,
 }: CheckoutModalProps) {
+  const { token } = useAuth();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -44,16 +46,38 @@ export default function CheckoutModal({
     onClose();
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!formData.name.trim() || !formData.phone.trim()) return;
     setIsProcessing(true);
 
-    // Simulate payment processing
-    setTimeout(() => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+      const res = await fetch(`${apiUrl}/api/payment/create-url`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Lỗi khi tạo URL thanh toán");
+      }
+
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url; // Chuyển hướng sang VNPAY
+      } else {
+        setIsProcessing(false);
+        alert("Không nhận được URL thanh toán từ server.");
+      }
+    } catch (error) {
+      console.error("Payment setup error:", error);
       setIsProcessing(false);
-      setStep(3);
-      onSuccess();
-    }, 2000);
+      alert(
+        "Đã xảy ra lỗi khi kết nối với cổng thanh toán. Vui lòng thử lại sau.",
+      );
+    }
   };
 
   const handleGoHome = () => {
@@ -135,7 +159,7 @@ export default function CheckoutModal({
                 <span className="text-slate-400 text-sm font-medium">
                   Token hàng tháng
                 </span>
-                <span className="text-cyan-400 font-bold">2.000 token</span>
+                <span className="text-cyan-400 font-bold">10.000 token</span>
               </div>
               <div className="flex justify-between items-center mb-4">
                 <span className="text-slate-400 text-sm font-medium">
@@ -222,7 +246,7 @@ export default function CheckoutModal({
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm">Gói Pro</p>
-                  <p className="text-slate-500 text-xs">2.000 token / tháng</p>
+                  <p className="text-slate-500 text-xs">10.000 token / tháng</p>
                 </div>
               </div>
               <span className="text-cyan-400 font-black">99.000đ</span>
@@ -279,7 +303,7 @@ export default function CheckoutModal({
               <span className="text-cyan-400 font-bold">Pro</span>
             </p>
             <p className="text-slate-500 text-xs mb-8">
-              2.000 token đã được cộng vào tài khoản của bạn
+              10.000 token đã được cộng vào tài khoản của bạn
             </p>
 
             {/* Upgrade summary */}
@@ -293,7 +317,7 @@ export default function CheckoutModal({
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="bg-slate-900 rounded-xl p-3">
                   <p className="text-slate-500 text-xs mb-1">Token</p>
-                  <p className="text-cyan-400 font-black text-lg">2.000</p>
+                  <p className="text-cyan-400 font-black text-lg">10.000</p>
                 </div>
                 <div className="bg-slate-900 rounded-xl p-3">
                   <p className="text-slate-500 text-xs mb-1">Phỏng vấn</p>

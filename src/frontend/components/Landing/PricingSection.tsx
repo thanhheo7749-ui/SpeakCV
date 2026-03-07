@@ -27,7 +27,7 @@ export default function PricingSection({ onUpgrade }: PricingSectionProps) {
   ];
 
   const proBenefits = [
-    "2.000 token mỗi tháng",
+    "10.000 token mỗi tháng",
     "Phỏng vấn không giới hạn",
     "Truy cập mọi tính năng VIP",
     "Tạo CV chuyên nghiệp",
