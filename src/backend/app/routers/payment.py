@@ -18,7 +18,8 @@ router = APIRouter(
 
 @router.post("/create-url")
 def create_payment_url(request: Request, db: Session = Depends(get_db), current_user: sql_models.User = Depends(get_current_user)):
-    txn_ref = str(uuid.uuid4())
+    # VNPAY requires vnp_TxnRef to only contain alphanumeric characters
+    txn_ref = str(uuid.uuid4()).replace("-", "")
     amount = 99000
     
     # 1. Store transaction in DB
