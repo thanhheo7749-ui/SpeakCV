@@ -157,7 +157,7 @@ export default function CheckoutModal({
               </div>
               <div className="flex justify-between items-center mb-4">
                 <span className="text-slate-400 text-sm font-medium">
-                  Token hàng tháng
+                  Token hàng ngày
                 </span>
                 <span className="text-cyan-400 font-bold">10.000 token</span>
               </div>
