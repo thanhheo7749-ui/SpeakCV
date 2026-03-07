@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from ..database.database import get_db
 from ..database import sql_models
-from ..auth.security import get_current_user
+from .profile import get_current_user
 from ..core.config import settings
 from ..utils.vnpay import VnPay
 
@@ -19,7 +19,7 @@ router = APIRouter(
 @router.post("/create-url")
 def create_payment_url(request: Request, db: Session = Depends(get_db), current_user: sql_models.User = Depends(get_current_user)):
     txn_ref = str(uuid.uuid4())
-    amount = 99000  # 99.000 VND theo giao diện Pro Plan
+    amount = 99000
     
     # 1. Store transaction in DB
     transaction = sql_models.Transaction(
