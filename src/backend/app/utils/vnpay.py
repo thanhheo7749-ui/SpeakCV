@@ -13,21 +13,33 @@ class VnPay:
     def __init__(self, tmn_code, secret_key, return_url, vnpay_payment_url):
         self.tmn_code = tmn_code.strip() if tmn_code else ""
         self.secret_key = secret_key.strip() if secret_key else ""
-        self.return_url = return_url.strip() if return_url else ""
+        
+        ret_url = return_url.strip() if return_url else ""
+        if ret_url and not ret_url.startswith("http"):
+            ret_url = "https://" + ret_url
+        self.return_url = ret_url
+        
         self.vnpay_payment_url = vnpay_payment_url.strip() if vnpay_payment_url else ""
 
     def _remove_accents(self, input_str: str) -> str:
         s1 = unicodedata.normalize('NFKD', input_str).encode('ascii', 'ignore').decode('utf-8')
-        # Only keep alphanumeric and spaces just to be absolutely safe for VNPAY
-        return re.sub(r'[^a-zA-Z0-9\s]', '', s1).strip()
+        # Only keep alphanumeric characters (no spaces, no special chars)
+        # This prevents urllib.parse.quote_plus from turning spaces into '+' which VNPAY might reject
+        return re.sub(r'[^a-zA-Z0-9]', '', s1).strip()
 
     def get_payment_url(self, order_id: str, amount: int, order_desc: str, ip_address: str) -> str:
-        # Prevent accents in order desc
+        # Prevent accents and spaces in order desc
         clean_order_desc = self._remove_accents(order_desc)
         if not clean_order_desc:
-            clean_order_desc = "Thanh toan don hang"
+            clean_order_desc = "Thanhtoandonhang"
             
         tz_vn = timezone(timedelta(hours=7))
+        
+        # Ensure IP is an IPv4 string without extra routing info
+        clean_ip = str(ip_address).strip()
+        if not clean_ip or len(clean_ip) > 15 or ":" in clean_ip:
+            clean_ip = "127.0.0.1"
+            
         vnp_Params = {
             "vnp_Version": "2.1.0",
             "vnp_Command": "pay",
@@ -39,7 +51,7 @@ class VnPay:
             "vnp_OrderType": "other",
             "vnp_Locale": "vn",
             "vnp_ReturnUrl": self.return_url,
-            "vnp_IpAddr": str(ip_address).strip()[:40] if ip_address and str(ip_address).strip() != "" else "127.0.0.1",
+            "vnp_IpAddr": clean_ip,
             "vnp_CreateDate": datetime.now(tz_vn).strftime("%Y%m%d%H%M%S"),
         }
 
