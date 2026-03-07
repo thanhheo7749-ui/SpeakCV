@@ -252,10 +252,11 @@ async def end_interview(request: models.ReportRequest, current_user: sql_models.
         system_prompt = f"""
         Bạn là HR. Đánh giá ứng viên vị trí: {request.jd_text}.
         DỰA CHÍNH XÁC VÀO LỊCH SỬ PHỎNG VẤN. QUY TẮC TỐI THƯỢNG:
-        1. TUYỆT ĐỐI KHÔNG tự bịa ra câu trả lời của ứng viên.
-        2. PHÂN BIỆT RÕ RÀNG TRẠNG THÁI TRẢ LỜI: BẠN CHỈ ĐƯỢC PHÉP ghi 'Ứng viên chưa trả lời' vào `candidate_answer` nếu trong lịch sử AI vừa hỏi mà ứng viên chưa có câu trả lời nào bên dưới, hoặc ứng viên CỐ TÌNH BỎ QUA (dùng từ 'next', 'không biết', 'bỏ qua'). Không trừ điểm câu đó nếu bị ngắt do lỗi hệ thống.
-        3. NẾU ỨNG VIÊN CÓ ĐƯA RA CÂU TRẢ LỜI: Cho dù câu trả lời đó sai kiến thức, thiếu ý, lan man, hay ngô nghê, BẠN BẮT BUỘC PHẢI trích dẫn nguyên văn câu nói đó vào trường `candidate_answer`. TUYỆT ĐỐI KHÔNG ĐƯỢC gán nhãn là 'Ứng viên chưa trả lời' trong trường hợp này.
-        4. Đối với các câu trả lời sai/thiếu đó, hãy chấm điểm thấp và ghi rõ lý do sai vào trường `evaluation`.
+        1. BẮT BUỘC PHẢI TRÍCH XUẤT VÀ ĐÁNH GIÁ TẤT CẢ CÁC CÂU HỎI CỦA AI CÓ TRONG LỊCH SỬ. SỐ LƯỢNG OBJECT TRONG MẢNG `details` PHẢI BẰNG ĐÚNG SỐ LƯỢNG CÂU HỎI TRONG LỊCH SỬ! TUYỆT ĐỐI KHÔNG ĐƯỢC LƯỢC BỎ BẤT KỲ CÂU NÀO.
+        2. TUYỆT ĐỐI KHÔNG tự bịa ra câu trả lời của ứng viên.
+        3. PHÂN BIỆT RÕ RÀNG TRẠNG THÁI TRẢ LỜI: BẠN CHỈ ĐƯỢC PHÉP ghi 'Ứng viên chưa trả lời' vào `candidate_answer` nếu trong lịch sử AI vừa hỏi mà ứng viên chưa có câu trả lời nào bên dưới, hoặc ứng viên CỐ TÌNH BỎ QUA (dùng từ 'next', 'không biết', 'bỏ qua'). Không trừ điểm câu đó nếu bị ngắt do lỗi hệ thống.
+        4. NẾU ỨNG VIÊN CÓ ĐƯA RA CÂU TRẢ LỜI: Cho dù câu trả lời đó sai kiến thức, thiếu ý, lan man, hay ngô nghê, BẠN BẮT BUỘC PHẢI trích dẫn nguyên văn câu nói đó vào trường `candidate_answer`. TUYỆT ĐỐI KHÔNG ĐƯỢC gán nhãn là 'Ứng viên chưa trả lời' trong trường hợp này.
+        5. Đối với các câu trả lời sai/thiếu đó, hãy chấm điểm thấp và ghi rõ lý do sai vào trường `evaluation`.
         
         QUY TẮC QUAN TRỌNG VỀ LỊCH SỬ BỊ GIÁN ĐOẠN: 
         Nếu ứng viên trả lời một câu hỏi cũ đã từng bị bỏ qua hoặc bị ngắt quãng trước đó, bạn PHẢI tự động ghép nối câu trả lời mới đó vào đúng câu hỏi tương ứng. GHI ĐÈ lên trạng thái 'Ứng viên chưa trả lời'. TUYỆT ĐỐI KHÔNG tạo ra 2 bản ghi trùng lặp cho cùng 1 câu hỏi.
@@ -272,6 +273,7 @@ async def end_interview(request: models.ReportRequest, current_user: sql_models.
                     "evaluation": "<Nhận xét chi tiết>",
                     "ideal_answer": "<Câu trả lời mẫu>"
                 }}
+                ... (LẶP LẠI CHO TẤT CẢ CÁC CÂU HỎI TRONG LỊCH SỬ, CŨ LẪN MỚI)
             ]
         }}
         """
