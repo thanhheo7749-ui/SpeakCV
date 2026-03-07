@@ -5,6 +5,8 @@
 import urllib.parse
 import hashlib
 import hmac
+import unicodedata
+import re
 from datetime import datetime
 
 class VnPay:
@@ -14,7 +16,17 @@ class VnPay:
         self.return_url = return_url
         self.vnpay_payment_url = vnpay_payment_url
 
+    def _remove_accents(self, input_str: str) -> str:
+        s1 = unicodedata.normalize('NFKD', input_str).encode('ascii', 'ignore').decode('utf-8')
+        # Only keep alphanumeric and spaces just to be absolutely safe for VNPAY
+        return re.sub(r'[^a-zA-Z0-9\s]', '', s1).strip()
+
     def get_payment_url(self, order_id: str, amount: int, order_desc: str, ip_address: str) -> str:
+        # Prevent accents in order desc
+        clean_order_desc = self._remove_accents(order_desc)
+        if not clean_order_desc:
+            clean_order_desc = "Thanh toan don hang"
+            
         vnp_Params = {
             "vnp_Version": "2.1.0",
             "vnp_Command": "pay",
@@ -22,7 +34,7 @@ class VnPay:
             "vnp_Amount": str(int(amount) * 100),
             "vnp_CurrCode": "VND",
             "vnp_TxnRef": str(order_id),
-            "vnp_OrderInfo": order_desc,
+            "vnp_OrderInfo": clean_order_desc,
             "vnp_OrderType": "other",
             "vnp_Locale": "vn",
             "vnp_ReturnUrl": self.return_url,
@@ -30,46 +42,47 @@ class VnPay:
             "vnp_CreateDate": datetime.now().strftime("%Y%m%d%H%M%S"),
         }
 
-        vnp_Params = {k: v for k, v in vnp_Params.items() if v != "" and v is not None}
+        vnp_Params = {k: v for k, v in vnp_Params.items() if v is not None and str(v).strip() != ""}
 
         # Sort alphabetically
         inputData = sorted(vnp_Params.items())
         
-        hasData = ''
-        seq = 0
-        for key, val in inputData:
-            if seq == 1:
-                hasData = hasData + "&" + str(key) + '=' + urllib.parse.quote_plus(str(val))
-            else:
-                seq = 1
-                hasData = str(key) + '=' + urllib.parse.quote_plus(str(val))
+        # Build hash data
+        hasData = "&".join([f"{key}={urllib.parse.quote_plus(str(val))}" for key, val in inputData])
 
-        hashValue = hmac.new(self.secret_key.encode('utf-8'), hasData.encode('utf-8'), hashlib.sha512).hexdigest()
+        hashValue = hmac.new(
+            self.secret_key.encode('utf-8'),
+            hasData.encode('utf-8'),
+            hashlib.sha512
+        ).hexdigest()
 
         # Build the final URL
         return self.vnpay_payment_url + "?" + hasData + "&vnp_SecureHash=" + hashValue
 
     def validate_response(self, vnp_Params: dict) -> bool:
-        vnp_SecureHash = vnp_Params.pop("vnp_SecureHash", None)
-        vnp_Params.pop("vnp_SecureHashType", None)
+        # Clone to avoid mutating original dictionary if used later
+        params = vnp_Params.copy()
+        
+        vnp_SecureHash = params.pop("vnp_SecureHash", None)
+        params.pop("vnp_SecureHashType", None)
 
         if not vnp_SecureHash:
             return False
 
+        # Filter empty
+        params = {k: v for k, v in params.items() if v is not None and str(v).strip() != ""}
+
         # Sort
-        inputData = sorted(vnp_Params.items())
+        inputData = sorted(params.items())
         
         # Build hash data
-        hasData = ''
-        seq = 0
-        for key, val in inputData:
-            if seq == 1:
-                hasData = hasData + "&" + str(key) + '=' + urllib.parse.quote_plus(str(val))
-            else:
-                seq = 1
-                hasData = str(key) + '=' + urllib.parse.quote_plus(str(val))
+        hasData = "&".join([f"{key}={urllib.parse.quote_plus(str(val))}" for key, val in inputData])
         
         # Check signature matches
-        hashValue = hmac.new(self.secret_key.encode('utf-8'), hasData.encode('utf-8'), hashlib.sha512).hexdigest()
+        hashValue = hmac.new(
+            self.secret_key.encode('utf-8'),
+            hasData.encode('utf-8'),
+            hashlib.sha512
+        ).hexdigest()
         
         return hashValue == vnp_SecureHash
