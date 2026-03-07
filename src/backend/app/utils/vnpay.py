@@ -19,29 +19,35 @@ class VnPay:
             "vnp_Version": "2.1.0",
             "vnp_Command": "pay",
             "vnp_TmnCode": self.tmn_code,
-            "vnp_Amount": str(amount * 100),
+            "vnp_Amount": str(int(amount) * 100),
             "vnp_CurrCode": "VND",
-            "vnp_TxnRef": order_id,
+            "vnp_TxnRef": str(order_id),
             "vnp_OrderInfo": order_desc,
             "vnp_OrderType": "other",
             "vnp_Locale": "vn",
             "vnp_ReturnUrl": self.return_url,
-            "vnp_IpAddr": ip_address,
+            "vnp_IpAddr": ip_address if ip_address else "127.0.0.1",
             "vnp_CreateDate": datetime.now().strftime("%Y%m%d%H%M%S"),
         }
 
-        # Sort alphabetically
-        vnp_Params = dict(sorted(vnp_Params.items()))
+        vnp_Params = {k: v for k, v in vnp_Params.items() if v != "" and v is not None}
 
-        # Build hash data
-        hash_data = "&".join(f"{k}={urllib.parse.quote_plus(str(v))}" for k, v in vnp_Params.items())
+        # Sort alphabetically
+        inputData = sorted(vnp_Params.items())
         
-        # Calculate signature
-        secure_hash = hmac.new(self.secret_key.encode('utf-8'), hash_data.encode('utf-8'), hashlib.sha512).hexdigest()
+        hasData = ''
+        seq = 0
+        for key, val in inputData:
+            if seq == 1:
+                hasData = hasData + "&" + str(key) + '=' + urllib.parse.quote_plus(str(val))
+            else:
+                seq = 1
+                hasData = str(key) + '=' + urllib.parse.quote_plus(str(val))
+
+        hashValue = hmac.new(self.secret_key.encode('utf-8'), hasData.encode('utf-8'), hashlib.sha512).hexdigest()
 
         # Build the final URL
-        query_string = urllib.parse.urlencode(vnp_Params)
-        return f"{self.vnpay_payment_url}?{query_string}&vnp_SecureHash={secure_hash}"
+        return self.vnpay_payment_url + "?" + hasData + "&vnp_SecureHash=" + hashValue
 
     def validate_response(self, vnp_Params: dict) -> bool:
         vnp_SecureHash = vnp_Params.pop("vnp_SecureHash", None)
@@ -51,12 +57,19 @@ class VnPay:
             return False
 
         # Sort
-        vnp_Params = dict(sorted(vnp_Params.items()))
+        inputData = sorted(vnp_Params.items())
         
         # Build hash data
-        hash_data = "&".join(f"{k}={urllib.parse.quote_plus(str(v))}" for k, v in vnp_Params.items())
+        hasData = ''
+        seq = 0
+        for key, val in inputData:
+            if seq == 1:
+                hasData = hasData + "&" + str(key) + '=' + urllib.parse.quote_plus(str(val))
+            else:
+                seq = 1
+                hasData = str(key) + '=' + urllib.parse.quote_plus(str(val))
         
         # Check signature matches
-        calculated_hash = hmac.new(self.secret_key.encode('utf-8'), hash_data.encode('utf-8'), hashlib.sha512).hexdigest()
+        hashValue = hmac.new(self.secret_key.encode('utf-8'), hasData.encode('utf-8'), hashlib.sha512).hexdigest()
         
-        return calculated_hash == vnp_SecureHash
+        return hashValue == vnp_SecureHash
