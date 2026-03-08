@@ -46,6 +46,36 @@ export default function CheckoutModal({
     onClose();
   };
 
+  const handleInstantUpgrade = async () => {
+    if (!formData.name.trim() || !formData.phone.trim()) return;
+    if (!window.confirm("Bạn có chắc chắn muốn nâng cấp lên Pro không?"))
+      return;
+
+    setIsProcessing(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+      const res = await fetch(`${apiUrl}/api/payment/instant-upgrade`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Lỗi khi nâng cấp");
+      }
+
+      setStep(3);
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      console.error("Instant upgrade error:", error);
+      alert("Đã xảy ra lỗi khi nâng cấp. Vui lòng thử lại sau.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handlePayment = async () => {
     if (!formData.name.trim() || !formData.phone.trim()) return;
     setIsProcessing(true);
@@ -254,28 +284,61 @@ export default function CheckoutModal({
               <span className="text-cyan-400 font-black">99.000đ</span>
             </div>
 
-            <button
-              onClick={handlePayment}
-              disabled={
-                !formData.name.trim() || !formData.phone.trim() || isProcessing
-              }
-              className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                !formData.name.trim() || !formData.phone.trim() || isProcessing
-                  ? "bg-slate-800 text-slate-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 text-white shadow-lg shadow-blue-500/30 active:scale-[0.98]"
-              }`}
-            >
-              {isProcessing ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Đang xử lý thanh toán...
-                </>
-              ) : (
-                <>
-                  <CreditCard size={16} /> Thanh toán 99.000đ
-                </>
-              )}
-            </button>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handlePayment}
+                disabled={
+                  !formData.name.trim() ||
+                  !formData.phone.trim() ||
+                  isProcessing
+                }
+                className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                  !formData.name.trim() ||
+                  !formData.phone.trim() ||
+                  isProcessing
+                    ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 text-white shadow-lg shadow-blue-500/30 active:scale-[0.98]"
+                }`}
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Đang xử lý...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard size={16} /> Thanh toán qua VNPAY (Sandbox)
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleInstantUpgrade}
+                disabled={
+                  !formData.name.trim() ||
+                  !formData.phone.trim() ||
+                  isProcessing
+                }
+                className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                  !formData.name.trim() ||
+                  !formData.phone.trim() ||
+                  isProcessing
+                    ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-emerald-600 to-teal-500 hover:opacity-90 text-white shadow-lg shadow-emerald-500/30 active:scale-[0.98]"
+                }`}
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Đang xử lý...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={16} /> Nâng cấp ngay (Test Mode)
+                  </>
+                )}
+              </button>
+            </div>
 
             <button
               onClick={() => setStep(1)}

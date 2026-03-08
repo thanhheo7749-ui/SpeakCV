@@ -17,6 +17,19 @@ router = APIRouter(
     tags=["Payment"]
 )
 
+@router.post("/instant-upgrade")
+def instant_upgrade(db: Session = Depends(get_db), current_user: sql_models.User = Depends(get_current_user)):
+    user = db.query(sql_models.User).filter(sql_models.User.id == current_user.id).first()
+    if not user:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    user.role = "admin"  # As requested in existing logic
+    user.plan = "pro"
+    user.credits += 10000
+    db.commit()
+    return {"status": "success", "message": "Nâng cấp thành công"}
+
 @router.post("/create-url")
 def create_payment_url(request: Request, db: Session = Depends(get_db), current_user: sql_models.User = Depends(get_current_user)):
     # VNPAY requires vnp_TxnRef to only contain alphanumeric characters
