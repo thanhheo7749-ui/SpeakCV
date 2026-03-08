@@ -23,7 +23,7 @@ services:
       context: ./src/frontend
       args:
         - NEXT_PUBLIC_API_URL=https://hoangthanhzzz.id.vn
-        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     container_name: speakcv_frontend
     restart: unless-stopped
     ports:
