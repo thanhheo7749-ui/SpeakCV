@@ -39,10 +39,10 @@ def create_payment_url(request: Request, db: Session = Depends(get_db), current_
         ip_address = request.headers.get("x-forwarded-for").split(",")[0]
         
     # 3. Create VNPay URL
-    tmn_code = os.getenv("VNPAY_TMN_CODE")
-    hash_secret = os.getenv("VNPAY_HASH_SECRET")
-    return_url = os.getenv("VNPAY_RETURN_URL") or "https://hoangthanhzzz.id.vn/upgrade/success"
-    payment_url = os.getenv("VNPAY_PAYMENT_URL") or "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    tmn_code = "3E9ZED04"
+    hash_secret = "U0J3OO0YZVAXCQ8DWLGM3MJKOZ7LNTQB"
+    payment_url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    return_url = "https://hoangthanhzzz.id.vn/upgrade/success"
 
     vnp = VnPay(
         tmn_code=tmn_code,
@@ -64,10 +64,10 @@ def create_payment_url(request: Request, db: Session = Depends(get_db), current_
 def vnpay_ipn(request: Request, db: Session = Depends(get_db)):
     vnp_Params = dict(request.query_params)
     
-    tmn_code = os.getenv("VNPAY_TMN_CODE")
-    hash_secret = os.getenv("VNPAY_HASH_SECRET")
-    return_url = os.getenv("VNPAY_RETURN_URL") or "https://hoangthanhzzz.id.vn/upgrade/success"
-    payment_url = os.getenv("VNPAY_PAYMENT_URL") or "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    tmn_code = "3E9ZED04"
+    hash_secret = "U0J3OO0YZVAXCQ8DWLGM3MJKOZ7LNTQB"
+    payment_url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    return_url = "https://hoangthanhzzz.id.vn/upgrade/success"
 
     vnp = VnPay(
         tmn_code=tmn_code,
