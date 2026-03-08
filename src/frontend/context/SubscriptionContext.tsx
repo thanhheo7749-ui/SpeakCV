@@ -43,7 +43,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       const profile = await getMyProfile();
       const userPlan = profile.plan === "pro" ? "pro" : "free";
       setPlan(userPlan);
-      setTokens(profile.credits ?? (userPlan === "pro" ? 2000 : 50));
+      setTokens(profile.credits ?? (userPlan === "pro" ? 10000 : 50));
     } catch {
       setPlan("free");
       setTokens(50);
@@ -74,7 +74,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     try {
       await upgradeApi();
       setPlan("pro");
-      setTokens(2000);
+      setTokens(10000);
     } catch (e) {
       console.error("Failed to upgrade:", e);
     }
