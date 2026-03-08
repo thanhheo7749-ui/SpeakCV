@@ -30,6 +30,7 @@ import {
 
 import { renameInterview, deleteInterview } from "@/services/api";
 import toast from "react-hot-toast";
+import { useSubscription } from "@/context/SubscriptionContext";
 
 interface SidebarProps {
   user: any;
@@ -70,6 +71,8 @@ export function Sidebar({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+
+  const { tokens, plan } = useSubscription();
 
   const handleRename = async (id: number) => {
     if (!editTitle.trim()) return;
@@ -132,6 +135,14 @@ export function Sidebar({
                 <p className="text-white font-bold text-sm truncate">
                   {myProfileData?.full_name || user}
                 </p>
+                <div className="flex text-[11px] items-center gap-1 mt-0.5 font-medium text-slate-400">
+                  <Sparkles size={10} className="text-yellow-400" />
+                  <span>
+                    Token:{" "}
+                    <span className="text-yellow-400 font-bold">{tokens}</span>{" "}
+                    {plan === "pro" && "(Pro)"}
+                  </span>
+                </div>
               </div>
               {showUserMenu ? (
                 <ChevronUp size={16} className="text-slate-400" />

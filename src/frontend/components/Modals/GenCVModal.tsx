@@ -15,6 +15,8 @@ import {
   MapPin,
   Lightbulb,
   ChevronLeft,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -215,6 +217,51 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
     newEdus[index][field] = val;
     setCvData({ ...cvData, educations: newEdus });
   };
+
+  const addExp = () => {
+    setCvData({
+      ...cvData,
+      experiences: [
+        ...cvData.experiences,
+        {
+          company_name: "Tên công ty mới",
+          position: "Vị trí mới",
+          start_date: "MM/YYYY",
+          end_date: "Nay",
+          description: "- Mô tả công việc...",
+        },
+      ],
+    });
+  };
+
+  const removeExp = (index: number) => {
+    const newExps = cvData.experiences.filter(
+      (_: any, i: number) => i !== index,
+    );
+    setCvData({ ...cvData, experiences: newExps });
+  };
+
+  const addEdu = () => {
+    setCvData({
+      ...cvData,
+      educations: [
+        ...cvData.educations,
+        {
+          school_name: "Tên trường mới",
+          major: "Ngành học mới",
+          start_date: "YYYY",
+          end_date: "YYYY",
+        },
+      ],
+    });
+  };
+
+  const removeEdu = (index: number) => {
+    const newEdus = cvData.educations.filter(
+      (_: any, i: number) => i !== index,
+    );
+    setCvData({ ...cvData, educations: newEdus });
+  };
   const changeTheme = (type: string) => {
     if (type === "topcv")
       setTheme({ name: "topcv", leftBg: "#42312B", rightPill: "#42312B" });
@@ -409,24 +456,45 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                   </div>
 
                   <div className="w-full mb-8">
-                    <div
-                      className="px-4 py-1.5 rounded-full inline-block font-bold mb-4 text-sm uppercase"
-                      style={{
-                        backgroundColor:
-                          theme.name === "thamvong"
-                            ? "transparent"
-                            : "rgba(255,255,255,0.15)",
-                        borderBottom:
-                          theme.name === "thamvong" ? "1px solid #444" : "none",
-                        color: theme.name === "thamvong" ? "#F39C12" : "white",
-                        paddingLeft: theme.name === "thamvong" ? "0" : "1rem",
-                      }}
-                    >
-                      Học vấn
+                    <div className="flex items-center gap-2 mb-4">
+                      <div
+                        className="px-4 py-1.5 rounded-full inline-block font-bold text-sm uppercase"
+                        style={{
+                          backgroundColor:
+                            theme.name === "thamvong"
+                              ? "transparent"
+                              : "rgba(255,255,255,0.15)",
+                          borderBottom:
+                            theme.name === "thamvong"
+                              ? "1px solid #444"
+                              : "none",
+                          color:
+                            theme.name === "thamvong" ? "#F39C12" : "white",
+                          paddingLeft: theme.name === "thamvong" ? "0" : "1rem",
+                        }}
+                      >
+                        Học vấn
+                      </div>
+                      <button
+                        onClick={addEdu}
+                        data-html2canvas-ignore="true"
+                        className="p-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                        title="Thêm học vấn"
+                      >
+                        <Plus size={16} />
+                      </button>
                     </div>
                     <div className="space-y-4">
                       {cvData.educations.map((edu: any, i: number) => (
-                        <div key={i} className="text-sm">
+                        <div key={i} className="text-sm relative group">
+                          <button
+                            onClick={() => removeEdu(i)}
+                            data-html2canvas-ignore="true"
+                            className="absolute -right-4 top-0 p-1 text-red-400 hover:bg-red-400/20 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Xóa học vấn này"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                           <EditableText
                             className={`font-bold ${theme.name === "thamvong" ? "text-white" : "text-gray-100"}`}
                             value={edu.major}
@@ -517,18 +585,36 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                   </div>
 
                   <div className="mb-8">
-                    <div
-                      className="text-white px-5 py-1.5 rounded-full inline-block font-bold mb-4 text-[13px] uppercase"
-                      style={{
-                        backgroundColor: theme.rightPill,
-                        color: theme.name === "thamvong" ? "#000" : "#fff",
-                      }}
-                    >
-                      Kinh nghiệm làm việc
+                    <div className="flex items-center gap-2 mb-4">
+                      <div
+                        className="text-white px-5 py-1.5 rounded-full inline-block font-bold text-[13px] uppercase"
+                        style={{
+                          backgroundColor: theme.rightPill,
+                          color: theme.name === "thamvong" ? "#000" : "#fff",
+                        }}
+                      >
+                        Kinh nghiệm làm việc
+                      </div>
+                      <button
+                        onClick={addExp}
+                        data-html2canvas-ignore="true"
+                        className="p-1 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors"
+                        title="Thêm kinh nghiệm"
+                      >
+                        <Plus size={16} />
+                      </button>
                     </div>
                     <div className="space-y-6">
                       {cvData.experiences.map((exp: any, i: number) => (
-                        <div key={i}>
+                        <div key={i} className="relative group">
+                          <button
+                            onClick={() => removeExp(i)}
+                            data-html2canvas-ignore="true"
+                            className="absolute -right-6 top-0 p-1.5 text-red-500 hover:bg-red-500/10 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Xóa kinh nghiệm này"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                           <div className="flex justify-between items-baseline mb-1">
                             <EditableText
                               className="font-bold text-[15px] text-gray-900 w-[70%]"

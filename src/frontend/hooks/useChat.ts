@@ -64,6 +64,9 @@ export const useChat = () => {
         setStatus("Sẵn sàng");
       }
 
+      // Automatically refresh tokens on successful AI reply
+      window.dispatchEvent(new Event("auth-changed"));
+
     } catch (e: any) {
       if (e.name !== 'AbortError') {
         toast.error("Connection error or server overloaded!");
