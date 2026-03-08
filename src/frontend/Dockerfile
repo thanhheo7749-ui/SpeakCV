@@ -10,9 +10,11 @@ RUN npm install
 
 COPY . .
 
-# Declare build argument and set environment variable for Next.js build
+# Declare build arguments and set environment variables for Next.js build
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
 RUN npm run build
 
