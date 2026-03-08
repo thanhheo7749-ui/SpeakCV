@@ -124,7 +124,7 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[1.1] tracking-tight mb-8 animate-in slide-in-from-bottom-6 fade-in duration-700 delay-100 max-w-5xl">
-            Master Your Next IT Interview with{" "}
+            Master Your Next Interview with{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-cyan-400 to-emerald-400">
               AI
             </span>

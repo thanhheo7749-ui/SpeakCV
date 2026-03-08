@@ -20,33 +20,60 @@ body {
 
 /* --- HIỆU ỨNG SÓNG ÂM (Giữ lại CSS thuần cho mượt) --- */
 .audio-wave {
-  display: flex; align-items: center; justify-content: center; gap: 6px; height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 60px;
 }
 .bar {
-  width: 8px; border-radius: 999px; height: 10px;
+  width: 8px;
+  border-radius: 999px;
+  height: 10px;
   animation: sound 0ms -800ms linear infinite alternate;
 }
 @keyframes sound {
-  0% { opacity: .35; height: 10px; }
-  100% { opacity: 1; height: 60px; }
+  0% {
+    opacity: 0.35;
+    height: 10px;
+  }
+  100% {
+    opacity: 1;
+    height: 60px;
+  }
 }
 /* Màu sắc và tốc độ nhảy */
-.listening .bar { background: #ef4444; animation-duration: 474ms; } /* Đỏ */
-.speaking .bar { background: #3b82f6; animation-duration: 474ms; } /* Xanh */
+.listening .bar {
+  background: #ef4444;
+  animation-duration: 474ms;
+}
+.speaking .bar {
+  background: #3b82f6;
+  animation-duration: 474ms;
+}
 
-/* Lệch pha cho tự nhiên */
-.bar:nth-child(1) { animation-duration: 474ms; }
-.bar:nth-child(2) { animation-duration: 433ms; }
-.bar:nth-child(3) { animation-duration: 407ms; }
-.bar:nth-child(4) { animation-duration: 458ms; }
-.bar:nth-child(5) { animation-duration: 400ms; }
+.bar:nth-child(1) {
+  animation-duration: 474ms;
+}
+.bar:nth-child(2) {
+  animation-duration: 433ms;
+}
+.bar:nth-child(3) {
+  animation-duration: 407ms;
+}
+.bar:nth-child(4) {
+  animation-duration: 458ms;
+}
+.bar:nth-child(5) {
+  animation-duration: 400ms;
+}
 
 /* --- HIỆU ỨNG NÚT --- */
 @layer components {
   .icon-btn {
     @apply p-3 rounded-xl cursor-pointer text-slate-400 hover:bg-slate-800 transition-all duration-200;
   }
-  
+
   .end-btn {
     @apply mt-auto mb-6 p-3 bg-red-500/10 rounded-full cursor-pointer hover:bg-red-500/20 hover:scale-110 transition-all duration-300 group;
   }
@@ -57,30 +84,41 @@ body {
   body * {
     visibility: hidden;
   }
-  #root > div, .fixed { 
-    visibility: visible; 
+  #root > div,
+  .fixed {
+    visibility: visible;
   }
 }
 
 /* TÙY CHỈNH THANH CUỘN */
 
 ::-webkit-scrollbar {
-  width: 6px; 
+  width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent; 
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155; 
-  border-radius: 10px; 
+  background: #334155;
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569; 
+  background: #475569;
 }
 
 ::-webkit-scrollbar-button {
   display: none;
+}
+
+* {
+  caret-color: transparent;
+}
+
+input,
+textarea,
+[contenteditable]:not([contenteditable="false"]) {
+  caret-color: auto;
 }
