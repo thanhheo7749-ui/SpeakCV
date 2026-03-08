@@ -41,8 +41,8 @@ def create_payment_url(request: Request, db: Session = Depends(get_db), current_
     # 3. Create VNPay URL
     tmn_code = os.getenv("VNPAY_TMN_CODE")
     hash_secret = os.getenv("VNPAY_HASH_SECRET")
-    return_url = os.getenv("VNPAY_RETURN_URL")
-    payment_url = os.getenv("VNPAY_PAYMENT_URL")
+    return_url = os.getenv("VNPAY_RETURN_URL") or "https://hoangthanhzzz.id.vn/upgrade/success"
+    payment_url = os.getenv("VNPAY_PAYMENT_URL") or "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
 
     vnp = VnPay(
         tmn_code=tmn_code,
@@ -66,8 +66,8 @@ def vnpay_ipn(request: Request, db: Session = Depends(get_db)):
     
     tmn_code = os.getenv("VNPAY_TMN_CODE")
     hash_secret = os.getenv("VNPAY_HASH_SECRET")
-    return_url = os.getenv("VNPAY_RETURN_URL")
-    payment_url = os.getenv("VNPAY_PAYMENT_URL")
+    return_url = os.getenv("VNPAY_RETURN_URL") or "https://hoangthanhzzz.id.vn/upgrade/success"
+    payment_url = os.getenv("VNPAY_PAYMENT_URL") or "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
 
     vnp = VnPay(
         tmn_code=tmn_code,

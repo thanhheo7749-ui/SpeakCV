@@ -52,7 +52,7 @@ class VnPay:
         hashValue = hmac.new(bytes(self.secret_key, 'utf-8'), bytes(hasData, 'utf-8'), hashlib.sha512).hexdigest()
         
         # Trả về URL cuối cùng
-        final_url = self.vnpay_payment_url + "?" + hasData + "&vnp_SecureHash=" + hashValue
+        final_url = f"{self.vnpay_payment_url}?{hasData}&vnp_SecureHash={hashValue}"
         return final_url
 
     def validate_response(self, vnp_Params: dict) -> bool:
