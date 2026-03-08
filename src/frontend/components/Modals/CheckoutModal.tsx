@@ -157,9 +157,9 @@ export default function CheckoutModal({
               </div>
               <div className="flex justify-between items-center mb-4">
                 <span className="text-slate-400 text-sm font-medium">
-                  Token hàng ngày
+                  Lượt tương tác / ngày
                 </span>
-                <span className="text-cyan-400 font-bold">10.000 token</span>
+                <span className="text-cyan-400 font-bold">10.000 lượt</span>
               </div>
               <div className="flex justify-between items-center mb-4">
                 <span className="text-slate-400 text-sm font-medium">
@@ -246,7 +246,9 @@ export default function CheckoutModal({
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm">Gói Pro</p>
-                  <p className="text-slate-500 text-xs">10.000 token / tháng</p>
+                  <p className="text-slate-500 text-xs">
+                    10.000 lượt tương tác / ngày
+                  </p>
                 </div>
               </div>
               <span className="text-cyan-400 font-black">99.000đ</span>
@@ -303,7 +305,7 @@ export default function CheckoutModal({
               <span className="text-cyan-400 font-bold">Pro</span>
             </p>
             <p className="text-slate-500 text-xs mb-8">
-              10.000 token đã được cộng vào tài khoản của bạn
+              10.000 lượt tương tác đã được cộng vào tài khoản của bạn
             </p>
 
             {/* Upgrade summary */}
@@ -316,7 +318,7 @@ export default function CheckoutModal({
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="bg-slate-900 rounded-xl p-3">
-                  <p className="text-slate-500 text-xs mb-1">Token</p>
+                  <p className="text-slate-500 text-xs mb-1">Lượt tương tác</p>
                   <p className="text-cyan-400 font-black text-lg">10.000</p>
                 </div>
                 <div className="bg-slate-900 rounded-xl p-3">

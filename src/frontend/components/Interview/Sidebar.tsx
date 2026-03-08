@@ -138,7 +138,7 @@ export function Sidebar({
                 <div className="flex text-[11px] items-center gap-1 mt-0.5 font-medium text-slate-400">
                   <Sparkles size={10} className="text-yellow-400" />
                   <span>
-                    Token:{" "}
+                    Lượt tương tác:{" "}
                     <span className="text-yellow-400 font-bold">{tokens}</span>{" "}
                     {plan === "pro" && "(Pro)"}
                   </span>

@@ -19,7 +19,7 @@ export default function PricingSection({ onUpgrade }: PricingSectionProps) {
   const { plan } = useSubscription();
 
   const freeBenefits = [
-    "100 token miễn phí",
+    "100 lượt tương tác miễn phí",
     "5 lượt phỏng vấn / ngày",
     "Phỏng vấn AI cơ bản",
     "Chấm điểm tự động",
@@ -27,7 +27,7 @@ export default function PricingSection({ onUpgrade }: PricingSectionProps) {
   ];
 
   const proBenefits = [
-    "10.000 token mỗi tháng",
+    "10.000 lượt tương tác mỗi ngày",
     "Phỏng vấn không giới hạn",
     "Truy cập mọi tính năng VIP",
     "Tạo CV chuyên nghiệp",

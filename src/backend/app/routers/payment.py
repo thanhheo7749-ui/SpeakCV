@@ -2,6 +2,7 @@
 # This project is licensed under the MIT License.
 # See the LICENSE file in the project root for more information.
 
+import os
 import uuid
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
@@ -38,11 +39,16 @@ def create_payment_url(request: Request, db: Session = Depends(get_db), current_
         ip_address = request.headers.get("x-forwarded-for").split(",")[0]
         
     # 3. Create VNPay URL
+    tmn_code = os.getenv("VNPAY_TMN_CODE")
+    hash_secret = os.getenv("VNPAY_HASH_SECRET")
+    return_url = os.getenv("VNPAY_RETURN_URL")
+    payment_url = os.getenv("VNPAY_PAYMENT_URL")
+
     vnp = VnPay(
-        tmn_code=settings.VNPAY_TMN_CODE,
-        secret_key=settings.VNPAY_HASH_SECRET,
-        return_url=settings.VNPAY_RETURN_URL,
-        vnpay_payment_url=settings.VNPAY_PAYMENT_URL
+        tmn_code=tmn_code,
+        secret_key=hash_secret,
+        return_url=return_url,
+        vnpay_payment_url=payment_url
     )
     
     payment_url = vnp.get_payment_url(
@@ -58,11 +64,16 @@ def create_payment_url(request: Request, db: Session = Depends(get_db), current_
 def vnpay_ipn(request: Request, db: Session = Depends(get_db)):
     vnp_Params = dict(request.query_params)
     
+    tmn_code = os.getenv("VNPAY_TMN_CODE")
+    hash_secret = os.getenv("VNPAY_HASH_SECRET")
+    return_url = os.getenv("VNPAY_RETURN_URL")
+    payment_url = os.getenv("VNPAY_PAYMENT_URL")
+
     vnp = VnPay(
-        tmn_code=settings.VNPAY_TMN_CODE,
-        secret_key=settings.VNPAY_HASH_SECRET,
-        return_url=settings.VNPAY_RETURN_URL,
-        vnpay_payment_url=settings.VNPAY_PAYMENT_URL
+        tmn_code=tmn_code,
+        secret_key=hash_secret,
+        return_url=return_url,
+        vnpay_payment_url=payment_url
     )
     
     if vnp.validate_response(vnp_Params):

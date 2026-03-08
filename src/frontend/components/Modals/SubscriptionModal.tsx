@@ -84,7 +84,7 @@ export default function SubscriptionModal({
         <div className="bg-slate-950 rounded-2xl border border-slate-800 p-6 mb-6">
           <div className="flex justify-between items-center mb-3">
             <span className="text-slate-400 text-sm font-medium">
-              Token còn lại
+              Lượt tương tác còn lại
             </span>
             <span
               className={`font-black text-lg ${

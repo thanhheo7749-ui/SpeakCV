@@ -52,7 +52,7 @@ export function OverviewTab({ stats }: { stats: any }) {
           </div>
           <div>
             <p className="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1">
-              Token AI Đã Đốt
+              Lượt AI Tương Tác
             </p>
             <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
               {(stats?.total_tokens || 0).toLocaleString()}
