@@ -8,7 +8,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Lightbulb, X } from "lucide-react";
+import { Lightbulb, X, Menu } from "lucide-react";
 import toast from "react-hot-toast";
 
 import {
@@ -49,6 +49,7 @@ export default function InterviewRoom() {
   const { upgradeToPro } = useSubscription();
   const [showSubscription, setShowSubscription] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const {
     modals,
@@ -405,9 +406,19 @@ export default function InterviewRoom() {
         handleNewChat={handleNewChat}
         isGeneratingReport={isGeneratingReport}
         onOpenSubscription={() => setShowSubscription(true)}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       <main className="flex-1 flex flex-col items-center justify-between py-8 px-6 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
+        {/* Mobile Hamburger Menu */}
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className={`md:hidden absolute top-4 left-4 z-20 p-2 bg-slate-800/80 border border-slate-700 rounded-lg text-slate-300 hover:text-white backdrop-blur-sm shadow-lg transition-opacity duration-300 ${isSidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+        >
+          <Menu size={20} />
+        </button>
+
         <header className="text-center z-10 flex flex-col items-center">
           <h1
             className="text-6xl font-black italic bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent cursor-pointer"
@@ -439,7 +450,7 @@ export default function InterviewRoom() {
                 onClick={onMicClick}
                 langLabel={isEnglish ? "English" : "Tiếng Việt"}
               />
-              <div className="absolute -right-28 top-0 flex flex-col gap-4">
+              <div className="absolute right-0 -top-12 md:bottom-auto md:right-auto md:-right-28 md:top-0 flex flex-col gap-4">
                 <button
                   onClick={async () => {
                     setHint({ show: true, content: "Đang nghĩ..." });
@@ -451,13 +462,13 @@ export default function InterviewRoom() {
                       toast.error("Không lấy được gợi ý lúc này");
                     }
                   }}
-                  className="w-14 h-14 rounded-full bg-yellow-500/10 flex items-center justify-center hover:scale-110 transition-transform"
+                  className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-yellow-500/10 flex items-center justify-center hover:scale-110 transition-transform shadow-lg backdrop-blur-sm"
                 >
-                  <Lightbulb className="text-yellow-400" />
+                  <Lightbulb className="text-yellow-400 w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
               {hint.show && (
-                <div className="absolute left-full top-0 ml-8 z-50 w-[420px] max-h-[220px] flex flex-col bg-slate-900/95 p-5 rounded-2xl border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] backdrop-blur-md animate-in fade-in slide-in-from-left-5 origin-top-left">
+                <div className="hidden md:flex absolute left-full top-0 ml-8 z-50 w-[420px] max-h-[220px] flex-col bg-slate-900/95 p-5 rounded-2xl border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] backdrop-blur-md animate-in fade-in slide-in-from-left-5 origin-top-left">
                   <button
                     onClick={() => setHint({ show: false, content: "" })}
                     className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors bg-slate-800/50 rounded-full p-1.5 hover:bg-slate-700/50 z-10"
@@ -489,6 +500,32 @@ export default function InterviewRoom() {
                 onMicClick();
               }}
             />
+
+            {/* Mobile Hint Modal */}
+            {hint.show && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:hidden">
+                <div
+                  className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                  onClick={() => setHint({ show: false, content: "" })}
+                />
+                <div className="relative w-full max-w-sm max-h-[80vh] flex flex-col bg-slate-900 border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] rounded-2xl p-5 animate-in zoom-in-95">
+                  <button
+                    onClick={() => setHint({ show: false, content: "" })}
+                    className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors bg-slate-800/50 rounded-full p-1.5 hover:bg-slate-700/50 z-10"
+                  >
+                    <X size={16} />
+                  </button>
+
+                  <div className="flex items-center gap-2 mb-3 text-yellow-400 font-semibold uppercase text-xs tracking-wider shrink-0">
+                    <Lightbulb size={14} /> Gợi ý từ AI
+                  </div>
+
+                  <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap break-words font-medium pl-1 overflow-y-auto pr-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-slate-500 transition-colors">
+                    {hint.content}
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
       </main>

@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAdminDashboard } from "@/services/api";
-import { ShieldAlert, ArrowLeft } from "lucide-react";
+import { ShieldAlert, ArrowLeft, Menu } from "lucide-react";
 
 // Import child components
 import { AdminSidebar } from "@/components/Admin/AdminSidebar";
@@ -27,6 +27,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     getAdminDashboard()
@@ -63,11 +64,24 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 flex font-sans">
+      {/* Mobile Hamburger Menu */}
+      <button
+        onClick={() => setIsSidebarOpen(true)}
+        className="md:hidden absolute top-4 left-4 z-20 p-2 bg-slate-800/80 border border-slate-700 rounded-lg text-slate-300 hover:text-white backdrop-blur-sm shadow-lg"
+      >
+        <Menu size={20} />
+      </button>
+
       {/* SIDEBAR Component */}
-      <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <AdminSidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
       {/* MAIN CONTENT Component */}
-      <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
+      <div className="flex-1 p-4 md:p-10 pt-16 md:pt-10 overflow-y-auto custom-scrollbar bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
         {activeTab === "overview" && <OverviewTab stats={data?.stats} />}
         {activeTab === "users" && <UsersTab users={data?.users} />}
         {activeTab === "logs" && <SystemLogsTab />}
