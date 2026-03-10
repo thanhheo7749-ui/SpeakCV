@@ -26,6 +26,15 @@ def instant_upgrade(db: Session = Depends(get_db), current_user: sql_models.User
         
     user.plan = "pro"
     user.credits += 10000
+    
+    # Log transaction for admin visibility
+    txn_log = sql_models.TransactionHistory(
+        user_id=user.id,
+        amount=10000,
+        transaction_type="upgrade_pro",
+        note=f"Nâng cấp gói Pro (Instant) cho {user.email}"
+    )
+    db.add(txn_log)
     db.commit()
     return {"status": "success", "message": "Nâng cấp thành công"}
 
@@ -102,6 +111,15 @@ def vnpay_ipn(request: Request, db: Session = Depends(get_db)):
                 if user:
                     user.plan = "pro"
                     user.credits += 10000
+                    
+                    # Log transaction for admin visibility
+                    txn_log = sql_models.TransactionHistory(
+                        user_id=user.id,
+                        amount=10000,
+                        transaction_type="upgrade_pro",
+                        note=f"Nâng cấp gói Pro (VNPAY) cho {user.email}"
+                    )
+                    db.add(txn_log)
                 db.commit()
                 return {"RspCode": "00", "Message": "Confirm Success"}
             elif rsp_code != "00" and transaction.status == "pending":
