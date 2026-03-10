@@ -51,12 +51,36 @@ export default function JobRecommendations({ file }: Props) {
 
   if (loading) {
     return (
-      <div className="w-full bg-slate-900 border border-slate-700/50 rounded-2xl p-6 mt-6 flex flex-col items-center justify-center min-h-[200px]">
-        <Loader2 className="animate-spin text-blue-500 mb-4" size={32} />
-        <p className="text-slate-400 text-sm animate-pulse">
-          ✨ AI đang phân tích CV để tìm việc làm phù hợp hoàn hảo nhất cho
-          bạn...
-        </p>
+      <div className="w-full mt-6 bg-slate-950 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="relative z-10 flex items-center gap-3 mb-6 pb-4 border-b border-slate-800/60">
+          <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0">
+            <Loader2 className="animate-spin text-blue-500" size={20} />
+          </div>
+          <div>
+            <div className="h-6 w-64 bg-slate-800 rounded animate-pulse mb-2"></div>
+            <div className="h-4 w-40 bg-slate-800/50 rounded animate-pulse"></div>
+          </div>
+        </div>
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4 animate-pulse"
+            >
+              <div className="flex gap-4">
+                <div className="w-14 h-14 bg-slate-800 rounded-xl shrink-0"></div>
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-5 bg-slate-800 rounded w-3/4"></div>
+                  <div className="h-4 bg-slate-800/70 rounded w-1/2"></div>
+                </div>
+              </div>
+              <div className="h-16 bg-slate-800 rounded-xl"></div>
+              <div className="h-20 bg-slate-800/60 rounded-xl"></div>
+              <div className="h-12 bg-slate-800 rounded-xl mt-1"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -137,14 +161,14 @@ export default function JobRecommendations({ file }: Props) {
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   Mức độ phù hợp
                 </span>
-                <span className="text-sm font-bold text-blue-400 flex items-center">
+                <span className="text-sm font-bold text-green-400 flex items-center">
                   {job.match_percentage}{" "}
                   <Percent size={12} className="ml-1 opacity-70" />
                 </span>
               </div>
               <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  className="bg-gradient-to-r from-green-500 to-emerald-400 h-2.5 rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${job.match_percentage}%` }}
                 ></div>
               </div>
