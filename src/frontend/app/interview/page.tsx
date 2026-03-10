@@ -456,7 +456,7 @@ export default function InterviewRoom() {
                 onClick={onMicClick}
                 langLabel={isEnglish ? "English" : "Tiếng Việt"}
               />
-              <div className="absolute right-0 -top-12 md:bottom-auto md:right-auto md:-right-28 md:top-0 flex flex-col gap-4 z-50">
+              <div className="absolute right-0 -top-12 md:-right-20 md:top-0 flex flex-col gap-4 z-50">
                 <button
                   onClick={async () => {
                     setHint({ show: true, content: "Đang nghĩ..." });
