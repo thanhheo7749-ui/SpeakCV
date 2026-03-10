@@ -130,7 +130,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
         {/* Body */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {!res && !loading ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-6 animate-in zoom-in-95 duration-300 w-full max-w-2xl mx-auto overflow-y-auto custom-scrollbar pr-2 pb-4">
+            <div className="flex flex-col items-center h-full space-y-6 animate-in zoom-in-95 duration-300 w-full max-w-2xl mx-auto overflow-y-auto custom-scrollbar pr-2 py-4">
               {/* Mode Selection */}
               <div className="w-full grid grid-cols-2 gap-4 shrink-0">
                 <div
@@ -152,7 +152,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
                   <h3
                     className={`font-bold ${reviewMode === "manual" ? "text-blue-400" : "text-slate-300"}`}
                   >
-                    📝 Phân tích theo JD (Cơ bản)
+                    Phân tích theo JD (Cơ bản)
                   </h3>
                   <p className="text-xs mt-2 text-slate-500">
                     Tự nhập mô tả công việc để AI chấm điểm
@@ -181,7 +181,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
                   <h3
                     className={`font-bold relative z-10 ${reviewMode === "auto_match" ? "text-amber-400" : "text-amber-200/80"}`}
                   >
-                    🚀 Gợi ý việc làm (👑 PRO)
+                    Gợi ý việc làm (PRO)
                   </h3>
                   <p className="text-xs mt-2 text-slate-500 relative z-10">
                     AI tự động phân tích CV và tìm công ty phù hợp nhất trong hệ
