@@ -64,6 +64,22 @@ class UserCreate(BaseModel):
     full_name: str
     credits: int = 100
 
+class AdminUserCreate(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    role: str = "user"
+    credits: int = 100
+    plan: str = "free"
+
+class AdminUserUpdate(BaseModel):
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    role: Optional[str] = None
+    credits: Optional[int] = None
+    plan: Optional[str] = None
+    password: Optional[str] = None # Admin can optionally reset password
+
 class GoogleAuthRequest(BaseModel):
     token: str
 

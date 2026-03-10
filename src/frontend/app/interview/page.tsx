@@ -361,9 +361,15 @@ export default function InterviewRoom() {
     setHasStarted(true);
     setCurrentHistoryId(h.id);
 
-    // Don't cache old report — let handleOpenReport always re-evaluate
-    // so new questions added during the resumed session are included
-    setSavedReport(null);
+    // Cache old report so that if the user clicks "Chấm điểm" without sending any new messages,
+    // we bypass the slow scoring API call and simply return the existing history details.
+    // If they do send a new message, handleSend will call setSavedReport(null) to force re-evaluation.
+    setSavedReport({
+      score: h.score,
+      overall_feedback: h.overall_feedback,
+      details: h.details || [],
+      inferred_position: h.position || "Tự do",
+    });
 
     if (resumeSettings.interviewType === "timed") {
       resetTimer();

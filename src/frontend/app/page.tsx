@@ -70,21 +70,21 @@ export default function LandingPage() {
               onClick={handleSmoothScroll}
               className="hover:text-white transition-colors"
             >
-              Features
+              Tính năng
             </a>
             <a
               href="#testimonials"
               onClick={handleSmoothScroll}
               className="hover:text-white transition-colors"
             >
-              Testimonials
+              Đánh giá
             </a>
             <a
               href="#pricing"
               onClick={handleSmoothScroll}
               className="hover:text-white transition-colors"
             >
-              Pricing
+              Bảng giá
             </a>
           </div>
 
@@ -94,21 +94,21 @@ export default function LandingPage() {
                 onClick={() => router.push("/interview")}
                 className="text-sm font-bold text-slate-300 hover:text-white transition-colors hidden sm:block"
               >
-                Hi, {user}
+                Chào, {user}
               </button>
             ) : (
               <button
                 onClick={handleLogin}
                 className="text-sm font-bold text-slate-300 hover:text-white transition-colors hidden sm:block"
               >
-                Login
+                Đăng nhập
               </button>
             )}
             <button
               onClick={handleStart}
               className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-2.5 rounded-full font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-blue-500/30 active:scale-95 flex items-center gap-2"
             >
-              Get Started <ChevronRight size={16} />
+              Bắt đầu <ChevronRight size={16} />
             </button>
           </div>
         </div>
@@ -120,20 +120,19 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 text-sm font-medium text-cyan-400 mb-8 animate-in slide-in-from-bottom-4 fade-in duration-700">
-            <Sparkles size={16} /> The ultimate AI Mock Interview platform
+            <Sparkles size={16} /> Nền tảng Phỏng vấn giả lập AI hàng đầu
           </div>
 
           <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[1.1] tracking-tight mb-8 animate-in slide-in-from-bottom-6 fade-in duration-700 delay-100 max-w-5xl">
-            Master Your Next Interview with{" "}
+            Chinh phục kỳ phỏng vấn với{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-cyan-400 to-emerald-400">
               AI
             </span>
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200">
-            Practice realistic interviews, get instant detailed scoring, and
-            generate a professional CV automatically. Stop guessing, start
-            passing.
+            Luyện tập phỏng vấn thực tế, chấm điểm chi tiết tức thì và tạo CV
+            chuyên nghiệp tự động. Ngừng nghi ngờ, bắt đầu thành công.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-300 w-full sm:w-auto">
@@ -141,7 +140,7 @@ export default function LandingPage() {
               onClick={handleStart}
               className="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-slate-900 font-bold text-lg hover:bg-slate-100 transition-all flex items-center justify-center gap-3 active:scale-95"
             >
-              <Mic size={22} className="text-blue-600" /> Start Free Interview
+              <Mic size={22} className="text-blue-600" /> Phỏng vấn miễn phí
             </button>
             <button
               onClick={() =>
@@ -151,7 +150,7 @@ export default function LandingPage() {
               }
               className="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-800/80 hover:bg-slate-800 text-white font-bold text-lg border border-slate-700/50 transition-all flex items-center justify-center gap-3 backdrop-blur-md active:scale-95"
             >
-              See Pricing
+              Xem bảng giá
             </button>
           </div>
 
@@ -169,10 +168,10 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <h3 className="text-white font-bold text-xl">
-                        React Native Developer
+                        Lập trình viên React Native
                       </h3>
                       <p className="text-slate-400 text-sm">
-                        TechCorp Inc. • Timed Mode
+                        Công ty TechCorp • Chế độ tính giờ
                       </p>
                     </div>
                   </div>
@@ -184,19 +183,19 @@ export default function LandingPage() {
                         </span>
                       </div>
                       <div className="bg-slate-800/50 p-4 rounded-2xl rounded-tl-sm text-sm text-slate-300 border border-slate-700/50">
-                        Can you explain the difference between useMemo and
-                        useCallback in React?
+                        Bạn có thể giải thích điểm khác biệt giữa useMemo và
+                        useCallback trong React không?
                       </div>
                     </div>
                     <div className="flex gap-3 flex-row-reverse">
                       <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                         <span className="text-xs font-bold text-white">
-                          You
+                          Bạn
                         </span>
                       </div>
                       <div className="bg-blue-600/20 p-4 rounded-2xl rounded-tr-sm text-sm text-blue-100 border border-blue-500/30">
-                        Sure! useMemo is used to memoize values, while
-                        useCallback memoizes functions...
+                        Chắc chắn rồi! useMemo được dùng để ghi nhớ giá trị,
+                        trong khi useCallback ghi nhớ hàm...
                       </div>
                     </div>
                   </div>
@@ -204,13 +203,13 @@ export default function LandingPage() {
 
                 <div className="w-full sm:w-64 bg-slate-950/80 p-6 rounded-2xl border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.15)] flex flex-col items-center justify-center text-center shrink-0">
                   <p className="text-slate-400 text-sm font-bold mb-2 uppercase tracking-wider">
-                    Interview Score
+                    Điểm Phỏng vấn
                   </p>
                   <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-cyan-400 mb-2">
                     95<span className="text-2xl text-slate-500">/100</span>
                   </div>
                   <div className="flex items-center gap-1 text-emerald-400 text-sm font-medium mt-2 bg-emerald-500/10 px-3 py-1.5 rounded-full">
-                    <CheckCircle2 size={16} /> Excellent Answer
+                    <CheckCircle2 size={16} /> Câu trả lời xuất sắc
                   </div>
                 </div>
               </div>
@@ -227,11 +226,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-5xl font-black text-white mb-6">
-              Why Choose SpeakCV?
+              Tại sao chọn SpeakCV?
             </h2>
             <p className="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto">
-              Everything you need to confidently ace your next technical
-              interview and land the offer.
+              Mọi thứ bạn cần để tự tin vượt qua kỳ phỏng vấn phần mềm và nhận
+              được lời mời làm việc.
             </p>
           </div>
 
@@ -242,12 +241,13 @@ export default function LandingPage() {
                 <Mic className="text-blue-400" size={32} />
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">
-                Real-time AI Voice Interviews
+                Phỏng vấn Giọng nói AI thời gian thực
               </h3>
               <p className="text-slate-400 leading-relaxed">
-                Talk naturally with our low-latency AI interviewer. It listens,
-                processes context, and adapts questions dynamically based on
-                your specific industry and previous answers.
+                Nói chuyện tự nhiên với người phỏng vấn AI có độ trễ thấp của
+                chúng tôi. Hệ thống lắng nghe, xử lý ngữ cảnh và tự động điều
+                chỉnh câu hỏi dựa trên ngành nghề chuyên biệt và các câu trả lời
+                trước đó của bạn.
               </p>
             </div>
 
@@ -257,12 +257,12 @@ export default function LandingPage() {
                 <BarChart className="text-purple-400" size={32} />
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">
-                Deep Analytics & Scoring
+                Phân tích & Chấm điểm Sâu
               </h3>
               <p className="text-slate-400 leading-relaxed">
-                Get instantly graded on technical accuracy, soft skills, and
-                communication style. Review detailed feedback, transcript
-                histories, and ideal model answers.
+                Được chấm điểm tức thì về chuyên môn, kỹ năng mềm và kỹ năng
+                giao tiếp. Xem lại phản hồi chi tiết, lịch sử trò chuyện và câu
+                trả lời mẫu lí tưởng.
               </p>
             </div>
 
@@ -272,12 +272,12 @@ export default function LandingPage() {
                 <FileText className="text-emerald-400" size={32} />
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">
-                1-Click Auto CV Builder
+                Tạo CV Tự động 1-Chạm
               </h3>
               <p className="text-slate-400 leading-relaxed">
-                Turn your brilliant interview answers into a polished,
-                ATS-friendly CV automatically. We extract your skills and
-                experiences to generate a ready-to-download PDF.
+                Tự động biến những câu trả lời xuất sắc của bạn thành một bản CV
+                chuyên nghiệp, chuẩn ATS. Chúng tôi trích xuất những kỹ năng và
+                kinh nghiệm của bạn để tạo ra file PDF tải liền tay.
               </p>
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-5xl font-black text-white mb-6">
-              Loved by thousands of candidates
+              Được yêu thích bởi hàng ngàn ứng viên
             </h2>
           </div>
 
@@ -311,18 +311,18 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-slate-300 mb-8 italic leading-relaxed text-lg">
-                "I was extremely nervous about my first React Native interview.
-                SpeakCV's timed mode helped me get used to the pressure. The
-                feedback was spot on, and I landed the job!"
+                "Tôi đã vô cùng lo lắng trước buổi phỏng vấn React Native đầu
+                tiên. Chế độ tính giờ của SpeakCV giúp tôi làm quen với áp lực.
+                Phản hồi rất chuẩn xác, và tôi đã nhận được công việc!"
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
                   M
                 </div>
                 <div>
-                  <h4 className="text-white font-bold">Minh Pham</h4>
+                  <h4 className="text-white font-bold">Minh Phạm</h4>
                   <p className="text-slate-500 text-sm">
-                    Frontend Developer at VNG
+                    Lập trình viên Frontend tại VNG
                   </p>
                 </div>
               </div>
@@ -340,18 +340,18 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-slate-300 mb-8 italic leading-relaxed text-lg">
-                "The AI asks incredibly relevant questions based on the JD. It
-                caught me off guard initially, but practicing with it made the
-                actual Shopee interview feel like a breeze."
+                "AI đặt những câu hỏi bám sát JD. Ban đầu tôi hơi bất ngờ, nhưng
+                việc luyện tập giúp buổi phỏng vấn thực tế tại Shopee trở nên
+                thật dễ dàng."
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
                   T
                 </div>
                 <div>
-                  <h4 className="text-white font-bold">Trang Nguyen</h4>
+                  <h4 className="text-white font-bold">Trang Nguyễn</h4>
                   <p className="text-slate-500 text-sm">
-                    Data Analyst at Shopee
+                    Chuyên viên Phân tích Dữ liệu tại Shopee
                   </p>
                 </div>
               </div>
@@ -369,18 +369,18 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-slate-300 mb-8 italic leading-relaxed text-lg">
-                "What amazed me most was the auto CV builder. It took all my
-                answers from the mock interviews and structured them perfectly
-                using the STAR method. Save me hours!"
+                "Điều làm tôi bất ngờ nhất là tính năng tạo CV tự động. Hệ thống
+                lấy câu trả lời từ các buổi phỏng vấn giả lập và cấu trúc hoàn
+                hảo theo phương pháp STAR. Tiết kiệm cho tôi hàng giờ đồng hồ!"
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
                   D
                 </div>
                 <div>
-                  <h4 className="text-white font-bold">Duc Tran</h4>
+                  <h4 className="text-white font-bold">Đức Trần</h4>
                   <p className="text-slate-500 text-sm">
-                    Backend Engineer at FPT
+                    Kỹ sư Backend tại FPT
                   </p>
                 </div>
               </div>
@@ -399,19 +399,19 @@ export default function LandingPage() {
 
           <div className="bg-slate-950 rounded-[2.4rem] p-10 md:p-20 text-center relative z-10">
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-              Ready to land your dream job?
+              Sẵn sàng nhận được công việc mơ ước?
             </h2>
             <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
-              Join thousands of developers who have leveled up their interview
-              skills. Claim your{" "}
-              <span className="text-cyan-400 font-bold">100 free credits</span>{" "}
-              today.
+              Tham gia cùng hàng ngàn lập trình viên đã nâng cấp kỹ năng phỏng
+              vấn của họ. Nhận{" "}
+              <span className="text-cyan-400 font-bold">100 lượt miễn phí</span>{" "}
+              ngay hôm nay.
             </p>
             <button
               onClick={handleStart}
               className="px-10 py-5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black text-xl hover:scale-105 transition-transform shadow-[0_0_40px_rgba(59,130,246,0.4)] flex items-center justify-center gap-3 mx-auto"
             >
-              Get Started Now <ChevronRight size={24} />
+              Bắt đầu ngay <ChevronRight size={24} />
             </button>
           </div>
         </div>
@@ -428,17 +428,17 @@ export default function LandingPage() {
           </div>
           <div className="flex gap-6 text-sm text-slate-500 font-medium">
             <a href="#" className="hover:text-white transition-colors">
-              Privacy Policy
+              Chính sách Bảo mật
             </a>
             <a href="#" className="hover:text-white transition-colors">
-              Terms of Service
+              Điều khoản Dịch vụ
             </a>
             <a href="#" className="hover:text-white transition-colors">
-              Contact Support
+              Liên hệ Hỗ trợ
             </a>
           </div>
           <p className="text-slate-600 text-sm">
-            © {new Date().getFullYear()} SpeakCV. All rights reserved.
+            © {new Date().getFullYear()} SpeakCV. Đã đăng ký Bản quyền.
           </p>
         </div>
       </footer>

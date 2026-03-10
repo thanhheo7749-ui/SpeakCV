@@ -5,6 +5,7 @@ from .. import models
 from ..database import sql_models
 from ..database.database import get_db
 from .profile import get_current_user
+from ..auth import security
 
 router = APIRouter()
 
@@ -29,6 +30,7 @@ async def get_admin_dashboard(current_user: sql_models.User = Depends(get_curren
             "email": u.email,
             "full_name": u.full_name,
             "role": u.role,
+            "plan": u.plan,
             "interview_count": user_interview_count,
             "tokens_used": user_interview_count * 2500,
             "credits": u.credits 
@@ -198,10 +200,88 @@ async def delete_user(
     user = db.query(sql_models.User).filter(sql_models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    # Cascade delete all related records before deleting the user
+    db.query(sql_models.InterviewHistory).filter(sql_models.InterviewHistory.user_id == user_id).delete()
+    db.query(sql_models.TransactionHistory).filter(sql_models.TransactionHistory.user_id == user_id).delete()
+    db.query(sql_models.SupportMessage).filter(sql_models.SupportMessage.user_id == user_id).delete()
+    db.query(sql_models.Transaction).filter(sql_models.Transaction.user_id == user_id).delete()
+    db.query(sql_models.UserProfile).filter(sql_models.UserProfile.user_id == user_id).delete()
+    db.query(sql_models.Experience).filter(sql_models.Experience.user_id == user_id).delete()
+    db.query(sql_models.Education).filter(sql_models.Education.user_id == user_id).delete()
         
     db.delete(user)
     db.commit()
     return {"message": "User permanently deleted!"}
+
+# Create a new user (Admin only)
+@router.post("/api/admin/users")
+async def create_user_admin(
+    request: models.AdminUserCreate, 
+    current_user: sql_models.User = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+        
+    # Check if email exists
+    existing_user = db.query(sql_models.User).filter(sql_models.User.email == request.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+        
+    hashed_pw = security.get_password_hash(request.password)
+    
+    new_user = sql_models.User(
+        email=request.email,
+        full_name=request.full_name,
+        hashed_password=hashed_pw,
+        role=request.role,
+        credits=request.credits,
+        plan=request.plan
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    return {"message": "User created successfully!", "user_id": new_user.id}
+
+# Update a user (Admin only)
+@router.put("/api/admin/users/{user_id}")
+async def update_user_admin(
+    user_id: int,
+    request: models.AdminUserUpdate, 
+    current_user: sql_models.User = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+        
+    user = db.query(sql_models.User).filter(sql_models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    # Check if new email conflicts with another user
+    if request.email and request.email != user.email:
+        existing_email = db.query(sql_models.User).filter(sql_models.User.email == request.email).first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already taken by another user")
+            
+    if request.email is not None:
+        user.email = request.email
+    if request.full_name is not None:
+        user.full_name = request.full_name
+    if request.role is not None:
+        user.role = request.role
+    if request.credits is not None:
+        user.credits = request.credits
+    if request.plan is not None:
+        user.plan = request.plan
+    if request.password is not None and request.password != "":
+        user.hashed_password = security.get_password_hash(request.password)
+        
+    db.commit()
+    
+    return {"message": "User updated successfully!"}
 
 # Add credits for a user (Admin only)
 @router.post("/api/admin/users/{user_id}/add-credits")
@@ -267,3 +347,57 @@ async def get_admin_transactions(
         })
         
     return {"transactions": result}
+
+# Get user detail (Admin only)
+@router.get("/api/admin/users/{user_id}")
+async def get_user_detail(
+    user_id: int,
+    current_user: sql_models.User = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+        
+    user = db.query(sql_models.User).filter(sql_models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Interview history
+    interviews = db.query(sql_models.InterviewHistory).filter(
+        sql_models.InterviewHistory.user_id == user_id
+    ).order_by(sql_models.InterviewHistory.created_at.desc()).all()
+    
+    interview_list = [{
+        "id": iv.id,
+        "title": iv.title,
+        "position": iv.position,
+        "score": iv.score,
+        "interview_type": iv.interview_type,
+        "created_at": iv.created_at
+    } for iv in interviews]
+    
+    # Transaction history
+    transactions = db.query(sql_models.TransactionHistory).filter(
+        sql_models.TransactionHistory.user_id == user_id
+    ).order_by(sql_models.TransactionHistory.created_at.desc()).all()
+    
+    transaction_list = [{
+        "id": txn.id,
+        "amount": txn.amount,
+        "transaction_type": txn.transaction_type,
+        "note": txn.note,
+        "created_at": txn.created_at
+    } for txn in transactions]
+    
+    return {
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "role": user.role,
+            "plan": user.plan,
+            "credits": user.credits
+        },
+        "interviews": interview_list,
+        "transactions": transaction_list
+    }

@@ -24,7 +24,6 @@ def instant_upgrade(db: Session = Depends(get_db), current_user: sql_models.User
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="User not found")
         
-    user.role = "admin"  # As requested in existing logic
     user.plan = "pro"
     user.credits += 10000
     db.commit()
@@ -101,7 +100,6 @@ def vnpay_ipn(request: Request, db: Session = Depends(get_db)):
                 # Update User
                 user = db.query(sql_models.User).filter(sql_models.User.id == transaction.user_id).first()
                 if user:
-                    user.role = "admin"  # As requested
                     user.plan = "pro"
                     user.credits += 10000
                 db.commit()

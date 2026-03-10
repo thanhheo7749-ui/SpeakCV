@@ -78,7 +78,19 @@ export function TransactionsTab() {
             </thead>
             <tbody className="divide-y divide-slate-800/50">
               {logs.map((log) => {
-                const isAdd = log.transaction_type === "add_credits";
+                const isAdd =
+                  log.amount > 0 ||
+                  log.transaction_type === "add_credits" ||
+                  log.transaction_type.startsWith("upgrade_pro");
+                let actionName = "Giao dịch khác";
+                if (log.transaction_type === "add_credits")
+                  actionName = "Nạp Credit Auth";
+                else if (log.transaction_type.startsWith("upgrade_pro"))
+                  actionName = "Nâng cấp Pro";
+                else if (log.transaction_type === "consume_credits")
+                  actionName = "Sử dụng Credit";
+                else actionName = log.transaction_type;
+
                 return (
                   <tr
                     key={log.id}
@@ -101,7 +113,7 @@ export function TransactionsTab() {
                         </div>
                         <div>
                           <div className="font-bold text-slate-200">
-                            {isAdd ? "Nạp Credit" : "Trừ Credit"}
+                            {actionName}
                           </div>
                           <div className="text-xs text-slate-500 font-medium font-mono uppercase">
                             #{log.id.toString().padStart(5, "0")}

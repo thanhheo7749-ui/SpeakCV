@@ -367,3 +367,52 @@ export const deleteUser = async (userId: number) => {
   }
   return res.json();
 };
+
+// Create a user (Admin only)
+export const createUserAsAdmin = async (data: any) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/admin/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || "Failed to create user");
+  }
+  return res.json();
+};
+
+// Update a user (Admin only)
+export const updateUserAsAdmin = async (userId: number, data: any) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/admin/users/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || "Failed to update user");
+  }
+  return res.json();
+};
+
+// Get user detail (Admin only)
+export const getUserDetail = async (userId: number) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/admin/users/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || "Failed to load user detail");
+  }
+  return res.json();
+};
