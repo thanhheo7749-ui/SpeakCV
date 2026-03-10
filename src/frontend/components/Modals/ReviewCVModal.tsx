@@ -9,6 +9,7 @@ import { X, Check, Upload, Loader2, FileText, AlertCircle } from "lucide-react";
 import { reviewCV } from "@/services/api";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
+import JobRecommendations from "../JobRecommendations";
 
 export default function ReviewCVModal({ show, onClose }: any) {
   const [file, setFile] = useState<File | null>(null);
@@ -185,6 +186,9 @@ export default function ReviewCVModal({ show, onClose }: any) {
                 <div className="prose prose-invert max-w-none prose-headings:text-blue-400 prose-strong:text-white">
                   <ReactMarkdown>{res || "Đang phân tích..."}</ReactMarkdown>
                 </div>
+
+                {/* Job Recommendations Feature */}
+                {res && !loading && file && <JobRecommendations file={file} />}
               </div>
               <div className="pt-4 flex justify-end">
                 <button
