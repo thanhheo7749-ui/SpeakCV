@@ -26,7 +26,7 @@ import { ChatBox } from "@/components/Interview/ChatBox";
 import { Sidebar } from "@/components/Interview/Sidebar";
 import { SetupForm } from "@/components/Interview/SetupForm";
 import { TimerDisplay } from "@/components/Interview/TimerDisplay";
-import { OnboardingTour } from "@/components/OnboardingTour";
+
 
 import {
   endInterview,
@@ -399,7 +399,7 @@ export default function InterviewRoom() {
 
   return (
     <div className="flex h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      <OnboardingTour />
+
       <Sidebar
         user={user}
         myProfileData={myProfileData}
