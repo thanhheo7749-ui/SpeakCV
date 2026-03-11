@@ -4,10 +4,10 @@ import requests
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from dotenv import load_dotenv
 from .cv import extract_text_from_cv
+from ..ai_service import call_ai_chat
 
 load_dotenv()
 router = APIRouter()
-api_key = os.getenv("OPENAI_API_KEY")
 
 MOCK_JOBS = [
     {
@@ -51,40 +51,32 @@ async def match_jobs(file: UploadFile = File(...)):
         if not cv_text:
             raise HTTPException(status_code=400, detail="Cannot extract text from CV.")
 
-        url = "https://newapi.ccfilm.online/v1/chat/completions"
-        headers = { "Authorization": f"Bearer {api_key}", "Content-Type": "application/json" }
-        
         prompt = f"Dưới đây là CV ứng viên: {cv_text}. Và danh sách 5 công việc: {MOCK_JOBS}. Hãy chọn ra 2 công việc PHÙ HỢP NHẤT với CV này. Trả về kết quả STRICTLY dưới dạng JSON array chứa các object: 'company', 'role', 'match_percentage' (số nguyên), 'reason' (1 câu giải thích tại sao hợp)."
         
-        data = {
-            "model": "gpt-4o",
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.2
-        }
+        messages = [{"role": "user", "content": prompt}]
         
-        res = requests.post(url, headers=headers, json=data, timeout=90)
+        content = call_ai_chat(
+            messages=messages,
+            model="gpt-4o",
+            temperature=0.2,
+            timeout=90
+        )
         
-        if res.status_code == 200:
-            content = res.json()["choices"][0]["message"]["content"].strip()
-            # Clean up markdown if AI still outputs it
-            if content.startswith("```json"):
-                content = content[7:]
-            if content.endswith("```"):
-                content = content[:-3]
-            content = content.strip()
-            
-            try:
-                matched_jobs = json.loads(content)
-                return matched_jobs
-            except json.JSONDecodeError as de:
-                print(f"JSON Decode Error: {de}. Raw content: {content}")
-                return []
-        else:
-            print(f"⚠️ AI error: {res.text}")
-            raise HTTPException(status_code=500, detail="AI Service Error")
+        # Clean up markdown if AI still outputs it
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
+        
+        try:
+            matched_jobs = json.loads(content)
+            return matched_jobs
+        except json.JSONDecodeError as de:
+            print(f"JSON Decode Error: {de}. Raw content: {content}")
+            return []
             
     except Exception as e:
         print(f"❌ JOB MATCH ERROR: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+

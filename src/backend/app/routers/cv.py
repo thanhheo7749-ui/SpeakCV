@@ -8,12 +8,11 @@ from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 from dotenv import load_dotenv
 
 from .. import models
+from ..ai_service import call_ai_chat, call_ai_chat_stream
 
 load_dotenv() 
 
 router = APIRouter()
-
-api_key = os.getenv("OPENAI_API_KEY")
 
 async def extract_text_from_cv(file: UploadFile) -> str:
     content = await file.read()
@@ -49,20 +48,14 @@ async def extract_text_from_cv(file: UploadFile) -> str:
 async def generate_cv(request: models.CVGenRequest): 
     try:
         print(f"⏳ Generating CV for {request.position} | Style: {request.style_instruction}")
-        url = "https://newapi.ccfilm.online/v1/chat/completions"
-        headers = { "Authorization": f"Bearer {api_key}", "Content-Type": "application/json" }
         
         system_prompt = f"Viết CV HTML cho {request.position} tại {request.company}. {request.style_instruction}"
-        data = { "model": "gpt-4o", "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": request.user_info}] }
+        messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": request.user_info}]
         
-        res = requests.post(url, headers=headers, json=data, timeout=120)
+        result = call_ai_chat(messages=messages, model="gpt-4o", timeout=120)
         
-        if res.status_code == 200:
-            print("✅ CV generated successfully!")
-            return {"content": res.json()["choices"][0]["message"]["content"].replace("```html","").replace("```","")}
-        else:
-            print(f"⚠️ AI error: {res.text}")
-            return {"content": f"<p>AI connection error: {res.status_code}</p>"}
+        print("✅ CV generated successfully!")
+        return {"content": result.replace("```html","").replace("```","")}
             
     except Exception as e: 
         print(f"❌ CV GENERATION ERROR: {e}")
@@ -80,9 +73,6 @@ async def review_cv(file: UploadFile = File(...), jd_text: str = Form("Không c�
         
         if not cv_text:
             return {"review": "Cannot extract text from this CV file. Please try another file."}
-            
-        url = "https://newapi.ccfilm.online/v1/chat/completions"
-        headers = { "Authorization": f"Bearer {api_key}", "Content-Type": "application/json" }
         
         system_prompt = "You are an expert ATS system. Evaluate the candidate's CV against the JD. Output a beautifully formatted Markdown report in Vietnamese (DO NOT USE JSON). Include these sections: 🎯 Match Percentage (e.g., 85%), 🔑 Missing Keywords, and 📝 Detailed Feedback (Positive & Areas for Improvement). Use emojis, bold text, and bullet points to make it easy to read."
         
@@ -92,38 +82,12 @@ async def review_cv(file: UploadFile = File(...), jd_text: str = Form("Không c�
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt}
         ]
-        
-        data = {
-            "model": "gpt-4o",
-            "messages": messages,
-            "stream": True
-        }
-        
-        def chunk_generator():
-            try:
-                res = requests.post(url, headers=headers, json=data, stream=True, timeout=90)
-                if res.status_code != 200:
-                    yield f"AI Server error: {res.status_code}"
-                    return
-                    
-                for line in res.iter_lines():
-                    if line:
-                        line_text = line.decode('utf-8')
-                        if line_text.startswith("data: ") and line_text != "data: [DONE]":
-                            try:
-                                chunk_data = json.loads(line_text[6:].strip())
-                                choices = chunk_data.get("choices", [])
-                                if choices and len(choices) > 0:
-                                    delta = choices[0].get("delta", {}).get("content", "")
-                                    if delta:
-                                        yield delta
-                            except json.JSONDecodeError:
-                                continue
-            except Exception as e:
-                yield f"\n\n**Error during report generation:** {str(e)}"
 
         print("✅ Starting CV Review stream!")
-        return StreamingResponse(chunk_generator(), media_type="text/event-stream")
+        return StreamingResponse(
+            call_ai_chat_stream(messages=messages, model="gpt-4o", timeout=90),
+            media_type="text/event-stream"
+        )
             
     except Exception as e: 
         print(f"❌ CV READ ERROR: {e}")

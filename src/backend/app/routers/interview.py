@@ -15,6 +15,7 @@ from .. import models
 from ..database import sql_models
 from ..database.database import get_db
 from .profile import get_current_user
+from ..ai_service import call_ai_chat
 
 load_dotenv() 
 
@@ -166,57 +167,46 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
     
     temperature = float(temp_config.setting_value) if temp_config else 0.7
 
+    if is_english:
+        system_prompt = f"""
+        Interview mode: {request.mode}. 
+        Position: {request.jd_text}. 
+        IMPORTANT: You MUST conduct the entire interview in English only.
+        
+        {base_system_prompt}
+        """
+    else:
+        system_prompt = f"""
+        Chế độ phỏng vấn (Mode): {request.mode}. 
+        Vị trí: {request.jd_text}. 
+        
+        {base_system_prompt}
+        """
+    
+    messages = [{"role": "system", "content": system_prompt}]
+    if request.chat_history:
+        messages.extend(request.chat_history)
+    messages.append({"role": "user", "content": request.user_text})
+
     for attempt in range(3):
         try:
             print(f"⏳ Calling AI (attempt {attempt + 1})...")
-                
-            url = "https://newapi.ccfilm.online/v1/chat/completions"
-            headers = { "Authorization": f"Bearer {api_key}", "Content-Type": "application/json" }
-
-            if is_english:
-                system_prompt = f"""
-                Interview mode: {request.mode}. 
-                Position: {request.jd_text}. 
-                IMPORTANT: You MUST conduct the entire interview in English only.
-                
-                {base_system_prompt}
-                """
-            else:
-                system_prompt = f"""
-                Chế độ phỏng vấn (Mode): {request.mode}. 
-                Vị trí: {request.jd_text}. 
-                
-                {base_system_prompt}
-                """
-            
-            messages = [{"role": "system", "content": system_prompt}]
-            if request.chat_history:
-                messages.extend(request.chat_history)
-            messages.append({"role": "user", "content": request.user_text})
-                
-            data = {
-                    "model": "gpt-4o-mini", 
-                    "messages": messages,
-                    "max_tokens": 250,
-                    "temperature": temperature
-            }
-            
-            res = requests.post(url, headers=headers, json=data, timeout=90)
-
-            if res.status_code == 200:
-                ai_text = res.json()["choices"][0]["message"]["content"]
-                if ai_text: 
-                    if user:
-                        user.credits -= 1
-                        db.commit()
-                    break
-            else:
-                print(f"⚠️ AI Server error (code {res.status_code}): {res.text}")
-            
+            ai_text = call_ai_chat(
+                messages=messages,
+                model="gpt-4o-mini",
+                temperature=temperature,
+                max_tokens=250,
+                timeout=90
+            )
+            if ai_text:
+                if user:
+                    user.credits -= 1
+                    db.commit()
+                break
             time.sleep(2)
-            
-        except Exception as e: 
-            print(f"⚠️ Network/Timeout error (attempt {attempt+1}): {e}")
+        except Exception as e:
+            print(f"⚠️ AI error (attempt {attempt+1}): {e}")
+            time.sleep(2)
 
     ai_text = str(ai_text).strip() or "Mạng đang lag, bạn nói lại giúp mình nhé."
     print(f"✅ AI: {ai_text}")
@@ -236,19 +226,14 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
 @router.post("/api/hint")
 async def get_hint(request: models.HintRequest):
     try:
-        url = "https://newapi.ccfilm.online/v1/chat/completions"
-        headers = { "Authorization": f"Bearer {api_key}", "Content-Type": "application/json" }
-        data = { "model": "gpt-4o", "messages": [{"role": "system", "content": "Gợi ý 3 ý ngắn."}, {"role": "user", "content": f"Câu hỏi: {request.last_question}. JD: {request.jd_text}"}] }
-        res = requests.post(url, headers=headers, json=data, timeout=30)
-        return {"hint": res.json()["choices"][0]["message"]["content"]}
+        messages = [{"role": "system", "content": "Gợi ý 3 ý ngắn."}, {"role": "user", "content": f"Câu hỏi: {request.last_question}. JD: {request.jd_text}"}]
+        result = call_ai_chat(messages=messages, model="gpt-4o", timeout=30)
+        return {"hint": result}
     except: return {"hint": "Không lấy được gợi ý."}
 
 @router.post("/api/end-interview")
 async def end_interview(request: models.ReportRequest, current_user: sql_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        url = "https://newapi.ccfilm.online/v1/chat/completions"
-        headers = { "Authorization": f"Bearer {api_key}", "Content-Type": "application/json" }
-        
         system_prompt = f"""
         Bạn là HR. Đánh giá ứng viên vị trí: {request.jd_text}.
         DỰA CHÍNH XÁC VÀO LỊCH SỬ PHỎNG VẤN. QUY TẮC TỐI THƯỢNG:
@@ -278,18 +263,19 @@ async def end_interview(request: models.ReportRequest, current_user: sql_models.
         }}
         """
         
-        data = { 
-            "model": "gpt-4o-mini", 
-            "response_format": { "type": "json_object" },
-            "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": f"Lịch sử:\n{request.history}"}],
-            "temperature": 0.2,
-            "max_tokens": 4000
-        }
+        messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": f"Lịch sử:\n{request.history}"}]
         
-        res = requests.post(url, headers=headers, json=data, timeout=90)
+        raw_content = call_ai_chat(
+            messages=messages,
+            model="gpt-4o-mini",
+            temperature=0.2,
+            max_tokens=4000,
+            response_format={"type": "json_object"},
+            timeout=90
+        )
         
-        if res.status_code == 200:
-            report_data = clean_and_parse_json(res.json()["choices"][0]["message"]["content"])
+        if raw_content:
+            report_data = clean_and_parse_json(raw_content)
             score = report_data.get("score", 0)
             overall_feedback = report_data.get("overall_feedback", "")
             details = report_data.get("details", [])
