@@ -285,7 +285,7 @@ export default function ReviewCVModal({ show, onClose }: any) {
                 </div>
 
                 {/* Job Recommendations Feature */}
-                {res && !loading && file && <JobRecommendations file={file} />}
+                {res && !loading && file && reviewMode === "auto_match" && <JobRecommendations file={file} />}
               </div>
               <div className="pt-4 flex justify-end">
                 <button
