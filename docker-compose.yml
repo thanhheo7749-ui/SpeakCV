@@ -19,7 +19,7 @@ services:
 
   # --- FRONTEND ---
   frontend:
-    build: 
+    build:
       context: ./src/frontend
       args:
         - NEXT_PUBLIC_API_URL=https://hoangthanhzzz.id.vn
