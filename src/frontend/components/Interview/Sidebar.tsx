@@ -248,6 +248,7 @@ export function Sidebar({
                 <Sparkles size={16} /> Tạo CV (Demo)
               </button>
               <button
+                id="tour-step-cv"
                 onClick={() => toggleModal("review", true)}
                 className="w-full text-left px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-purple-400 rounded-lg flex items-center gap-3"
               >

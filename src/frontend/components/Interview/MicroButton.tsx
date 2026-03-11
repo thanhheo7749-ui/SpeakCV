@@ -29,6 +29,7 @@ export const MicroButton = ({
       ></div>
 
       <button
+        id="tour-step-mic"
         onClick={onClick}
         className={`w-52 h-52 rounded-full bg-slate-900/80 backdrop-blur-sm border-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 shadow-2xl relative z-10 hover:scale-105 active:scale-95 
           ${isListening ? "border-red-500 shadow-red-900/40" : isActive ? "border-yellow-500 shadow-yellow-900/40" : "border-slate-700 hover:border-blue-500 shadow-blue-900/20"}

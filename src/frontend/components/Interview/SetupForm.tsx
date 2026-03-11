@@ -70,6 +70,7 @@ export function SetupForm({ config, setConfig, onStart }: SetupFormProps) {
         />
       </div>
       <button
+        id="tour-step-start"
         onClick={handleStart}
         className="mt-4 bg-red-600 hover:bg-red-500 text-white font-black py-4 px-8 rounded-xl text-lg shadow-[0_0_20px_rgba(220,38,38,0.3)] active:scale-95 transition-all flex items-center justify-center gap-3"
       >
