@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
  */
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   X,
   LayoutTemplate,
@@ -21,6 +21,7 @@ import {
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import toast from "react-hot-toast";
+import CVProTemplate, { type CVData } from "./CVProTemplate";
 
 // 1. SMART HINTS DATA
 const HINTS: any = {
@@ -104,7 +105,11 @@ const AvatarDisplay = ({ src }: { src?: string }) => {
   );
 };
 
-// 3. MAIN COMPONENT
+// 3. UID HELPER — unique keys for array items
+let _uidCounter = 0;
+const genUid = () => `uid_${++_uidCounter}_${Date.now()}`;
+
+// 4. MAIN COMPONENT
 export default function GenCVModal({ show, onClose, userProfile }: any) {
   const [cvData, setCvData] = useState<any>({
     full_name: "",
@@ -145,7 +150,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
           "- Cập nhật mục tiêu nghề nghiệp của bạn tại đây...",
         skills:
           userProfile.info?.skills || "- Kỹ năng 1\n- Kỹ năng 2\n- Kỹ năng 3",
-        experiences: userProfile.experiences?.length
+        experiences: (userProfile.experiences?.length
           ? userProfile.experiences
           : [
               {
@@ -156,8 +161,8 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                 description:
                   "- Nhập mô tả công việc của bạn...\n- Đạt được thành tựu...",
               },
-            ],
-        educations: userProfile.educations?.length
+            ]).map((e: any) => ({ ...e, _uid: e._uid || genUid() })),
+        educations: (userProfile.educations?.length
           ? userProfile.educations
           : [
               {
@@ -166,10 +171,43 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                 start_date: "2019",
                 end_date: "2023",
               },
-            ],
+            ]).map((e: any) => ({ ...e, _uid: e._uid || genUid() })),
       });
     }
   }, [show, userProfile]);
+
+  // Adapter: convert GenCVModal state → CVData format for CVProTemplate
+  const toCVDataFormat = (): CVData => {
+    const skillsList = cvData.skills
+      ? cvData.skills.split("\n").map((s: string) => s.replace(/^-\s*/, "").trim()).filter(Boolean)
+      : [];
+    return {
+      personal_info: {
+        name: cvData.full_name,
+        title: cvData.position,
+        email: cvData.email,
+        phone: cvData.phone,
+        linkedin: cvData.linkedin,
+        location: cvData.address,
+        summary: cvData.summary,
+      },
+      skills: skillsList,
+      experience: (cvData.experiences || []).map((exp: any) => ({
+        company: exp.company_name,
+        role: exp.position,
+        period: [exp.start_date, exp.end_date].filter(Boolean).join(" - "),
+        achievements: exp.description
+          ? exp.description.split("\n").map((a: string) => a.replace(/^-\s*/, "").trim()).filter(Boolean)
+          : [],
+      })),
+      education: (cvData.educations || []).map((edu: any) => ({
+        school: edu.school_name,
+        degree: edu.major,
+        period: [edu.start_date, edu.end_date].filter(Boolean).join(" - "),
+      })),
+      projects: [],
+    };
+  };
 
   // Load AI-generated CV data from sessionStorage (from CV Makeover)
   useEffect(() => {
@@ -178,13 +216,16 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
     if (!raw) return;
 
     try {
-      const aiData = JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      // Support both wrapped { data, theme } and raw CVData format
+      const aiData = parsed.data || parsed;
+      const draftTheme = parsed.theme || null;
       const info = aiData.personal_info || {};
 
       // Helper: split "01/2023 - 06/2025" into start_date / end_date
       const splitPeriod = (period?: string) => {
         if (!period) return { start_date: "", end_date: "" };
-        const parts = period.split(/\s*[-–—]\s*/);
+        const parts = period.split(/\s*[-\u2013\u2014]\s*/);
         return { start_date: parts[0]?.trim() || "", end_date: parts[1]?.trim() || "Nay" };
       };
 
@@ -195,15 +236,16 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
         email: info.email || "",
         address: info.location || "",
         linkedin: info.linkedin || "",
-        avatar: "",
+        avatar: userProfile?.info?.avatar || "",
         summary: info.summary || "",
         skills: Array.isArray(aiData.skills)
           ? aiData.skills.map((s: string) => `- ${s}`).join("\n")
           : aiData.skills || "",
-        experiences: Array.isArray(aiData.experience) && aiData.experience.length > 0
+        experiences: (Array.isArray(aiData.experience) && aiData.experience.length > 0
           ? aiData.experience.map((exp: any) => {
               const { start_date, end_date } = splitPeriod(exp.period);
               return {
+                _uid: genUid(),
                 company_name: exp.company || "",
                 position: exp.role || "",
                 start_date,
@@ -213,19 +255,25 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                   : "",
               };
             })
-          : [{ company_name: "Tên công ty", position: "Vị trí", start_date: "01/2023", end_date: "Nay", description: "- Mô tả công việc..." }],
-        educations: Array.isArray(aiData.education) && aiData.education.length > 0
+          : [{ _uid: genUid(), company_name: "Tên công ty", position: "Vị trí", start_date: "01/2023", end_date: "Nay", description: "- Mô tả công việc..." }]),
+        educations: (Array.isArray(aiData.education) && aiData.education.length > 0
           ? aiData.education.map((edu: any) => {
               const { start_date, end_date } = splitPeriod(edu.period);
               return {
+                _uid: genUid(),
                 school_name: edu.school || "",
                 major: edu.degree || "",
                 start_date,
                 end_date,
               };
             })
-          : [{ school_name: "Tên trường", major: "Tên ngành học", start_date: "2019", end_date: "2023" }],
+          : [{ _uid: genUid(), school_name: "Tên trường", major: "Tên ngành học", start_date: "2019", end_date: "2023" }]),
       });
+
+      // Auto-select the makeover template if the flag was passed
+      if (draftTheme) {
+        changeTheme(draftTheme);
+      }
 
       sessionStorage.removeItem('draft_cv_data');
       toast.success("Đã tải dữ liệu CV từ AI. Bạn có thể chỉnh sửa theo ý muốn!");
@@ -233,6 +281,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
       console.error("Failed to parse draft_cv_data:", err);
       sessionStorage.removeItem('draft_cv_data');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
 
   // PDF DOWNLOAD HANDLER (1-CLICK)
@@ -284,11 +333,12 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
   };
 
   const addExp = () => {
-    setCvData({
-      ...cvData,
+    setCvData((prev: any) => ({
+      ...prev,
       experiences: [
-        ...cvData.experiences,
+        ...prev.experiences,
         {
+          _uid: genUid(),
           company_name: "Tên công ty mới",
           position: "Vị trí mới",
           start_date: "MM/YYYY",
@@ -296,36 +346,37 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
           description: "- Mô tả công việc...",
         },
       ],
-    });
+    }));
   };
 
   const removeExp = (index: number) => {
-    const newExps = cvData.experiences.filter(
-      (_: any, i: number) => i !== index,
-    );
-    setCvData({ ...cvData, experiences: newExps });
+    setCvData((prev: any) => ({
+      ...prev,
+      experiences: prev.experiences.filter((_: any, i: number) => i !== index),
+    }));
   };
 
   const addEdu = () => {
-    setCvData({
-      ...cvData,
+    setCvData((prev: any) => ({
+      ...prev,
       educations: [
-        ...cvData.educations,
+        ...prev.educations,
         {
+          _uid: genUid(),
           school_name: "Tên trường mới",
           major: "Ngành học mới",
           start_date: "YYYY",
           end_date: "YYYY",
         },
       ],
-    });
+    }));
   };
 
   const removeEdu = (index: number) => {
-    const newEdus = cvData.educations.filter(
-      (_: any, i: number) => i !== index,
-    );
-    setCvData({ ...cvData, educations: newEdus });
+    setCvData((prev: any) => ({
+      ...prev,
+      educations: prev.educations.filter((_: any, i: number) => i !== index),
+    }));
   };
   const changeTheme = (type: string) => {
     if (type === "topcv")
@@ -334,6 +385,8 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
       setTheme({ name: "antuong", leftBg: "#465345", rightPill: "#465345" });
     if (type === "thamvong")
       setTheme({ name: "thamvong", leftBg: "#1A1A1A", rightPill: "#F39C12" });
+    if (type === "makeover_blue")
+      setTheme({ name: "makeover_blue", leftBg: "#1e3a5f", rightPill: "#2563eb" });
   };
 
   if (!show) return null;
@@ -430,10 +483,21 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                       )}
                     </h4>
                   </div>
+                  <div
+                    onClick={() => changeTheme("makeover_blue")}
+                    className={`p-4 rounded-xl cursor-pointer border relative overflow-hidden transition-all ${theme.name === "makeover_blue" ? "border-blue-500 bg-slate-800" : "border-slate-700 bg-slate-950 hover:border-slate-500"}`}
+                  >
+                    <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-blue-600 to-indigo-700"></div>
+                    <h4 className="font-bold text-white flex justify-between ml-2">
+                      Xanh Chuyên nghiệp (Makeover){" "}
+                      {theme.name === "makeover_blue" && (
+                        <CheckCircle2 className="text-blue-500" size={18} />
+                      )}
+                    </h4>
+                  </div>
                 </div>
                 <div className="mt-6 p-4 bg-yellow-500/10 rounded-xl text-sm text-yellow-200 border border-yellow-500/20">
-                  💡 <b>Hướng dẫn:</b> Bấm trực tiếp vào dòng chữ bên phải để
-                  sửa nội dung!
+                  💡 <b>Hướng dẫn:</b> {theme.name === "makeover_blue" ? "Template này hiển thị dạng xem trước. Chọn theme khác để chỉnh sửa trực tiếp!" : "Bấm trực tiếp vào dòng chữ bên phải để sửa nội dung!"}
                 </div>
               </div>
             )}
@@ -443,6 +507,15 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
           <div className="w-[75%] bg-slate-800 rounded-2xl border border-slate-700 overflow-auto p-8 custom-scrollbar relative flex justify-center">
             {/* ZOOM WRAPPER (Display scale only) */}
             <div className="origin-top scale-[0.80] sm:scale-[0.9] lg:scale-[0.95] transition-transform">
+              {theme.name === "makeover_blue" ? (
+                /* === MAKEOVER BLUE TEMPLATE (CVProTemplate - read-only preview) === */
+                <CVProTemplate
+                  ref={cvRef}
+                  cvData={toCVDataFormat()}
+                  avatarUrl={cvData.avatar}
+                />
+              ) : (
+                /* === CLASSIC EDITABLE TEMPLATE === */
               <div
                 ref={cvRef}
                 className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed"
@@ -551,7 +624,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                     </div>
                     <div className="space-y-4">
                       {cvData.educations.map((edu: any, i: number) => (
-                        <div key={i} className="text-sm relative group">
+                        <div key={edu._uid || i} className="text-sm relative group">
                           <button
                             onClick={() => removeEdu(i)}
                             data-html2canvas-ignore="true"
@@ -671,7 +744,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                     </div>
                     <div className="space-y-6">
                       {cvData.experiences.map((exp: any, i: number) => (
-                        <div key={i} className="relative group">
+                        <div key={exp._uid || i} className="relative group">
                           <button
                             onClick={() => removeExp(i)}
                             data-html2canvas-ignore="true"
@@ -728,6 +801,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                   </div>
                 </div>
               </div>
+              )}
             </div>
           </div>
         </div>

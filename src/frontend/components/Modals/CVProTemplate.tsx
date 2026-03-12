@@ -47,7 +47,14 @@ export interface CVProjectItem {
   technologies?: string[];
 }
 
+export interface CVAnalysisFeedback {
+  strengths?: string[];
+  weaknesses?: string[];
+  overall_score?: number;
+}
+
 export interface CVData {
+  analysis_feedback?: CVAnalysisFeedback;
   personal_info?: CVPersonalInfo;
   skills?: string[];
   experience?: CVExperienceItem[];

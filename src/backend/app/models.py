@@ -153,7 +153,13 @@ class CVProjectItem(BaseModel):
     description: Optional[str] = ""
     technologies: Optional[List[str]] = []
 
+class CVAnalysisFeedback(BaseModel):
+    strengths: Optional[List[str]] = []
+    weaknesses: Optional[List[str]] = []
+    overall_score: Optional[int] = 0
+
 class CVMakeoverData(BaseModel):
+    analysis_feedback: Optional[CVAnalysisFeedback] = CVAnalysisFeedback()
     personal_info: Optional[CVPersonalInfo] = CVPersonalInfo()
     skills: Optional[List[str]] = []
     experience: Optional[List[CVExperienceItem]] = []

@@ -219,7 +219,7 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
 
   const handleEditManually = () => {
     if (!cvData) return;
-    sessionStorage.setItem('draft_cv_data', JSON.stringify(cvData));
+    sessionStorage.setItem('draft_cv_data', JSON.stringify({ data: cvData, theme: 'makeover_blue' }));
     toast.success("Đang chuyển sang trình soạn thảo CV...");
     onEditManually?.();
   };
@@ -433,17 +433,96 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
           ) : (
             /* === RESULT PHASE — Split Screen === */
             <div className="flex-1 flex min-h-0">
-              {/* LEFT PANEL — Original CV Text */}
+              {/* LEFT PANEL — AI Analysis + Original CV Text */}
               <div className="w-[35%] border-r border-slate-800 flex flex-col min-h-0 bg-slate-950/80">
                 <div className="px-5 py-3 border-b border-slate-800 shrink-0 flex items-center gap-2">
                   <FileText size={16} className="text-slate-400" />
-                  <span className="text-sm font-bold text-slate-300">CV Gốc</span>
+                  <span className="text-sm font-bold text-slate-300">CV Gốc & Nhận Xét</span>
                   <span className="text-xs text-slate-600 ml-auto truncate max-w-[150px]">{file?.name}</span>
                 </div>
-                <div className="flex-1 overflow-auto p-5 custom-scrollbar">
-                  <pre className="text-[12px] text-slate-400 whitespace-pre-wrap leading-relaxed font-mono">
-                    {extractedText}
-                  </pre>
+                <div className="flex-1 overflow-auto p-5 custom-scrollbar space-y-4">
+                  {/* === AI ANALYSIS FEEDBACK CARD === */}
+                  {cvData?.analysis_feedback && (
+                    <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/60 rounded-2xl p-5 space-y-4 animate-in slide-in-from-top-3 duration-300">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-lg">🤖</span>
+                        <h3 className="text-sm font-bold text-white tracking-wide">AI Nhận Xét</h3>
+                      </div>
+
+                      {/* Score Badge */}
+                      {cvData.analysis_feedback.overall_score != null && (
+                        <div className="flex items-center gap-4">
+                          <div className={`relative w-16 h-16 rounded-full flex items-center justify-center border-[3px] ${
+                            cvData.analysis_feedback.overall_score >= 80
+                              ? 'border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
+                              : cvData.analysis_feedback.overall_score >= 60
+                              ? 'border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
+                              : 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.25)]'
+                          }`}>
+                            <span className={`text-xl font-extrabold ${
+                              cvData.analysis_feedback.overall_score >= 80
+                                ? 'text-emerald-400'
+                                : cvData.analysis_feedback.overall_score >= 60
+                                ? 'text-amber-400'
+                                : 'text-red-400'
+                            }`}>
+                              {cvData.analysis_feedback.overall_score}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-400">Điểm tổng quan</p>
+                            <p className={`text-sm font-bold ${
+                              cvData.analysis_feedback.overall_score >= 80
+                                ? 'text-emerald-400'
+                                : cvData.analysis_feedback.overall_score >= 60
+                                ? 'text-amber-400'
+                                : 'text-red-400'
+                            }`}>
+                              {cvData.analysis_feedback.overall_score >= 80 ? 'Tốt' : cvData.analysis_feedback.overall_score >= 60 ? 'Khá' : 'Cần cải thiện'}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Strengths */}
+                      {cvData.analysis_feedback.strengths && cvData.analysis_feedback.strengths.length > 0 && (
+                        <div>
+                          <p className="text-xs font-bold text-emerald-400 mb-2 uppercase tracking-wider">Điểm mạnh</p>
+                          <ul className="space-y-1.5">
+                            {cvData.analysis_feedback.strengths.map((s, i) => (
+                              <li key={i} className="flex items-start gap-2 text-xs text-slate-300 leading-relaxed">
+                                <span className="text-emerald-400 mt-0.5 shrink-0">✅</span>
+                                <span>{s}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Weaknesses */}
+                      {cvData.analysis_feedback.weaknesses && cvData.analysis_feedback.weaknesses.length > 0 && (
+                        <div>
+                          <p className="text-xs font-bold text-amber-400 mb-2 uppercase tracking-wider">Cần cải thiện</p>
+                          <ul className="space-y-1.5">
+                            {cvData.analysis_feedback.weaknesses.map((w, i) => (
+                              <li key={i} className="flex items-start gap-2 text-xs text-slate-300 leading-relaxed">
+                                <span className="text-amber-400 mt-0.5 shrink-0">⚠️</span>
+                                <span>{w}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* === ORIGINAL CV TEXT === */}
+                  <div>
+                    <p className="text-[10px] text-slate-600 uppercase tracking-wider font-bold mb-2">Nội dung CV gốc</p>
+                    <pre className="text-[12px] text-slate-400 whitespace-pre-wrap leading-relaxed font-mono">
+                      {extractedText}
+                    </pre>
+                  </div>
                 </div>
               </div>
 
