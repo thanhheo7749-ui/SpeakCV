@@ -79,14 +79,19 @@ body {
   }
 }
 
-/* --- IN CV --- */
+/* --- IN CV (react-to-print) --- */
 @media print {
-  body * {
-    visibility: hidden;
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: white !important;
   }
-  #root > div,
-  .fixed {
-    visibility: visible;
+
+  #cv-pro-template {
+    width: 100% !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
 }
 

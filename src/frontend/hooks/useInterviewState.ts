@@ -14,6 +14,7 @@ export function useInterviewState() {
     review: false,
     history: false,
     resumeConfig: false,
+    makeover: false,
   });
 
   const [pendingResumeData, setPendingResumeData] = useState<any>(null);

@@ -432,3 +432,20 @@ export const matchJobs = async (file: File) => {
   }
   return res.json();
 };
+
+// --- CV MAKEOVER (FILE UPLOAD) ---
+export const uploadMakeoverCV = async (file: File, industry: string) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("industry", industry);
+
+  const res = await fetch(`${API_URL}/cv/upload-makeover`, {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "CV makeover failed" }));
+    throw new Error(err.detail || "CV makeover failed");
+  }
+  return res.json();
+};

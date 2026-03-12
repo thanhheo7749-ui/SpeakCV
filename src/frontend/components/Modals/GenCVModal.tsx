@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import toast from "react-hot-toast";
 
 // 1. SMART HINTS DATA
 const HINTS: any = {
@@ -169,6 +170,70 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
       });
     }
   }, [show, userProfile]);
+
+  // Load AI-generated CV data from sessionStorage (from CV Makeover)
+  useEffect(() => {
+    if (!show) return;
+    const raw = sessionStorage.getItem('draft_cv_data');
+    if (!raw) return;
+
+    try {
+      const aiData = JSON.parse(raw);
+      const info = aiData.personal_info || {};
+
+      // Helper: split "01/2023 - 06/2025" into start_date / end_date
+      const splitPeriod = (period?: string) => {
+        if (!period) return { start_date: "", end_date: "" };
+        const parts = period.split(/\s*[-–—]\s*/);
+        return { start_date: parts[0]?.trim() || "", end_date: parts[1]?.trim() || "Nay" };
+      };
+
+      setCvData({
+        full_name: info.name || "TÊN CỦA BẠN",
+        position: info.title || "Vị trí ứng tuyển",
+        phone: info.phone || "",
+        email: info.email || "",
+        address: info.location || "",
+        linkedin: info.linkedin || "",
+        avatar: "",
+        summary: info.summary || "",
+        skills: Array.isArray(aiData.skills)
+          ? aiData.skills.map((s: string) => `- ${s}`).join("\n")
+          : aiData.skills || "",
+        experiences: Array.isArray(aiData.experience) && aiData.experience.length > 0
+          ? aiData.experience.map((exp: any) => {
+              const { start_date, end_date } = splitPeriod(exp.period);
+              return {
+                company_name: exp.company || "",
+                position: exp.role || "",
+                start_date,
+                end_date,
+                description: Array.isArray(exp.achievements)
+                  ? exp.achievements.map((a: string) => `- ${a}`).join("\n")
+                  : "",
+              };
+            })
+          : [{ company_name: "Tên công ty", position: "Vị trí", start_date: "01/2023", end_date: "Nay", description: "- Mô tả công việc..." }],
+        educations: Array.isArray(aiData.education) && aiData.education.length > 0
+          ? aiData.education.map((edu: any) => {
+              const { start_date, end_date } = splitPeriod(edu.period);
+              return {
+                school_name: edu.school || "",
+                major: edu.degree || "",
+                start_date,
+                end_date,
+              };
+            })
+          : [{ school_name: "Tên trường", major: "Tên ngành học", start_date: "2019", end_date: "2023" }],
+      });
+
+      sessionStorage.removeItem('draft_cv_data');
+      toast.success("Đã tải dữ liệu CV từ AI. Bạn có thể chỉnh sửa theo ý muốn!");
+    } catch (err) {
+      console.error("Failed to parse draft_cv_data:", err);
+      sessionStorage.removeItem('draft_cv_data');
+    }
+  }, [show]);
 
   // PDF DOWNLOAD HANDLER (1-CLICK)
   const handleDownloadPDF = () => {

@@ -58,6 +58,10 @@ class CVGenRequest(BaseModel):
     company: str
     style_instruction: str = ""
 
+class CVRewriteRequest(BaseModel):
+    cv_text: str
+    template_style: str = "harvard"
+
 class UserCreate(BaseModel):
     email: str
     password: str
@@ -121,3 +125,37 @@ class SupportMessageResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# --- CV Makeover JSON Schema ---
+class CVPersonalInfo(BaseModel):
+    name: Optional[str] = ""
+    title: Optional[str] = ""
+    email: Optional[str] = ""
+    phone: Optional[str] = ""
+    linkedin: Optional[str] = ""
+    location: Optional[str] = ""
+    summary: Optional[str] = ""
+
+class CVExperienceItem(BaseModel):
+    company: Optional[str] = ""
+    role: Optional[str] = ""
+    period: Optional[str] = ""
+    achievements: Optional[List[str]] = []
+
+class CVEducationItem(BaseModel):
+    school: Optional[str] = ""
+    degree: Optional[str] = ""
+    period: Optional[str] = ""
+
+class CVProjectItem(BaseModel):
+    name: Optional[str] = ""
+    description: Optional[str] = ""
+    technologies: Optional[List[str]] = []
+
+class CVMakeoverData(BaseModel):
+    personal_info: Optional[CVPersonalInfo] = CVPersonalInfo()
+    skills: Optional[List[str]] = []
+    experience: Optional[List[CVExperienceItem]] = []
+    education: Optional[List[CVEducationItem]] = []
+    projects: Optional[List[CVProjectItem]] = []

@@ -19,6 +19,7 @@ import {
   ResumeConfigModal,
   SubscriptionModal,
   CheckoutModal,
+  CVMakeover,
 } from "@/components/Modals";
 import SupportChatWidget from "@/components/SupportChatWidget";
 import { MicroButton } from "@/components/Interview/MicroButton";
@@ -574,6 +575,15 @@ export default function InterviewRoom() {
       <ReviewCVModal
         show={modals.review}
         onClose={() => toggleModal("review", false)}
+      />
+      <CVMakeover
+        show={modals.makeover}
+        onClose={() => toggleModal("makeover", false)}
+        userAvatar={myProfileData?.info?.avatar}
+        onEditManually={() => {
+          toggleModal("makeover", false);
+          toggleModal("cv", true);
+        }}
       />
       <ResumeConfigModal
         show={modals.resumeConfig}
