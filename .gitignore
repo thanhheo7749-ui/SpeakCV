@@ -210,3 +210,6 @@ __marimo__/
 # Node.js / Next.js
 node_modules/
 .next/
+
+# AI Agent files
+.agent/
