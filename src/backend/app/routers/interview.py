@@ -378,6 +378,31 @@ async def update_interview_history(
     db.commit()
     return {"message": "Updated successfully"}
 
+@router.patch("/api/history/{history_id}/config")
+async def update_interview_config(
+    history_id: int,
+    request: models.UpdateInterviewConfig,
+    current_user: sql_models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    history = db.query(sql_models.InterviewHistory).filter(
+        sql_models.InterviewHistory.id == history_id,
+        sql_models.InterviewHistory.user_id == current_user.id
+    ).first()
+    if not history:
+        raise HTTPException(status_code=404, detail="Interview history not found.")
+    
+    history.interview_type = request.interview_type
+    history.question_limit = request.question_limit
+    history.time_limit = request.time_limit
+    db.commit()
+    return {
+        "message": "Config updated successfully",
+        "interview_type": history.interview_type,
+        "question_limit": history.question_limit,
+        "time_limit": history.time_limit,
+    }
+
 @router.delete("/api/history/{history_id}")
 async def delete_interview_history(
     history_id: int, 

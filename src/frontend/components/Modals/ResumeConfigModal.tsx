@@ -5,7 +5,16 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { Play, Settings, X, Clock, HelpCircle } from "lucide-react";
+import {
+  Play,
+  Settings,
+  X,
+  Clock,
+  HelpCircle,
+  Briefcase,
+  Zap,
+  Coffee,
+} from "lucide-react";
 
 interface ResumeConfigModalProps {
   show: boolean;
@@ -24,10 +33,21 @@ export function ResumeConfigModal({
   const [questionLimit, setQuestionLimit] = useState(5);
   const [timeLimit, setTimeLimit] = useState(120);
 
+  const existingQuestionCount = initialConfig?.details?.length || 0;
+  const sessionPosition =
+    initialConfig?.position || initialConfig?.title || "Chưa xác định";
+  const sessionScore = initialConfig?.score ?? null;
+
   useEffect(() => {
     if (show && initialConfig) {
       setInterviewType(initialConfig.interview_type || "free");
-      setQuestionLimit(initialConfig.question_limit || 5);
+      const existingCount = initialConfig.details?.length || 0;
+      const defaultLimit = Math.min(existingCount + 5, 15);
+      setQuestionLimit(
+        initialConfig.question_limit && initialConfig.question_limit > existingCount
+          ? initialConfig.question_limit
+          : defaultLimit
+      );
       setTimeLimit(initialConfig.time_limit || 120);
     }
   }, [show, initialConfig]);
@@ -44,9 +64,11 @@ export function ResumeConfigModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
+      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative animate-in zoom-in-95 duration-300">
+        {/* Gradient top bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500"></div>
 
+        {/* Header */}
         <div className="p-6 border-b border-slate-800 bg-slate-800/30 flex justify-between items-start">
           <div>
             <h3 className="text-xl font-bold text-white flex items-center gap-2 mb-1">
@@ -54,8 +76,7 @@ export function ResumeConfigModal({
               Tiếp tục Phỏng vấn
             </h3>
             <p className="text-sm text-amber-400 font-medium bg-amber-500/10 inline-block px-2 py-1 rounded-md mt-2">
-              ⚠️ Bạn đang tiếp tục một phiên phỏng vấn cũ. Bạn có thể giữ nguyên
-              tính năng hoặc thay đổi cài đặt bên dưới.
+              ⚠️ Thiết lập lại chế độ trước khi tiếp tục phiên phỏng vấn cũ.
             </p>
           </div>
           <button
@@ -66,7 +87,43 @@ export function ResumeConfigModal({
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-5">
+          {/* Session Context (Read-only) */}
+          <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <Briefcase size={14} className="text-blue-400" />
+              Thông tin phiên phỏng vấn
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-400">Chủ đề:</span>
+              <span className="text-sm font-bold text-white truncate max-w-[280px]" title={sessionPosition}>
+                {sessionPosition}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-400">Đã hỏi:</span>
+              <span className="text-sm font-bold text-cyan-400">
+                {existingQuestionCount} câu
+              </span>
+            </div>
+            {sessionScore !== null && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-400">Điểm hiện tại:</span>
+                <span
+                  className={`text-sm font-bold ${
+                    sessionScore >= 8
+                      ? "text-emerald-400"
+                      : sessionScore >= 5
+                        ? "text-yellow-400"
+                        : "text-red-400"
+                  }`}
+                >
+                  {sessionScore}/10
+                </span>
+              </div>
+            )}
+          </div>
+
           {/* SELECT INTERVIEW MODE */}
           <div className="space-y-3">
             <label className="text-sm font-bold text-slate-300">
@@ -77,11 +134,17 @@ export function ResumeConfigModal({
                 onClick={() => setInterviewType("free")}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${
                   interviewType === "free"
-                    ? "border-blue-500 bg-blue-500/10"
+                    ? "border-blue-500 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
                     : "border-slate-700 hover:border-slate-500 bg-slate-800/50"
                 }`}
               >
-                <div className="font-bold text-white mb-1">Tự do</div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Coffee
+                    size={18}
+                    className={interviewType === "free" ? "text-blue-400" : "text-slate-500"}
+                  />
+                  <span className="font-bold text-white">Tự do</span>
+                </div>
                 <div className="text-xs text-slate-400">
                   Trao đổi thoải mái, không giới hạn thời gian
                 </div>
@@ -91,12 +154,22 @@ export function ResumeConfigModal({
                 onClick={() => setInterviewType("timed")}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${
                   interviewType === "timed"
-                    ? "border-amber-500 bg-amber-500/10"
+                    ? "border-amber-500 bg-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
                     : "border-slate-700 hover:border-slate-500 bg-slate-800/50"
                 }`}
               >
-                <div className="font-bold text-white mb-1 text-amber-500">
-                  Áp lực (Có tính giờ)
+                <div className="flex items-center gap-2 mb-1">
+                  <Zap
+                    size={18}
+                    className={interviewType === "timed" ? "text-amber-400" : "text-slate-500"}
+                  />
+                  <span
+                    className={`font-bold ${
+                      interviewType === "timed" ? "text-amber-400" : "text-white"
+                    }`}
+                  >
+                    Áp lực
+                  </span>
                 </div>
                 <div className="text-xs text-slate-400">
                   Mô phỏng phỏng vấn thực tế với áp lực thời gian
@@ -118,17 +191,26 @@ export function ResumeConfigModal({
                   value={questionLimit}
                   onChange={(e) => setQuestionLimit(Number(e.target.value))}
                 >
-                  <option value={3}>3 câu</option>
-                  <option value={5}>5 câu</option>
-                  <option value={7}>7 câu</option>
-                  <option value={10}>10 câu</option>
+                  {[5, 7, 10, 15].map((v) => (
+                    <option key={v} value={v}>
+                      {v} câu{" "}
+                      {v === Math.min(existingQuestionCount + 5, 15)
+                        ? "(Đề xuất)"
+                        : ""}
+                    </option>
+                  ))}
                 </select>
+                {existingQuestionCount > 0 && (
+                  <p className="text-[11px] text-slate-500">
+                    Tiếp tục từ câu {existingQuestionCount + 1}/{questionLimit}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Clock size={14} className="text-amber-500" />
-                  Thời gian trả lời (mỗi câu)
+                  Thời gian mỗi câu
                 </label>
                 <select
                   className="w-full bg-slate-800 border border-slate-700 text-white text-sm rounded-xl focus:ring-amber-500 focus:border-amber-500 block p-3 transition-colors appearance-none font-bold cursor-pointer"
@@ -145,6 +227,7 @@ export function ResumeConfigModal({
           )}
         </div>
 
+        {/* Footer Actions */}
         <div className="p-6 pt-0 flex justify-end gap-3 rounded-b-2xl">
           <button
             onClick={onClose}
@@ -154,10 +237,10 @@ export function ResumeConfigModal({
           </button>
           <button
             onClick={handleConfirm}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold rounded-xl hover:opacity-90 transition shadow-lg shadow-blue-500/30"
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold rounded-xl hover:opacity-90 transition shadow-lg shadow-blue-500/30 active:scale-95"
           >
             <Play size={18} />
-            Bắt đầu Phỏng vấn
+            Bắt đầu ngay
           </button>
         </div>
       </div>

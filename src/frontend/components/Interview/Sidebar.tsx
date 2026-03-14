@@ -360,8 +360,14 @@ export function Sidebar({
                     {/* Bottom row: Mode badge + Date + Action */}
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                        <span className="font-medium bg-slate-800/80 px-1.5 py-0.5 rounded text-slate-400 truncate max-w-[90px]">
-                          {h.mode || "Tự do"}
+                        <span
+                          className={`font-bold px-1.5 py-0.5 rounded text-[10px] truncate max-w-[90px] transition-all duration-300 ${
+                            h.interview_type === "timed"
+                              ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                              : "bg-slate-800/80 text-slate-400 border border-slate-700/50"
+                          }`}
+                        >
+                          {h.interview_type === "timed" ? "⚡ Áp lực" : "Tự do"}
                         </span>
                         <span className="text-slate-600">•</span>
                         <span>

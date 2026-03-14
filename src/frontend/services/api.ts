@@ -217,6 +217,23 @@ export const deleteInterview = async (id: number) => {
     return res.json();
 };
 
+export const updateInterviewConfig = async (
+    historyId: number,
+    data: { interview_type: string; question_limit: number; time_limit: number }
+) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/history/${historyId}/config`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Failed to update interview config");
+    return res.json();
+};
+
 // --- API ADMIN ---
 export const getAdminDashboard = async () => {
   const token = localStorage.getItem("token");

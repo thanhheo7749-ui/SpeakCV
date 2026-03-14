@@ -100,6 +100,11 @@ class Token(BaseModel):
 class RenameRequest(BaseModel):
     title: str
 
+class UpdateInterviewConfig(BaseModel):
+    interview_type: str = "free"
+    question_limit: int = 5
+    time_limit: int = 120
+
 class JDTemplateRequest(BaseModel):
     title: str
     description: str

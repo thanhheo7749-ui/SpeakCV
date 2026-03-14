@@ -35,6 +35,7 @@ import {
   getMyProfile,
   getAdminDashboard,
   getHistory,
+  updateInterviewConfig,
 } from "@/services/api";
 import { useMicrophone } from "@/hooks/useMicrophone";
 import { useChat } from "@/hooks/useChat";
@@ -331,7 +332,7 @@ export default function InterviewRoom() {
     toggleModal("resumeConfig", true);
   };
 
-  const handleConfirmResume = (resumeSettings: any) => {
+  const handleConfirmResume = async (resumeSettings: any) => {
     const h = pendingResumeData;
     if (!h) return;
 
@@ -377,6 +378,30 @@ export default function InterviewRoom() {
     if (resumeSettings.interviewType === "timed") {
       resetTimer();
       setQuestionCount(h.details.length + 1);
+    }
+
+    // Persist config to DB and sync Sidebar badge immediately
+    try {
+      await updateInterviewConfig(h.id, {
+        interview_type: resumeSettings.interviewType,
+        question_limit: resumeSettings.questionLimit,
+        time_limit: resumeSettings.timeLimit,
+      });
+      // Optimistically update local state so Sidebar badge reflects the change instantly
+      setInterviewHistories(
+        interviewHistories.map((item: any) =>
+          item.id === h.id
+            ? {
+                ...item,
+                interview_type: resumeSettings.interviewType,
+                question_limit: resumeSettings.questionLimit,
+                time_limit: resumeSettings.timeLimit,
+              }
+            : item,
+        ),
+      );
+    } catch (err) {
+      console.warn("Failed to update interview config:", err);
     }
 
     loadSession(
