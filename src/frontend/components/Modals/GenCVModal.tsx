@@ -22,7 +22,6 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import toast from "react-hot-toast";
 
-
 // 1. SMART HINTS DATA
 const HINTS: any = {
   summary: {
@@ -161,7 +160,8 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                 description:
                   "- Nhập mô tả công việc của bạn...\n- Đạt được thành tựu...",
               },
-            ]).map((e: any) => ({ ...e, _uid: e._uid || genUid() })),
+            ]
+        ).map((e: any) => ({ ...e, _uid: e._uid || genUid() })),
         educations: (userProfile.educations?.length
           ? userProfile.educations
           : [
@@ -171,17 +171,16 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                 start_date: "2019",
                 end_date: "2023",
               },
-            ]).map((e: any) => ({ ...e, _uid: e._uid || genUid() })),
+            ]
+        ).map((e: any) => ({ ...e, _uid: e._uid || genUid() })),
       });
     }
   }, [show, userProfile]);
 
-
-
   // Load AI-generated CV data from sessionStorage (from CV Makeover)
   useEffect(() => {
     if (!show) return;
-    const raw = sessionStorage.getItem('draft_cv_data');
+    const raw = sessionStorage.getItem("draft_cv_data");
     if (!raw) return;
 
     try {
@@ -195,7 +194,10 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
       const splitPeriod = (period?: string) => {
         if (!period) return { start_date: "", end_date: "" };
         const parts = period.split(/\s*[-\u2013\u2014]\s*/);
-        return { start_date: parts[0]?.trim() || "", end_date: parts[1]?.trim() || "Nay" };
+        return {
+          start_date: parts[0]?.trim() || "",
+          end_date: parts[1]?.trim() || "Nay",
+        };
       };
 
       setCvData({
@@ -210,33 +212,52 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
         skills: Array.isArray(aiData.skills)
           ? aiData.skills.map((s: string) => `- ${s}`).join("\n")
           : aiData.skills || "",
-        experiences: (Array.isArray(aiData.experience) && aiData.experience.length > 0
-          ? aiData.experience.map((exp: any) => {
-              const { start_date, end_date } = splitPeriod(exp.period);
-              return {
-                _uid: genUid(),
-                company_name: exp.company || "",
-                position: exp.role || "",
-                start_date,
-                end_date,
-                description: Array.isArray(exp.achievements)
-                  ? exp.achievements.map((a: string) => `- ${a}`).join("\n")
-                  : "",
-              };
-            })
-          : [{ _uid: genUid(), company_name: "Tên công ty", position: "Vị trí", start_date: "01/2023", end_date: "Nay", description: "- Mô tả công việc..." }]),
-        educations: (Array.isArray(aiData.education) && aiData.education.length > 0
-          ? aiData.education.map((edu: any) => {
-              const { start_date, end_date } = splitPeriod(edu.period);
-              return {
-                _uid: genUid(),
-                school_name: edu.school || "",
-                major: edu.degree || "",
-                start_date,
-                end_date,
-              };
-            })
-          : [{ _uid: genUid(), school_name: "Tên trường", major: "Tên ngành học", start_date: "2019", end_date: "2023" }]),
+        experiences:
+          Array.isArray(aiData.experience) && aiData.experience.length > 0
+            ? aiData.experience.map((exp: any) => {
+                const { start_date, end_date } = splitPeriod(exp.period);
+                return {
+                  _uid: genUid(),
+                  company_name: exp.company || "",
+                  position: exp.role || "",
+                  start_date,
+                  end_date,
+                  description: Array.isArray(exp.achievements)
+                    ? exp.achievements.map((a: string) => `- ${a}`).join("\n")
+                    : "",
+                };
+              })
+            : [
+                {
+                  _uid: genUid(),
+                  company_name: "Tên công ty",
+                  position: "Vị trí",
+                  start_date: "01/2023",
+                  end_date: "Nay",
+                  description: "- Mô tả công việc...",
+                },
+              ],
+        educations:
+          Array.isArray(aiData.education) && aiData.education.length > 0
+            ? aiData.education.map((edu: any) => {
+                const { start_date, end_date } = splitPeriod(edu.period);
+                return {
+                  _uid: genUid(),
+                  school_name: edu.school || "",
+                  major: edu.degree || "",
+                  start_date,
+                  end_date,
+                };
+              })
+            : [
+                {
+                  _uid: genUid(),
+                  school_name: "Tên trường",
+                  major: "Tên ngành học",
+                  start_date: "2019",
+                  end_date: "2023",
+                },
+              ],
       });
 
       // Auto-select the makeover template if the flag was passed
@@ -244,13 +265,15 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
         changeTheme(draftTheme);
       }
 
-      sessionStorage.removeItem('draft_cv_data');
-      toast.success("Đã tải dữ liệu CV từ AI. Bạn có thể chỉnh sửa theo ý muốn!");
+      sessionStorage.removeItem("draft_cv_data");
+      toast.success(
+        "Đã tải dữ liệu CV từ AI. Bạn có thể chỉnh sửa theo ý muốn!",
+      );
     } catch (err) {
       console.error("Failed to parse draft_cv_data:", err);
-      sessionStorage.removeItem('draft_cv_data');
+      sessionStorage.removeItem("draft_cv_data");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
 
   // PDF DOWNLOAD HANDLER (1-CLICK)
@@ -355,7 +378,11 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
     if (type === "thamvong")
       setTheme({ name: "thamvong", leftBg: "#1A1A1A", rightPill: "#F39C12" });
     if (type === "makeover_blue")
-      setTheme({ name: "makeover_blue", leftBg: "#1e3a5f", rightPill: "#2563eb" });
+      setTheme({
+        name: "makeover_blue",
+        leftBg: "#1e3a5f",
+        rightPill: "#2563eb",
+      });
   };
 
   if (!show) return null;
@@ -466,7 +493,8 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                   </div>
                 </div>
                 <div className="mt-6 p-4 bg-yellow-500/10 rounded-xl text-sm text-yellow-200 border border-yellow-500/20">
-                  💡 <b>Hướng dẫn:</b> Bấm trực tiếp vào dòng chữ bên phải để sửa nội dung!
+                  💡 <b>Hướng dẫn:</b> Bấm trực tiếp vào dòng chữ bên phải để
+                  sửa nội dung!
                 </div>
               </div>
             )}
@@ -585,7 +613,10 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                     </div>
                     <div className="space-y-4">
                       {cvData.educations.map((edu: any, i: number) => (
-                        <div key={edu._uid || i} className="text-sm relative group">
+                        <div
+                          key={edu._uid || i}
+                          className="text-sm relative group"
+                        >
                           <button
                             onClick={() => removeEdu(i)}
                             data-html2canvas-ignore="true"
