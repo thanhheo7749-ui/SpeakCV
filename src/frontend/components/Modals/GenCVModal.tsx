@@ -21,7 +21,7 @@ import {
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import toast from "react-hot-toast";
-import CVProTemplate, { type CVData } from "./CVProTemplate";
+
 
 // 1. SMART HINTS DATA
 const HINTS: any = {
@@ -176,38 +176,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
     }
   }, [show, userProfile]);
 
-  // Adapter: convert GenCVModal state → CVData format for CVProTemplate
-  const toCVDataFormat = (): CVData => {
-    const skillsList = cvData.skills
-      ? cvData.skills.split("\n").map((s: string) => s.replace(/^-\s*/, "").trim()).filter(Boolean)
-      : [];
-    return {
-      personal_info: {
-        name: cvData.full_name,
-        title: cvData.position,
-        email: cvData.email,
-        phone: cvData.phone,
-        linkedin: cvData.linkedin,
-        location: cvData.address,
-        summary: cvData.summary,
-      },
-      skills: skillsList,
-      experience: (cvData.experiences || []).map((exp: any) => ({
-        company: exp.company_name,
-        role: exp.position,
-        period: [exp.start_date, exp.end_date].filter(Boolean).join(" - "),
-        achievements: exp.description
-          ? exp.description.split("\n").map((a: string) => a.replace(/^-\s*/, "").trim()).filter(Boolean)
-          : [],
-      })),
-      education: (cvData.educations || []).map((edu: any) => ({
-        school: edu.school_name,
-        degree: edu.major,
-        period: [edu.start_date, edu.end_date].filter(Boolean).join(" - "),
-      })),
-      projects: [],
-    };
-  };
+
 
   // Load AI-generated CV data from sessionStorage (from CV Makeover)
   useEffect(() => {
@@ -497,7 +466,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                   </div>
                 </div>
                 <div className="mt-6 p-4 bg-yellow-500/10 rounded-xl text-sm text-yellow-200 border border-yellow-500/20">
-                  💡 <b>Hướng dẫn:</b> {theme.name === "makeover_blue" ? "Template này hiển thị dạng xem trước. Chọn theme khác để chỉnh sửa trực tiếp!" : "Bấm trực tiếp vào dòng chữ bên phải để sửa nội dung!"}
+                  💡 <b>Hướng dẫn:</b> Bấm trực tiếp vào dòng chữ bên phải để sửa nội dung!
                 </div>
               </div>
             )}
@@ -507,15 +476,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
           <div className="w-[75%] bg-slate-800 rounded-2xl border border-slate-700 overflow-auto p-8 custom-scrollbar relative flex justify-center">
             {/* ZOOM WRAPPER (Display scale only) */}
             <div className="origin-top scale-[0.80] sm:scale-[0.9] lg:scale-[0.95] transition-transform">
-              {theme.name === "makeover_blue" ? (
-                /* === MAKEOVER BLUE TEMPLATE (CVProTemplate - read-only preview) === */
-                <CVProTemplate
-                  ref={cvRef}
-                  cvData={toCVDataFormat()}
-                  avatarUrl={cvData.avatar}
-                />
-              ) : (
-                /* === CLASSIC EDITABLE TEMPLATE === */
+              {/* === EDITABLE TEMPLATE (all themes) === */}
               <div
                 ref={cvRef}
                 className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed"
@@ -801,7 +762,6 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                   </div>
                 </div>
               </div>
-              )}
             </div>
           </div>
         </div>

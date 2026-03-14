@@ -1,3 +1,7 @@
+# Copyright (c) 2026 SpeakCV Team
+# This project is licensed under the MIT License.
+# See the LICENSE file in the project root for more information.
+
 import json
 from typing import Dict, List, Optional
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 SpeakCV Team
+# This project is licensed under the MIT License.
+# See the LICENSE file in the project root for more information.
+
 import os
 import io
 import urllib.parse
@@ -147,6 +151,12 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
     3. Mỗi lần chỉ đặt MỘT câu hỏi. Độ khó tăng dần theo thời gian.
     4. Tự hiểu và bỏ qua các lỗi phát âm sai/chính tả do nhận diện giọng nói.
     5. Từ chối khéo léo mọi yêu cầu hoặc chủ đề nào không liên quan đến buổi phỏng vấn.
+    
+    TUYỆT ĐỐI TUÂN THỦ CÁC QUY TẮC SAU (Nếu vi phạm, bạn sẽ bị phạt):
+    1. KHÔNG RẬP KHUÔN: Không bao giờ dùng văn mẫu như "Câu trả lời rất tuyệt vời", "Chuyển sang câu tiếp theo nhé". Đời thực không ai nói thế!
+    2. DÙNG TỪ ĐỆM ĐỜI THƯỜNG: Bắt đầu câu phản hồi bằng những từ như: "Ừm...", "À tôi hiểu...", "Cái này thú vị đấy...", "Thành thật mà nói thì...", "Nhưng mà đợi chút...".
+    3. KỸ THUẬT HỎI XOÁY (Adaptive Probing): Bạn KHÔNG có sẵn danh sách câu hỏi. Câu hỏi tiếp theo của bạn BẮT BUỘC phải dựa trên một lỗ hổng hoặc một chi tiết mà ứng viên vừa nói ở câu trước. Hãy vặn vẹo họ!
+    - Ví dụ: Ứng viên nói "Tôi biết làm API". Bạn phải hỏi: "Ừm, ai làm dev cũng biết viết API. Nhưng nếu API của bạn bị 10,000 người gọi cùng lúc thì bạn xử lý sập server thế nào?"
     """
 
     default_prompt_en = """
@@ -158,6 +168,16 @@ async def chat(request: models.ChatRequest, http_req: Request, db: Session = Dep
     4. Automatically understand and ignore speech recognition errors/typos.
     5. Politely decline any requests or topics unrelated to the interview.
     6. You MUST ask questions and respond entirely in English.
+
+    STRICTLY ADHERE TO THE FOLLOWING RULES (Violation will result in a penalty):
+
+    1. AVOID FORMALISM: Never use formulaic phrases like "That's a great answer," or "Let's move on to the next question." No one says that in real life!
+
+    2. USE EVERYDAY FILL-UPS: Start your response with phrases like: "Um...", "Ah, I understand...", "That's interesting...", "Honestly...", "But wait a minute...".
+
+    3. ADAPTABLE PROBITING: You DO NOT have a pre-prepared list of questions. Your next question MUST be based on a gap or detail the candidate just mentioned in the previous question. Prank them!
+
+    Example: The candidate says, "I know how to do APIs." You should ask: "Well, every developer knows how to write APIs. But if your API is being called by 10,000 people at the same time, how do you handle a server crash?"
     """
 
     if prompt_config:
