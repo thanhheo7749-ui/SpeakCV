@@ -5,7 +5,7 @@
  */
 
 "use client";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, type ComponentType } from "react";
 import {
   X,
   Sparkles,
@@ -27,6 +27,9 @@ import {
 import { uploadMakeoverCV } from "@/services/api";
 import toast from "react-hot-toast";
 import CVProTemplate, { type CVData } from "./CVProTemplate";
+import CVTealSidebar from "./CVTealSidebar";
+import CVBrownElegant from "./CVBrownElegant";
+import CVBlueModern from "./CVBlueModern";
 import { useReactToPrint } from "react-to-print";
 
 type TemplateStyle = "tech" | "business" | "creative" | "fresher";
@@ -38,7 +41,8 @@ const TEMPLATES = [
     emoji: "💻",
     desc: "Tech Stack → Projects → Experience\nAgile/Scrum & hiệu năng",
     activeColor: "text-emerald-400",
-    activeBg: "border-emerald-500 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.15)]",
+    activeBg:
+      "border-emerald-500 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.15)]",
     iconActiveBg: "bg-emerald-500/20 shadow-lg shadow-emerald-500/10",
     checkBg: "bg-emerald-500",
     gradient: "from-emerald-500/5 to-teal-500/10",
@@ -50,7 +54,8 @@ const TEMPLATES = [
     emoji: "📈",
     desc: "KPI → Doanh thu → Chiến lược\nNhấn mạnh con số & kết quả",
     activeColor: "text-amber-400",
-    activeBg: "border-amber-500 bg-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.15)]",
+    activeBg:
+      "border-amber-500 bg-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.15)]",
     iconActiveBg: "bg-amber-500/20 shadow-lg shadow-amber-500/10",
     checkBg: "bg-amber-500",
     gradient: "from-amber-500/5 to-orange-500/10",
@@ -62,7 +67,8 @@ const TEMPLATES = [
     emoji: "🎨",
     desc: "Creative Profile → Projects\nDesign Thinking & UX-first",
     activeColor: "text-pink-400",
-    activeBg: "border-pink-500 bg-pink-500/10 shadow-[0_0_30px_rgba(236,72,153,0.15)]",
+    activeBg:
+      "border-pink-500 bg-pink-500/10 shadow-[0_0_30px_rgba(236,72,153,0.15)]",
     iconActiveBg: "bg-pink-500/20 shadow-lg shadow-pink-500/10",
     checkBg: "bg-pink-500",
     gradient: "from-pink-500/5 to-rose-500/10",
@@ -74,7 +80,8 @@ const TEMPLATES = [
     emoji: "🚀",
     desc: "Mục tiêu → Học vấn → Dự án\nNổi bật thái độ & tiềm năng",
     activeColor: "text-sky-400",
-    activeBg: "border-sky-500 bg-sky-500/10 shadow-[0_0_30px_rgba(14,165,233,0.15)]",
+    activeBg:
+      "border-sky-500 bg-sky-500/10 shadow-[0_0_30px_rgba(14,165,233,0.15)]",
     iconActiveBg: "bg-sky-500/20 shadow-lg shadow-sky-500/10",
     checkBg: "bg-sky-500",
     gradient: "from-sky-500/5 to-cyan-500/10",
@@ -89,6 +96,55 @@ const TEMPLATE_LABELS: Record<TemplateStyle, string> = {
   fresher: "Sinh viên / Fresher",
 };
 
+type CVTheme = "default" | "teal" | "brown" | "blue_modern";
+
+interface TemplateComponentProps {
+  cvData: CVData;
+  avatarUrl?: string;
+}
+
+const TEMPLATE_MAP: Record<
+  CVTheme,
+  ComponentType<TemplateComponentProps & { ref?: React.Ref<HTMLDivElement> }>
+> = {
+  default: CVProTemplate,
+  teal: CVTealSidebar,
+  brown: CVBrownElegant,
+  blue_modern: CVBlueModern,
+};
+
+const THEME_OPTIONS: {
+  key: CVTheme;
+  label: string;
+  color: string;
+  activeBorder: string;
+}[] = [
+  {
+    key: "default",
+    label: "Xanh Classic",
+    color: "bg-gradient-to-br from-blue-700 to-indigo-700",
+    activeBorder: "border-blue-500",
+  },
+  {
+    key: "teal",
+    label: "Teal Sidebar",
+    color: "bg-gradient-to-br from-teal-600 to-teal-800",
+    activeBorder: "border-teal-500",
+  },
+  {
+    key: "brown",
+    label: "Nâu Elegant",
+    color: "bg-gradient-to-br from-amber-800 to-amber-950",
+    activeBorder: "border-amber-500",
+  },
+  {
+    key: "blue_modern",
+    label: "Blue Modern",
+    color: "bg-gradient-to-br from-blue-700 to-blue-900",
+    activeBorder: "border-sky-500",
+  },
+];
+
 interface CVMakeoverProps {
   show: boolean;
   onClose: () => void;
@@ -96,8 +152,14 @@ interface CVMakeoverProps {
   onEditManually?: () => void;
 }
 
-export default function CVMakeover({ show, onClose, userAvatar, onEditManually }: CVMakeoverProps) {
+export default function CVMakeover({
+  show,
+  onClose,
+  userAvatar,
+  onEditManually,
+}: CVMakeoverProps) {
   const [template, setTemplate] = useState<TemplateStyle>("tech");
+  const [selectedTheme, setSelectedTheme] = useState<CVTheme>("default");
   const [file, setFile] = useState<File | null>(null);
   const [cvData, setCvData] = useState<CVData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -140,7 +202,11 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
 
   const validateFile = (f: File): boolean => {
     const name = f.name.toLowerCase();
-    if (!name.endsWith(".pdf") && !name.endsWith(".doc") && !name.endsWith(".docx")) {
+    if (
+      !name.endsWith(".pdf") &&
+      !name.endsWith(".doc") &&
+      !name.endsWith(".docx")
+    ) {
       toast.error("Chỉ hỗ trợ file PDF hoặc Word (DOCX)!");
       return false;
     }
@@ -196,7 +262,9 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
     try {
       const data = await uploadMakeoverCV(file, template);
       setCvData(data.cv_data || null);
-      setExtractedText(data.extracted_text || "Không thể trích xuất nội dung CV gốc.");
+      setExtractedText(
+        data.extracted_text || "Không thể trích xuất nội dung CV gốc.",
+      );
       setShowResult(true);
     } catch (err: any) {
       console.error(err);
@@ -219,7 +287,10 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
 
   const handleEditManually = () => {
     if (!cvData) return;
-    sessionStorage.setItem('draft_cv_data', JSON.stringify({ data: cvData, theme: 'makeover_blue' }));
+    sessionStorage.setItem(
+      "draft_cv_data",
+      JSON.stringify({ data: cvData, theme: selectedTheme }),
+    );
     toast.success("Đang chuyển sang trình soạn thảo CV...");
     onEditManually?.();
   };
@@ -243,8 +314,12 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
               <Wand2 className="text-white" size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Chỉnh sửa CV (CV Makeover)</h2>
-              <p className="text-xs text-slate-500">Upload CV → Chọn ngành → AI viết lại chuyên nghiệp</p>
+              <h2 className="text-xl font-bold text-white">
+                Chỉnh sửa CV (CV Makeover)
+              </h2>
+              <p className="text-xs text-slate-500">
+                Upload CV → Chọn ngành → AI viết lại chuyên nghiệp
+              </p>
             </div>
           </div>
 
@@ -317,20 +392,33 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
                               : "border-slate-800 bg-slate-900/50 hover:border-slate-600"
                           }`}
                         >
-                          <div className={`absolute inset-0 bg-gradient-to-br ${t.gradient} opacity-0 group-hover:opacity-100 transition-opacity ${isActive ? "opacity-100" : ""}`} />
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 relative z-10 transition-all ${
-                            isActive ? t.iconActiveBg : "bg-slate-800"
-                          }`}>
-                            <Icon className={isActive ? t.activeColor : "text-slate-500"} size={24} />
+                          <div
+                            className={`absolute inset-0 bg-gradient-to-br ${t.gradient} opacity-0 group-hover:opacity-100 transition-opacity ${isActive ? "opacity-100" : ""}`}
+                          />
+                          <div
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 relative z-10 transition-all ${
+                              isActive ? t.iconActiveBg : "bg-slate-800"
+                            }`}
+                          >
+                            <Icon
+                              className={
+                                isActive ? t.activeColor : "text-slate-500"
+                              }
+                              size={24}
+                            />
                           </div>
-                          <h3 className={`font-bold text-sm relative z-10 ${isActive ? t.activeColor : "text-slate-300"}`}>
+                          <h3
+                            className={`font-bold text-sm relative z-10 ${isActive ? t.activeColor : "text-slate-300"}`}
+                          >
                             {t.emoji} {t.label}
                           </h3>
                           <p className="text-[10px] mt-1.5 text-slate-500 relative z-10 leading-relaxed whitespace-pre-line">
                             {t.desc}
                           </p>
                           {isActive && (
-                            <div className={`absolute top-2 right-2 w-5 h-5 ${t.checkBg} rounded-full flex items-center justify-center`}>
+                            <div
+                              className={`absolute top-2 right-2 w-5 h-5 ${t.checkBg} rounded-full flex items-center justify-center`}
+                            >
                               <Check size={12} className="text-white" />
                             </div>
                           )}
@@ -354,8 +442,8 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
                       isDragging
                         ? "border-purple-500 bg-purple-500/10 scale-[1.01] shadow-[0_0_40px_rgba(168,85,247,0.15)]"
                         : file
-                        ? "border-emerald-500/50 bg-emerald-500/5 hover:border-emerald-400"
-                        : "border-slate-700 bg-slate-950 hover:border-purple-500/50 hover:bg-slate-900"
+                          ? "border-emerald-500/50 bg-emerald-500/5 hover:border-emerald-400"
+                          : "border-slate-700 bg-slate-950 hover:border-purple-500/50 hover:bg-slate-900"
                     }`}
                   >
                     <input
@@ -384,21 +472,33 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
                         </div>
                       ) : (
                         <div className="flex flex-col items-center text-center">
-                          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${
-                            isDragging
-                              ? "bg-purple-500/20 scale-110"
-                              : "bg-slate-800 group-hover:bg-purple-500/10 group-hover:scale-105"
-                          }`}>
+                          <div
+                            className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${
+                              isDragging
+                                ? "bg-purple-500/20 scale-110"
+                                : "bg-slate-800 group-hover:bg-purple-500/10 group-hover:scale-105"
+                            }`}
+                          >
                             {isDragging ? (
-                              <FileUp size={32} className="text-purple-400 animate-bounce" />
+                              <FileUp
+                                size={32}
+                                className="text-purple-400 animate-bounce"
+                              />
                             ) : (
-                              <Upload size={32} className="text-slate-500 group-hover:text-purple-400 transition-colors" />
+                              <Upload
+                                size={32}
+                                className="text-slate-500 group-hover:text-purple-400 transition-colors"
+                              />
                             )}
                           </div>
-                          <p className={`font-bold text-lg transition-colors ${
-                            isDragging ? "text-purple-300" : "text-slate-300"
-                          }`}>
-                            {isDragging ? "Thả file vào đây!" : "Kéo thả hoặc bấm để tải CV"}
+                          <p
+                            className={`font-bold text-lg transition-colors ${
+                              isDragging ? "text-purple-300" : "text-slate-300"
+                            }`}
+                          >
+                            {isDragging
+                              ? "Thả file vào đây!"
+                              : "Kéo thả hoặc bấm để tải CV"}
                           </p>
                           <p className="text-sm text-slate-500 mt-2">
                             Hỗ trợ PDF, DOCX (Tối đa 10MB)
@@ -437,8 +537,12 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
               <div className="w-[35%] border-r border-slate-800 flex flex-col min-h-0 bg-slate-950/80">
                 <div className="px-5 py-3 border-b border-slate-800 shrink-0 flex items-center gap-2">
                   <FileText size={16} className="text-slate-400" />
-                  <span className="text-sm font-bold text-slate-300">CV Gốc & Nhận Xét</span>
-                  <span className="text-xs text-slate-600 ml-auto truncate max-w-[150px]">{file?.name}</span>
+                  <span className="text-sm font-bold text-slate-300">
+                    CV Gốc & Nhận Xét
+                  </span>
+                  <span className="text-xs text-slate-600 ml-auto truncate max-w-[150px]">
+                    {file?.name}
+                  </span>
                 </div>
                 <div className="flex-1 overflow-auto p-5 custom-scrollbar space-y-4">
                   {/* === AI ANALYSIS FEEDBACK CARD === */}
@@ -446,79 +550,115 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
                     <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/60 rounded-2xl p-5 space-y-4 animate-in slide-in-from-top-3 duration-300">
                       <div className="flex items-center gap-2.5">
                         <span className="text-lg">🤖</span>
-                        <h3 className="text-sm font-bold text-white tracking-wide">AI Nhận Xét</h3>
+                        <h3 className="text-sm font-bold text-white tracking-wide">
+                          AI Nhận Xét
+                        </h3>
                       </div>
 
                       {/* Score Badge */}
                       {cvData.analysis_feedback.overall_score != null && (
                         <div className="flex items-center gap-4">
-                          <div className={`relative w-16 h-16 rounded-full flex items-center justify-center border-[3px] ${
-                            cvData.analysis_feedback.overall_score >= 80
-                              ? 'border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
-                              : cvData.analysis_feedback.overall_score >= 60
-                              ? 'border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
-                              : 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.25)]'
-                          }`}>
-                            <span className={`text-xl font-extrabold ${
+                          <div
+                            className={`relative w-16 h-16 rounded-full flex items-center justify-center border-[3px] ${
                               cvData.analysis_feedback.overall_score >= 80
-                                ? 'text-emerald-400'
+                                ? "border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
                                 : cvData.analysis_feedback.overall_score >= 60
-                                ? 'text-amber-400'
-                                : 'text-red-400'
-                            }`}>
+                                  ? "border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
+                                  : "border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.25)]"
+                            }`}
+                          >
+                            <span
+                              className={`text-xl font-extrabold ${
+                                cvData.analysis_feedback.overall_score >= 80
+                                  ? "text-emerald-400"
+                                  : cvData.analysis_feedback.overall_score >= 60
+                                    ? "text-amber-400"
+                                    : "text-red-400"
+                              }`}
+                            >
                               {cvData.analysis_feedback.overall_score}
                             </span>
                           </div>
                           <div>
-                            <p className="text-xs text-slate-400">Điểm tổng quan</p>
-                            <p className={`text-sm font-bold ${
-                              cvData.analysis_feedback.overall_score >= 80
-                                ? 'text-emerald-400'
+                            <p className="text-xs text-slate-400">
+                              Điểm tổng quan
+                            </p>
+                            <p
+                              className={`text-sm font-bold ${
+                                cvData.analysis_feedback.overall_score >= 80
+                                  ? "text-emerald-400"
+                                  : cvData.analysis_feedback.overall_score >= 60
+                                    ? "text-amber-400"
+                                    : "text-red-400"
+                              }`}
+                            >
+                              {cvData.analysis_feedback.overall_score >= 80
+                                ? "Tốt"
                                 : cvData.analysis_feedback.overall_score >= 60
-                                ? 'text-amber-400'
-                                : 'text-red-400'
-                            }`}>
-                              {cvData.analysis_feedback.overall_score >= 80 ? 'Tốt' : cvData.analysis_feedback.overall_score >= 60 ? 'Khá' : 'Cần cải thiện'}
+                                  ? "Khá"
+                                  : "Cần cải thiện"}
                             </p>
                           </div>
                         </div>
                       )}
 
                       {/* Strengths */}
-                      {cvData.analysis_feedback.strengths && cvData.analysis_feedback.strengths.length > 0 && (
-                        <div>
-                          <p className="text-xs font-bold text-emerald-400 mb-2 uppercase tracking-wider">Điểm mạnh</p>
-                          <ul className="space-y-1.5">
-                            {cvData.analysis_feedback.strengths.map((s, i) => (
-                              <li key={i} className="flex items-start gap-2 text-xs text-slate-300 leading-relaxed">
-                                <span className="text-emerald-400 mt-0.5 shrink-0">✅</span>
-                                <span>{s}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                      {cvData.analysis_feedback.strengths &&
+                        cvData.analysis_feedback.strengths.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold text-emerald-400 mb-2 uppercase tracking-wider">
+                              Điểm mạnh
+                            </p>
+                            <ul className="space-y-1.5">
+                              {cvData.analysis_feedback.strengths.map(
+                                (s, i) => (
+                                  <li
+                                    key={i}
+                                    className="flex items-start gap-2 text-xs text-slate-300 leading-relaxed"
+                                  >
+                                    <span className="text-emerald-400 mt-0.5 shrink-0">
+                                      ✅
+                                    </span>
+                                    <span>{s}</span>
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        )}
 
                       {/* Weaknesses */}
-                      {cvData.analysis_feedback.weaknesses && cvData.analysis_feedback.weaknesses.length > 0 && (
-                        <div>
-                          <p className="text-xs font-bold text-amber-400 mb-2 uppercase tracking-wider">Cần cải thiện</p>
-                          <ul className="space-y-1.5">
-                            {cvData.analysis_feedback.weaknesses.map((w, i) => (
-                              <li key={i} className="flex items-start gap-2 text-xs text-slate-300 leading-relaxed">
-                                <span className="text-amber-400 mt-0.5 shrink-0">⚠️</span>
-                                <span>{w}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                      {cvData.analysis_feedback.weaknesses &&
+                        cvData.analysis_feedback.weaknesses.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold text-amber-400 mb-2 uppercase tracking-wider">
+                              Cần cải thiện
+                            </p>
+                            <ul className="space-y-1.5">
+                              {cvData.analysis_feedback.weaknesses.map(
+                                (w, i) => (
+                                  <li
+                                    key={i}
+                                    className="flex items-start gap-2 text-xs text-slate-300 leading-relaxed"
+                                  >
+                                    <span className="text-amber-400 mt-0.5 shrink-0">
+                                      ⚠️
+                                    </span>
+                                    <span>{w}</span>
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        )}
                     </div>
                   )}
 
                   {/* === ORIGINAL CV TEXT === */}
                   <div>
-                    <p className="text-[10px] text-slate-600 uppercase tracking-wider font-bold mb-2">Nội dung CV gốc</p>
+                    <p className="text-[10px] text-slate-600 uppercase tracking-wider font-bold mb-2">
+                      Nội dung CV gốc
+                    </p>
                     <pre className="text-[12px] text-slate-400 whitespace-pre-wrap leading-relaxed font-mono">
                       {extractedText}
                     </pre>
@@ -526,22 +666,61 @@ export default function CVMakeover({ show, onClose, userAvatar, onEditManually }
                 </div>
               </div>
 
-              {/* RIGHT PANEL — CV Pro Template */}
+              {/* RIGHT PANEL — CV Template Preview */}
               <div className="w-[65%] flex flex-col min-h-0">
-                <div className="px-5 py-3 border-b border-slate-800 shrink-0 flex items-center gap-2 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
-                  <Sparkles size={16} className="text-purple-400" />
-                  <span className="text-sm font-bold text-purple-300">CV Chuyên Nghiệp</span>
-                  <span className="text-xs text-purple-500/60 ml-auto">✨ {TEMPLATE_LABELS[template]}</span>
+                {/* Header + Theme Selector */}
+                <div className="px-5 py-3 border-b border-slate-800 shrink-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <Sparkles size={16} className="text-purple-400" />
+                    <span className="text-sm font-bold text-purple-300">
+                      CV Chuyên Nghiệp
+                    </span>
+                    <span className="text-xs text-purple-500/60 ml-auto">
+                      ✨ {TEMPLATE_LABELS[template]}
+                    </span>
+                  </div>
+                  {/* Template Selector Strip */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider shrink-0">
+                      Mẫu CV:
+                    </span>
+                    <div className="flex gap-1.5">
+                      {THEME_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.key}
+                          onClick={() => setSelectedTheme(opt.key)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border-2 ${
+                            selectedTheme === opt.key
+                              ? `${opt.activeBorder} bg-slate-800 text-white shadow-lg`
+                              : "border-transparent bg-slate-800/50 text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                          }`}
+                        >
+                          <div
+                            className={`w-3.5 h-3.5 rounded-sm ${opt.color} shrink-0`}
+                          />
+                          {opt.label}
+                          {selectedTheme === opt.key && (
+                            <Check size={12} className="text-emerald-400" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+                {/* Template Preview */}
                 <div className="flex-1 overflow-auto custom-scrollbar bg-slate-800/30 p-6 flex justify-center">
                   <div className="transform origin-top scale-[0.62] xl:scale-[0.70] 2xl:scale-[0.78]">
-                    {cvData && (
-                      <CVProTemplate
-                        ref={cvTemplateRef}
-                        cvData={cvData}
-                        avatarUrl={userAvatar}
-                      />
-                    )}
+                    {cvData &&
+                      (() => {
+                        const TemplateComponent = TEMPLATE_MAP[selectedTheme];
+                        return (
+                          <TemplateComponent
+                            ref={cvTemplateRef}
+                            cvData={cvData}
+                            avatarUrl={userAvatar}
+                          />
+                        );
+                      })()}
                   </div>
                 </div>
               </div>
