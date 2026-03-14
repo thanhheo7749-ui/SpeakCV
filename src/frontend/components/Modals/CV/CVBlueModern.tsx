@@ -54,7 +54,6 @@ const CVBlueModern = forwardRef<HTMLDivElement, CVBlueModernProps>(
               }
               alt="Avatar"
               className="w-[120px] h-[120px] rounded-full border-[4px] border-blue-400/30 shadow-xl object-cover"
-              crossOrigin="anonymous"
               onError={(e) => {
                 e.currentTarget.src =
                   "https://ui-avatars.com/api/?name=User&background=1e40af&color=fff";

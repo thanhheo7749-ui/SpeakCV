@@ -53,7 +53,6 @@ const CVTealSidebar = forwardRef<HTMLDivElement, CVTealSidebarProps>(
               }
               alt="Avatar"
               className="w-[110px] h-[110px] rounded-full border-[3px] border-white/30 shadow-xl object-cover"
-              crossOrigin="anonymous"
               onError={(e) => {
                 e.currentTarget.src =
                   "https://ui-avatars.com/api/?name=User&background=0d9488&color=fff";

@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
  */
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   X,
   LayoutTemplate,
@@ -21,10 +21,6 @@ import {
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import toast from "react-hot-toast";
-import { type CVData } from "./CV/CVProTemplate";
-import CVTealSidebar from "./CV/CVTealSidebar";
-import CVBrownElegant from "./CV/CVBrownElegant";
-import CVBlueModern from "./CV/CVBlueModern";
 
 // 1. SMART HINTS DATA
 const HINTS: any = {
@@ -113,8 +109,6 @@ let _uidCounter = 0;
 const genUid = () => `uid_${++_uidCounter}_${Date.now()}`;
 
 // 4. MAIN COMPONENT
-const NEW_TEMPLATE_THEMES = ["teal", "brown", "blue_modern"] as const;
-
 export default function GenCVModal({ show, onClose, userProfile }: any) {
   const [cvData, setCvData] = useState<any>({
     full_name: "",
@@ -401,44 +395,6 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
       });
   };
 
-  // Check if current theme uses a new standalone template
-  const isNewTemplate = NEW_TEMPLATE_THEMES.includes(theme.name as any);
-
-  // Map builder data to CVData format for new templates
-  const mappedCVData: CVData = useMemo(() => {
-    const skillsList = (cvData.skills || "")
-      .split("\n")
-      .map((s: string) => s.replace(/^[-•]\s*/, "").trim())
-      .filter(Boolean);
-    return {
-      personal_info: {
-        name: cvData.full_name || "",
-        title: cvData.position || "",
-        email: cvData.email || "",
-        phone: cvData.phone || "",
-        location: cvData.address || "",
-        linkedin: cvData.linkedin || "",
-        summary: cvData.summary || "",
-      },
-      skills: skillsList,
-      experience: (cvData.experiences || []).map((exp: any) => ({
-        company: exp.company_name || "",
-        role: exp.position || "",
-        period: `${exp.start_date || ""} - ${exp.end_date || ""}`,
-        achievements: (exp.description || "")
-          .split("\n")
-          .map((s: string) => s.replace(/^[-•]\s*/, "").trim())
-          .filter(Boolean),
-      })),
-      education: (cvData.educations || []).map((edu: any) => ({
-        school: edu.school_name || "",
-        degree: edu.major || "",
-        period: `${edu.start_date || ""} - ${edu.end_date || ""}`,
-      })),
-      projects: [],
-    };
-  }, [cvData]);
-
   if (!show) return null;
 
   return (
@@ -600,27 +556,272 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
           <div className="w-[75%] bg-slate-800 rounded-2xl border border-slate-700 overflow-auto p-8 custom-scrollbar relative flex justify-center">
             {/* ZOOM WRAPPER (Display scale only) */}
             <div className="origin-top scale-[0.80] sm:scale-[0.9] lg:scale-[0.95] transition-transform">
-              {isNewTemplate ? (
-                /* === NEW TEMPLATE: Read-only preview with live data binding === */
-                <div ref={cvRef}>
-                  {theme.name === "teal" && (
-                    <CVTealSidebar
-                      cvData={mappedCVData}
-                      avatarUrl={cvData.avatar}
+              {theme.name === "teal" ? (
+                <div
+                  ref={cvRef}
+                  className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed"
+                >
+                  {/* LEFT SIDEBAR (Teal) */}
+                  <div className="w-[35%] bg-teal-700 text-white px-6 py-8 flex flex-col items-center">
+                    <div className="w-28 h-28 rounded-full bg-slate-200 border-[3px] border-white/30 flex items-center justify-center overflow-hidden mb-5 shadow-xl">
+                      <AvatarDisplay src={cvData.avatar} />
+                    </div>
+                    <EditableText
+                      className="text-[20px] font-extrabold text-center tracking-tight leading-tight mb-1 w-full text-white"
+                      value={cvData.full_name}
+                      onChange={(v: string) => setCvData({ ...cvData, full_name: v })}
                     />
-                  )}
-                  {theme.name === "brown" && (
-                    <CVBrownElegant
-                      cvData={mappedCVData}
-                      avatarUrl={cvData.avatar}
+                    <EditableText
+                      className="text-teal-200 text-[12px] font-medium text-center tracking-wide mb-6 w-full"
+                      value={cvData.position}
+                      onChange={(v: string) => setCvData({ ...cvData, position: v })}
                     />
-                  )}
-                  {theme.name === "blue_modern" && (
-                    <CVBlueModern
-                      cvData={mappedCVData}
-                      avatarUrl={cvData.avatar}
+                    {/* Contact */}
+                    <div className="w-full mb-6">
+                      <h2 className="text-[12px] font-bold uppercase tracking-widest mb-3 text-teal-200 border-b border-teal-500/50 pb-1.5">Liên hệ</h2>
+                      <div className="space-y-2.5 text-[11px]">
+                        <div className="flex items-center gap-2.5"><Phone size={13} className="text-teal-300 shrink-0" /><EditableText className="flex-1" value={cvData.phone} onChange={(v: string) => setCvData({ ...cvData, phone: v })} /></div>
+                        <div className="flex items-center gap-2.5"><Mail size={13} className="text-teal-300 shrink-0" /><EditableText className="flex-1" value={cvData.email} onChange={(v: string) => setCvData({ ...cvData, email: v })} /></div>
+                        <div className="flex items-center gap-2.5"><MapPin size={13} className="text-teal-300 shrink-0" /><EditableText className="flex-1" value={cvData.address} onChange={(v: string) => setCvData({ ...cvData, address: v })} /></div>
+                      </div>
+                    </div>
+                    {/* Skills */}
+                    <div className="w-full mb-6">
+                      <h2 className="text-[12px] font-bold uppercase tracking-widest mb-3 text-teal-200">Kỹ năng</h2>
+                      <EditableText isMultiline={true} className="text-sm text-teal-100 leading-relaxed" value={cvData.skills} onFocus={() => setFocusedSection("skills")} onChange={(v: string) => setCvData({ ...cvData, skills: v })} />
+                    </div>
+                    {/* Education */}
+                    <div className="w-full">
+                      <div className="flex items-center gap-2 mb-3">
+                        <h2 className="text-[12px] font-bold uppercase tracking-widest text-teal-200">Học vấn</h2>
+                        <button onClick={addEdu} data-html2canvas-ignore="true" className="p-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors" title="Thêm học vấn"><Plus size={14} /></button>
+                      </div>
+                      <div className="space-y-3">
+                        {cvData.educations.map((edu: any, i: number) => (
+                          <div key={edu._uid || i} className="text-sm relative group">
+                            <button onClick={() => removeEdu(i)} data-html2canvas-ignore="true" className="absolute -right-3 top-0 p-1 text-red-300 hover:bg-red-400/20 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa"><Trash2 size={12} /></button>
+                            <EditableText className="font-bold text-white text-[12px]" value={edu.major} onFocus={() => setFocusedSection("education")} onChange={(v: string) => updateEdu(i, "major", v)} placeholder="Ngành học" />
+                            <EditableText className="text-teal-200 text-[11px] mt-0.5" value={edu.school_name} onFocus={() => setFocusedSection("education")} onChange={(v: string) => updateEdu(i, "school_name", v)} placeholder="Tên trường" />
+                            <div className="text-teal-300/70 text-[10px] mt-0.5 flex gap-1 italic">
+                              <EditableText value={edu.start_date} onChange={(v: string) => updateEdu(i, "start_date", v)} placeholder="Bắt đầu" />{" "}-{" "}
+                              <EditableText value={edu.end_date} onChange={(v: string) => updateEdu(i, "end_date", v)} placeholder="Kết thúc" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  {/* RIGHT CONTENT (White) */}
+                  <div className="w-[65%] px-8 py-8 text-gray-800">
+                    {/* Summary */}
+                    <div className="mb-6">
+                      <h2 className="text-[14px] font-bold text-teal-700 uppercase tracking-wider mb-2">Giới thiệu</h2>
+                      <div className="w-10 h-[2px] bg-teal-600 mb-3 rounded-full" />
+                      <EditableText isMultiline={true} className="text-[12.5px] text-gray-600 leading-relaxed" value={cvData.summary} onFocus={() => setFocusedSection("summary")} onChange={(v: string) => setCvData({ ...cvData, summary: v })} />
+                    </div>
+                    {/* Experience */}
+                    <div className="mb-6">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h2 className="text-[14px] font-bold text-teal-700 uppercase tracking-wider">Kinh nghiệm Làm việc</h2>
+                        <button onClick={addExp} data-html2canvas-ignore="true" className="p-1 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors" title="Thêm"><Plus size={14} /></button>
+                      </div>
+                      <div className="w-10 h-[2px] bg-teal-600 mb-4 rounded-full" />
+                      <div className="space-y-5">
+                        {cvData.experiences.map((exp: any, i: number) => (
+                          <div key={exp._uid || i} className="relative group">
+                            <button onClick={() => removeExp(i)} data-html2canvas-ignore="true" className="absolute -right-5 top-0 p-1 text-red-500 hover:bg-red-500/10 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa"><Trash2 size={14} /></button>
+                            <div className="flex justify-between items-baseline mb-1">
+                              <EditableText className="font-bold text-[13px] text-gray-900 w-[70%]" value={exp.position} onChange={(v: string) => updateExp(i, "position", v)} />
+                              <div className="text-[10px] text-gray-400 flex gap-1">
+                                <EditableText value={exp.start_date} onChange={(v: string) => updateExp(i, "start_date", v)} placeholder="Bắt đầu" />{" "}-{" "}
+                                <EditableText value={exp.end_date} onChange={(v: string) => updateExp(i, "end_date", v)} placeholder="Kết thúc" />
+                              </div>
+                            </div>
+                            <EditableText className="text-[12px] text-teal-600 font-semibold mb-1" value={exp.company_name} onChange={(v: string) => updateExp(i, "company_name", v)} />
+                            <EditableText isMultiline={true} className="text-[12px] text-gray-600 leading-relaxed" value={exp.description} onFocus={() => setFocusedSection("experience")} onChange={(v: string) => updateExp(i, "description", v)} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : theme.name === "brown" ? (
+                <div
+                  ref={cvRef}
+                  className="bg-white w-[210mm] min-h-[297mm] shadow-2xl font-sans text-[13px] leading-relaxed"
+                >
+                  {/* Header (Dark Brown) */}
+                  <div className="bg-[#5D4037] px-10 py-8">
+                    <div className="flex items-center gap-6">
+                      <div className="w-[90px] h-[90px] rounded-full bg-slate-200 border-[3px] border-amber-200/30 flex items-center justify-center overflow-hidden shadow-xl shrink-0">
+                        <AvatarDisplay src={cvData.avatar} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <EditableText className="text-[28px] font-extrabold text-white tracking-tight leading-tight" value={cvData.full_name} onChange={(v: string) => setCvData({ ...cvData, full_name: v })} />
+                        <EditableText className="text-amber-200/80 text-[14px] font-medium mt-1 tracking-wide uppercase" value={cvData.position} onChange={(v: string) => setCvData({ ...cvData, position: v })} />
+                        <div className="flex flex-wrap items-center gap-4 mt-3 text-[11px] text-amber-100/70">
+                          <div className="flex items-center gap-1.5"><Phone size={12} className="shrink-0" /><EditableText value={cvData.phone} onChange={(v: string) => setCvData({ ...cvData, phone: v })} /></div>
+                          <div className="flex items-center gap-1.5"><Mail size={12} className="shrink-0" /><EditableText value={cvData.email} onChange={(v: string) => setCvData({ ...cvData, email: v })} /></div>
+                          <div className="flex items-center gap-1.5"><MapPin size={12} className="shrink-0" /><EditableText value={cvData.address} onChange={(v: string) => setCvData({ ...cvData, address: v })} /></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Body: 2-Column */}
+                  <div className="grid grid-cols-5 gap-0">
+                    {/* Left Column (2/5) */}
+                    <div className="col-span-2 px-6 py-7 bg-amber-50/40 border-r border-amber-100/50">
+                      {/* Skills */}
+                      <div className="mb-6">
+                        <h2 className="text-[13px] font-bold text-[#5D4037] uppercase tracking-wider mb-3">Kỹ năng</h2>
+                        <div className="w-8 h-[2px] bg-[#8D6E63] mb-3 rounded-full" />
+                        <EditableText isMultiline={true} className="text-[12px] text-gray-600 leading-relaxed" value={cvData.skills} onFocus={() => setFocusedSection("skills")} onChange={(v: string) => setCvData({ ...cvData, skills: v })} />
+                      </div>
+                      {/* Summary */}
+                      <div className="mb-6">
+                        <h2 className="text-[13px] font-bold text-[#5D4037] uppercase tracking-wider mb-3">Giới thiệu</h2>
+                        <div className="w-8 h-[2px] bg-[#8D6E63] mb-3 rounded-full" />
+                        <EditableText isMultiline={true} className="text-[12px] text-gray-600 leading-relaxed" value={cvData.summary} onFocus={() => setFocusedSection("summary")} onChange={(v: string) => setCvData({ ...cvData, summary: v })} />
+                      </div>
+                    </div>
+                    {/* Right Column (3/5) */}
+                    <div className="col-span-3 px-7 py-7 text-gray-800">
+                      {/* Experience */}
+                      <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <h2 className="text-[14px] font-bold text-[#5D4037] uppercase tracking-wider">Kinh nghiệm Làm việc</h2>
+                          <button onClick={addExp} data-html2canvas-ignore="true" className="p-1 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors" title="Thêm"><Plus size={14} /></button>
+                        </div>
+                        <div className="w-10 h-[2px] bg-[#8D6E63] mb-4 rounded-full" />
+                        <div className="space-y-5">
+                          {cvData.experiences.map((exp: any, i: number) => (
+                            <div key={exp._uid || i} className="relative group">
+                              <button onClick={() => removeExp(i)} data-html2canvas-ignore="true" className="absolute -right-5 top-0 p-1 text-red-500 hover:bg-red-500/10 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa"><Trash2 size={14} /></button>
+                              <div className="flex justify-between items-baseline mb-1">
+                                <EditableText className="font-bold text-[13px] text-gray-900 w-[70%]" value={exp.position} onChange={(v: string) => updateExp(i, "position", v)} />
+                                <div className="text-[10px] text-gray-400 bg-amber-50 px-2 py-0.5 rounded flex gap-1">
+                                  <EditableText value={exp.start_date} onChange={(v: string) => updateExp(i, "start_date", v)} placeholder="Bắt đầu" />{" "}-{" "}
+                                  <EditableText value={exp.end_date} onChange={(v: string) => updateExp(i, "end_date", v)} placeholder="Kết thúc" />
+                                </div>
+                              </div>
+                              <EditableText className="text-[12px] text-[#8D6E63] font-semibold mb-1" value={exp.company_name} onChange={(v: string) => updateExp(i, "company_name", v)} />
+                              <EditableText isMultiline={true} className="text-[12px] text-gray-600 leading-relaxed" value={exp.description} onFocus={() => setFocusedSection("experience")} onChange={(v: string) => updateExp(i, "description", v)} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Education */}
+                      <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <h2 className="text-[14px] font-bold text-[#5D4037] uppercase tracking-wider">Học vấn</h2>
+                          <button onClick={addEdu} data-html2canvas-ignore="true" className="p-1 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors" title="Thêm"><Plus size={14} /></button>
+                        </div>
+                        <div className="w-10 h-[2px] bg-[#8D6E63] mb-4 rounded-full" />
+                        <div className="space-y-3">
+                          {cvData.educations.map((edu: any, i: number) => (
+                            <div key={edu._uid || i} className="relative group">
+                              <button onClick={() => removeEdu(i)} data-html2canvas-ignore="true" className="absolute -right-5 top-0 p-1 text-red-400 hover:bg-red-400/20 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa"><Trash2 size={12} /></button>
+                              <EditableText className="font-bold text-[13px] text-gray-900" value={edu.school_name} onFocus={() => setFocusedSection("education")} onChange={(v: string) => updateEdu(i, "school_name", v)} placeholder="Tên trường" />
+                              <EditableText className="text-[12px] text-gray-600 mt-0.5" value={edu.major} onChange={(v: string) => updateEdu(i, "major", v)} placeholder="Ngành học" />
+                              <div className="text-[10px] text-gray-400 mt-0.5 flex gap-1">
+                                <EditableText value={edu.start_date} onChange={(v: string) => updateEdu(i, "start_date", v)} placeholder="Bắt đầu" />{" "}-{" "}
+                                <EditableText value={edu.end_date} onChange={(v: string) => updateEdu(i, "end_date", v)} placeholder="Kết thúc" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : theme.name === "blue_modern" ? (
+                <div
+                  ref={cvRef}
+                  className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed"
+                >
+                  {/* LEFT SIDEBAR (Blue) */}
+                  <div className="w-[35%] bg-blue-800 text-white px-6 py-8 flex flex-col items-center">
+                    <div className="w-[120px] h-[120px] rounded-full bg-slate-200 border-[4px] border-blue-400/30 flex items-center justify-center overflow-hidden mb-5 shadow-xl">
+                      <AvatarDisplay src={cvData.avatar} />
+                    </div>
+                    <EditableText
+                      className="text-[18px] font-extrabold text-center tracking-tight leading-tight mb-1 w-full text-white"
+                      value={cvData.full_name}
+                      onChange={(v: string) => setCvData({ ...cvData, full_name: v })}
                     />
-                  )}
+                    <EditableText
+                      className="text-blue-200 text-[11px] font-medium text-center tracking-wide uppercase mb-6 w-full"
+                      value={cvData.position}
+                      onChange={(v: string) => setCvData({ ...cvData, position: v })}
+                    />
+                    {/* Contact */}
+                    <div className="w-full mb-6">
+                      <h2 className="text-[11px] font-bold uppercase tracking-widest mb-3 text-blue-300 border-b border-blue-600/50 pb-1.5">Liên hệ</h2>
+                      <div className="space-y-2.5 text-[11px]">
+                        <div className="flex items-center gap-2.5"><Phone size={12} className="text-blue-300 shrink-0" /><EditableText className="flex-1" value={cvData.phone} onChange={(v: string) => setCvData({ ...cvData, phone: v })} /></div>
+                        <div className="flex items-center gap-2.5"><Mail size={12} className="text-blue-300 shrink-0" /><EditableText className="flex-1" value={cvData.email} onChange={(v: string) => setCvData({ ...cvData, email: v })} /></div>
+                        <div className="flex items-center gap-2.5"><MapPin size={12} className="text-blue-300 shrink-0" /><EditableText className="flex-1" value={cvData.address} onChange={(v: string) => setCvData({ ...cvData, address: v })} /></div>
+                      </div>
+                    </div>
+                    {/* Skills */}
+                    <div className="w-full">
+                      <h2 className="text-[11px] font-bold uppercase tracking-widest mb-3 text-blue-300">Kỹ năng</h2>
+                      <EditableText isMultiline={true} className="text-[11px] text-blue-100 leading-relaxed" value={cvData.skills} onFocus={() => setFocusedSection("skills")} onChange={(v: string) => setCvData({ ...cvData, skills: v })} />
+                    </div>
+                  </div>
+                  {/* RIGHT CONTENT (White with blue headers) */}
+                  <div className="w-[65%] py-8 text-gray-800">
+                    {/* Summary */}
+                    <div className="mb-5 px-7">
+                      <div className="bg-blue-50 px-4 py-1.5 rounded mb-3">
+                        <h2 className="text-[13px] font-bold text-blue-800 uppercase tracking-wider">Giới thiệu</h2>
+                      </div>
+                      <EditableText isMultiline={true} className="text-[12px] text-gray-600 leading-relaxed px-1" value={cvData.summary} onFocus={() => setFocusedSection("summary")} onChange={(v: string) => setCvData({ ...cvData, summary: v })} />
+                    </div>
+                    {/* Education */}
+                    <div className="mb-5 px-7">
+                      <div className="bg-blue-50 px-4 py-1.5 rounded mb-3 flex items-center gap-2">
+                        <h2 className="text-[13px] font-bold text-blue-800 uppercase tracking-wider">Học vấn</h2>
+                        <button onClick={addEdu} data-html2canvas-ignore="true" className="p-1 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors" title="Thêm"><Plus size={14} /></button>
+                      </div>
+                      <div className="space-y-3 px-1">
+                        {cvData.educations.map((edu: any, i: number) => (
+                          <div key={edu._uid || i} className="relative group">
+                            <button onClick={() => removeEdu(i)} data-html2canvas-ignore="true" className="absolute -right-5 top-0 p-1 text-red-400 hover:bg-red-400/20 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa"><Trash2 size={12} /></button>
+                            <EditableText className="font-bold text-[13px] text-gray-900" value={edu.school_name} onFocus={() => setFocusedSection("education")} onChange={(v: string) => updateEdu(i, "school_name", v)} placeholder="Tên trường" />
+                            <EditableText className="text-[12px] text-gray-600 mt-0.5" value={edu.major} onChange={(v: string) => updateEdu(i, "major", v)} placeholder="Ngành học" />
+                            <div className="text-[10px] text-gray-400 mt-0.5 flex gap-1">
+                              <EditableText value={edu.start_date} onChange={(v: string) => updateEdu(i, "start_date", v)} placeholder="Bắt đầu" />{" "}-{" "}
+                              <EditableText value={edu.end_date} onChange={(v: string) => updateEdu(i, "end_date", v)} placeholder="Kết thúc" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Experience */}
+                    <div className="mb-5 px-7">
+                      <div className="bg-blue-50 px-4 py-1.5 rounded mb-3 flex items-center gap-2">
+                        <h2 className="text-[13px] font-bold text-blue-800 uppercase tracking-wider">Kinh nghiệm Làm việc</h2>
+                        <button onClick={addExp} data-html2canvas-ignore="true" className="p-1 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors" title="Thêm"><Plus size={14} /></button>
+                      </div>
+                      <div className="space-y-5 px-1">
+                        {cvData.experiences.map((exp: any, i: number) => (
+                          <div key={exp._uid || i} className="relative group">
+                            <button onClick={() => removeExp(i)} data-html2canvas-ignore="true" className="absolute -right-5 top-0 p-1 text-red-500 hover:bg-red-500/10 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa"><Trash2 size={14} /></button>
+                            <div className="flex justify-between items-baseline mb-1">
+                              <EditableText className="font-bold text-[13px] text-gray-900 w-[70%]" value={exp.position} onChange={(v: string) => updateExp(i, "position", v)} />
+                              <div className="text-[10px] text-gray-400 flex gap-1">
+                                <EditableText value={exp.start_date} onChange={(v: string) => updateExp(i, "start_date", v)} placeholder="Bắt đầu" />{" "}-{" "}
+                                <EditableText value={exp.end_date} onChange={(v: string) => updateExp(i, "end_date", v)} placeholder="Kết thúc" />
+                              </div>
+                            </div>
+                            <EditableText className="text-[12px] text-blue-600 font-semibold mb-1" value={exp.company_name} onChange={(v: string) => updateExp(i, "company_name", v)} />
+                            <EditableText isMultiline={true} className="text-[12px] text-gray-600 leading-relaxed" value={exp.description} onFocus={() => setFocusedSection("experience")} onChange={(v: string) => updateExp(i, "description", v)} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 /* === LEGACY EDITABLE TEMPLATE (all legacy themes) === */

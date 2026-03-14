@@ -149,13 +149,15 @@ export function Sidebar({
                 className="flex items-center gap-3 cursor-pointer hover:bg-slate-800 p-2 rounded-xl transition-colors border border-transparent hover:border-slate-700"
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center overflow-hidden shrink-0 border border-slate-600">
-                  {(myProfileData?.info?.avatar || myProfileData?.avatar) ? (
+                  {myProfileData?.info?.avatar || myProfileData?.avatar ? (
                     <img
                       src={myProfileData?.info?.avatar || myProfileData?.avatar}
                       alt="Avatar"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        const name = encodeURIComponent(myProfileData?.full_name || "User");
+                        const name = encodeURIComponent(
+                          myProfileData?.full_name || "User",
+                        );
                         e.currentTarget.src = `https://ui-avatars.com/api/?name=${name}&background=random`;
                       }}
                     />
@@ -274,9 +276,8 @@ export function Sidebar({
                 onClick={() => toggleModal("makeover", true)}
                 className="w-full text-left px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-pink-400 rounded-lg flex items-center gap-3"
               >
-                <Wand2 size={16} /> Chỉnh sửa CV (AI)
+                <Wand2 size={16} /> Chỉnh sửa CV
               </button>
-
             </div>
           )}
         </div>
