@@ -17,10 +17,12 @@ import {
   ChevronLeft,
   Plus,
   Trash2,
+  Wand2,
 } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import toast from "react-hot-toast";
+import { TailorJDModal } from "./index";
 
 // 1. SMART HINTS DATA
 const HINTS: any = {
@@ -131,6 +133,12 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
   });
   const [focusedSection, setFocusedSection] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+
+  // Tailor JD States
+  const [showTailorModal, setShowTailorModal] = useState(false);
+  const [isTailoring, setIsTailoring] = useState(false);
+  const [tailorSummary, setTailorSummary] = useState<any>(null);
+  const [backupCvData, setBackupCvData] = useState<any>(null); // For discard functionality
 
   const cvRef = useRef<HTMLDivElement>(null);
 
@@ -276,6 +284,122 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
 
+  // --- JD TAILORING LOGIC ---
+  const handleTailorSubmit = async (jdText: string) => {
+    setIsTailoring(true);
+    setBackupCvData(JSON.parse(JSON.stringify(cvData))); // Backup before modifying
+
+    try {
+      // 1. Serialize cvData state to CVMakeoverData backend schema
+      const masterCvJson = {
+        personal_info: {
+          name: cvData.full_name,
+          title: cvData.position,
+          email: cvData.email,
+          phone: cvData.phone,
+          linkedin: cvData.linkedin,
+          location: cvData.address,
+          summary: cvData.summary,
+        },
+        skills: cvData.skills.split("\n").map((s: string) => s.replace(/^- /, "")).filter(Boolean),
+        experience: cvData.experiences.map((exp: any) => ({
+          company: exp.company_name,
+          role: exp.position,
+          period: `${exp.start_date} - ${exp.end_date}`,
+          achievements: exp.description.split("\n").map((a: string) => a.replace(/^- /, "")).filter(Boolean),
+        })),
+        education: cvData.educations.map((edu: any) => ({
+          school: edu.school_name,
+          degree: edu.major,
+          period: `${edu.start_date} - ${edu.end_date}`,
+        })),
+        projects: [] // Currently not handled in GenCVModal standard fields directly, keep empty or map if added later
+      };
+
+      // 2. Call tailored API
+      const res = await fetch("http://localhost:8000/api/cv/tailor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          master_cv_json: masterCvJson,
+          jd_text: jdText
+        }),
+      });
+
+      if (!res.ok) throw new Error("API responded with an error");
+
+      const data = await res.json();
+      
+      // 3. Apply changes temporarily to UI
+      const aiData = data.cv_data;
+      
+      const splitPeriod = (period?: string) => {
+        if (!period) return { start_date: "", end_date: "" };
+        const parts = period.split(/\s*[-\u2013\u2014]\s*/);
+        return {
+          start_date: parts[0]?.trim() || "",
+          end_date: parts[1]?.trim() || "Nay",
+        };
+      };
+
+      setCvData({
+        ...cvData, // Keep avatar and other unmapped data safe
+        full_name: aiData.personal_info?.name || cvData.full_name,
+        position: aiData.personal_info?.title || cvData.position,
+        phone: aiData.personal_info?.phone || cvData.phone,
+        email: aiData.personal_info?.email || cvData.email,
+        address: aiData.personal_info?.location || cvData.address,
+        linkedin: aiData.personal_info?.linkedin || cvData.linkedin,
+        summary: aiData.personal_info?.summary || cvData.summary,
+        skills: Array.isArray(aiData.skills)
+          ? aiData.skills.map((s: string) => `- ${s}`).join("\n")
+          : aiData.skills || cvData.skills,
+        experiences:
+          Array.isArray(aiData.experience) && aiData.experience.length > 0
+            ? aiData.experience.map((exp: any) => {
+                const { start_date, end_date } = splitPeriod(exp.period);
+                return {
+                  _uid: genUid(),
+                  company_name: exp.company || "",
+                  position: exp.role || "",
+                  start_date,
+                  end_date,
+                  description: Array.isArray(exp.achievements)
+                    ? exp.achievements.map((a: string) => `- ${a}`).join("\n")
+                    : "",
+                };
+              })
+            : cvData.experiences,
+      });
+
+      setTailorSummary(data.tailor_summary);
+      toast.success("CV đã được tối ưu! Vui lòng xem kết quả.");
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Có lỗi xảy ra khi tối ưu CV. Vui lòng thử lại.");
+    } finally {
+      setIsTailoring(false);
+    }
+  };
+
+  const applyTailoredChanges = () => {
+    setShowTailorModal(false);
+    setTailorSummary(null);
+    setBackupCvData(null);
+    toast.success("Đã áp dụng thay đổi vào CV của bạn!");
+  };
+
+  const discardTailoredChanges = () => {
+    if (backupCvData) {
+      setCvData(backupCvData);
+    }
+    setShowTailorModal(false);
+    setTailorSummary(null);
+    setBackupCvData(null);
+    toast("Đã hoàn tác thay đổi.", { icon: "↩️" });
+  };
+
   // PDF DOWNLOAD HANDLER (1-CLICK)
   const handleDownloadPDF = () => {
     setFocusedSection(null); // Remove blue border
@@ -406,6 +530,14 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
             <LayoutTemplate className="text-blue-500" /> Trình Soạn thảo CV
           </h2>
           <div className="flex gap-4">
+            <button
+              onClick={() => setShowTailorModal(true)}
+              disabled={isDownloading || isTailoring}
+              className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 text-white transition-all ${isDownloading || isTailoring ? "bg-slate-700 cursor-not-allowed opacity-50" : "bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 shadow-lg"}`}
+              title="Nhân bản & tối ưu CV theo Job Description"
+            >
+              <Wand2 size={18} className="text-blue-200" /> Tối ưu theo JD
+            </button>
             <button
               onClick={handleDownloadPDF}
               disabled={isDownloading}
@@ -1126,6 +1258,17 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
           </div>
         </div>
       </div>
+
+      {/* TAILOR JD MODAL */}
+      <TailorJDModal
+        show={showTailorModal}
+        onClose={discardTailoredChanges} // If closed without applying, discard
+        onSubmit={handleTailorSubmit}
+        tailorSummary={tailorSummary}
+        isLoading={isTailoring}
+        onApplyChanges={applyTailoredChanges}
+        onDiscardChanges={discardTailoredChanges}
+      />
     </div>
   );
 }

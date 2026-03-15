@@ -11,5 +11,6 @@ export { default as GenCVModal } from "./GenCVModal";
 export { default as ReviewCVModal } from "./ReviewCVModal";
 export { ResumeConfigModal } from "./ResumeConfigModal";
 export { default as CheckoutModal } from "./CheckoutModal";
+export { default as TailorJDModal } from "./TailorJDModal";
 export { default as SubscriptionModal } from "./SubscriptionModal";
 export { default as CVMakeover } from "./CV/CVMakeover";

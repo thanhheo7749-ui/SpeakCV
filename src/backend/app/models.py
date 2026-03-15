@@ -62,6 +62,10 @@ class CVRewriteRequest(BaseModel):
     cv_text: str
     template_style: str = "harvard"
 
+class CVTailorRequest(BaseModel):
+    master_cv_json: dict
+    jd_text: str
+
 class UserCreate(BaseModel):
     email: str
     password: str

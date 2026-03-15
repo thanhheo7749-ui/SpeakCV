@@ -245,3 +245,98 @@ async def upload_makeover_cv(file: UploadFile = File(...), industry: str = Form(
         print(f"❌ CV MAKEOVER ERROR: {e}")
         raise HTTPException(status_code=500, detail=f"Chỉnh sửa CV thất bại: {str(e)}")
 
+
+CV_TAILOR_SYSTEM_PROMPT = """Bạn là chuyên gia tư vấn CV hàng đầu hệ thống ATS (Applicant Tracking System).
+Nhiệm vụ của bạn là tối ưu hóa CV hiện tại của ứng viên để phù hợp nhất với Job Description (JD) được cung cấp.
+
+BẮT BUỘC TUÂN THỦ CÁC RÀO CHẮN TRỌNG YẾU SAU (NẾU VI PHẠM SẼ GÂY HẬU QUẢ NGHIÊM TRỌNG):
+1. KHÔNG ĐƯỢC BỊA ĐẶT (NO HALLUCINATION): Tuyệt đối không thêm bất kỳ công ty, dự án, trường học, điểm số, hoặc kinh nghiệm làm việc nào KHÔNG CÓ trong CV gốc.
+2. KHÔNG THÊM KỸ NĂNG ẢO: Chỉ được phép viết lại hoặc làm nổi bật những kỹ năng mà ứng viên thực sự có. Không tự tiện thêm "React" nếu CV gốc chỉ có "Vue", trừ khi ý nghĩa hoàn toàn tương đương.
+3. CHỈ ĐƯỢC PHÉP:
+   - Sắp xếp lại thứ tự ưu tiên (kinh nghiệm/kỹ năng nào sát với JD nhất đưa lên đầu).
+   - Tinh chỉnh từ khóa (Keyword matching): Viết lại các mô tả công việc (achievements) để mượt mà hơn và chứa các từ khóa từ JD (nhưng phải giữ nguyên bản chất thực tế).
+
+BẮT BUỘC: Trả về KẾT QUẢ DƯỚI DẠNG JSON THUẦN TÚY, không bọc trong markdown code block, không thêm bất kỳ text nào ngoài JSON.
+
+Schema JSON bắt buộc (Tương tự CV gốc, CHỈ THAY ĐỔI phần analysis_feedback thành tailor_summary):
+{
+  "analysis_feedback": {
+    "strengths": ["Điểm mạnh 1", "Điểm mạnh 2"],
+    "weaknesses": ["Điểm yếu 1", "Điểm yếu 2"],
+    "overall_score": 85
+  },
+  "personal_info": { ...giữ nguyên hoặc tinh chỉnh summary... },
+  "skills": ["kỹ năng tốt nhất cho JD", "kỹ năng số 2"...],
+  "experience": [ ...danh sách kinh nghiệm đã được sắp xếp và tinh chỉnh mô tả... ],
+  "education": [ ...giữ nguyên... ],
+  "projects": [ ...giữ nguyên hoặc tinh chỉnh mô tả... ]
+}
+
+LƯU Ý: Thay vì nhận xét chung chung ở `analysis_feedback`, hãy biến nó thành `tailor_summary` với:
+- strengths: Những thay đổi chính bạn đã làm (ví dụ: "Đã làm nổi bật kinh nghiệm ReactJS", "Đưa kỹ năng Quản lý dự án lên đầu")
+- weaknesses: Những từ khóa/yêu cầu quan trọng trong JD mà CV CÒN THIẾU (để báo cho ứng viên biết mức độ match)
+- overall_score: Độ match của CV (sau khi tối ưu) với JD (0-100)
+"""
+
+@router.post("/api/cv/tailor")
+async def tailor_cv(request: models.CVTailorRequest):
+    try:
+        jd_text = request.jd_text.strip()
+        if not jd_text:
+            raise HTTPException(status_code=400, detail="Không có nội dung Job Description (JD).")
+        
+        # Truncate JD to prevent token overflow
+        if len(jd_text) > 5000:
+            jd_text = jd_text[:5000] + "..."
+            
+        print(f"⏳ CV Tailor — Initiating tailoring for JD length: {len(jd_text)}")
+        
+        # We enforce JSON string format in prompt
+        user_prompt = f"Đây là Job Description (JD):\n\n{jd_text}\n\n---\n\nĐây là CV gốc (JSON) cần được cấu trúc lại và tối ưu:\n\n{json.dumps(request.master_cv_json, ensure_ascii=False)}"
+        
+        messages = [
+            {"role": "system", "content": CV_TAILOR_SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        # Temperature is low (0.3) to minimize hallucination when tailoring true facts
+        result = call_ai_chat(
+            messages=messages,
+            model="gpt-4o",
+            temperature=0.3,
+            response_format={"type": "json_object"},
+            timeout=120
+        )
+        
+        # Safety: strip markdown code block wrappers if present
+        cleaned = result.strip()
+        if cleaned.startswith("```"):
+            lines = cleaned.split("\n")
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].strip() == "```":
+                lines = lines[:-1]
+            cleaned = "\n".join(lines)
+            
+        # Parse and validate with Pydantic CVMakeoverData
+        try:
+            cv_json = json.loads(cleaned)
+            validated = models.CVMakeoverData(**cv_json)
+            cv_data = validated.model_dump()
+            
+            # Extract tailor_summary from what we hijacked as analysis_feedback
+            tailor_summary = cv_data.get("analysis_feedback", {})
+            
+        except (json.JSONDecodeError, Exception) as parse_err:
+            print(f"⚠️ JSON parse/validation error during tailoring: {parse_err}")
+            raise HTTPException(status_code=500, detail="AI trả về JSON không hợp lệ. Vui lòng thử lại.")
+            
+        print("✅ CV tailor completed!")
+        return {"cv_data": cv_data, "tailor_summary": tailor_summary}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ CV TAILOR ERROR: {e}")
+        raise HTTPException(status_code=500, detail=f"Tối ưu CV thất bại: {str(e)}")
+
