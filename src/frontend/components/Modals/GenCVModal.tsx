@@ -553,13 +553,14 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
           </div>
 
           {/* CV PREVIEW AND EDIT AREA (RIGHT SIDE) */}
-          <div className="w-[75%] bg-slate-800 rounded-2xl border border-slate-700 overflow-auto p-8 custom-scrollbar relative flex justify-center">
+          <div className="w-[75%] bg-slate-800 rounded-2xl border border-slate-700 overflow-auto p-8 custom-scrollbar relative flex justify-center items-start">
             {/* ZOOM WRAPPER (Display scale only) */}
-            <div className="origin-top scale-[0.80] sm:scale-[0.9] lg:scale-[0.95] transition-transform">
+            <div className="origin-top-left scale-[0.65] sm:scale-[0.72] lg:scale-[0.80] xl:scale-[0.88] transition-transform shrink-0">
               {theme.name === "teal" ? (
                 <div
                   ref={cvRef}
-                  className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed"
+                  className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed overflow-hidden"
+                  style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
                 >
                   {/* LEFT SIDEBAR (Teal) */}
                   <div className="w-[35%] bg-teal-700 text-white px-6 py-8 flex flex-col items-center">
@@ -648,7 +649,8 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
               ) : theme.name === "brown" ? (
                 <div
                   ref={cvRef}
-                  className="bg-white w-[210mm] min-h-[297mm] shadow-2xl font-sans text-[13px] leading-relaxed"
+                  className="bg-white w-[210mm] min-h-[297mm] shadow-2xl font-sans text-[13px] leading-relaxed overflow-hidden"
+                  style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
                 >
                   {/* Header (Dark Brown) */}
                   <div className="bg-[#5D4037] px-10 py-8">
@@ -737,7 +739,8 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
               ) : theme.name === "blue_modern" ? (
                 <div
                   ref={cvRef}
-                  className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed"
+                  className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed overflow-hidden"
+                  style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
                 >
                   {/* LEFT SIDEBAR (Blue) */}
                   <div className="w-[35%] bg-blue-800 text-white px-6 py-8 flex flex-col items-center">
@@ -827,7 +830,8 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
                 /* === LEGACY EDITABLE TEMPLATE (all legacy themes) === */
                 <div
                   ref={cvRef}
-                  className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed"
+                  className="bg-white flex flex-row min-h-[297mm] w-[210mm] shadow-2xl font-sans text-[13px] leading-relaxed overflow-hidden"
+                  style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
                 >
                   {/* --- LEFT COLUMN --- */}
                   <div
