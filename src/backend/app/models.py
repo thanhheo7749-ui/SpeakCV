@@ -6,6 +6,8 @@ from typing import List, Optional
 from pydantic import BaseModel
 from datetime import date
 
+# ── Profile & Experience ──────────────────────
+
 class ProfileUpdate(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
@@ -32,6 +34,8 @@ class EducationCreate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
 
+# ── Interview & Chat ─────────────────────────
+
 class ChatRequest(BaseModel):
     user_text: str
     jd_text: str = "" 
@@ -52,6 +56,8 @@ class ReportRequest(BaseModel):
     question_limit: int = 0
     time_limit: int = 0
 
+# ── CV Features ──────────────────────────────
+
 class CVGenRequest(BaseModel):
     user_info: str
     position: str
@@ -65,6 +71,8 @@ class CVRewriteRequest(BaseModel):
 class CVTailorRequest(BaseModel):
     master_cv_json: dict
     jd_text: str
+
+# ── Auth & Users ─────────────────────────────
 
 class UserCreate(BaseModel):
     email: str
@@ -101,6 +109,8 @@ class Token(BaseModel):
     user_name: str
     role: str = "user"
 
+# ── Interview Config & Templates ─────────────
+
 class RenameRequest(BaseModel):
     title: str
 
@@ -113,12 +123,16 @@ class JDTemplateRequest(BaseModel):
     title: str
     description: str
 
+# ── Admin & System ───────────────────────────
+
 class AddCreditRequest(BaseModel):
     amount: int
 
 class SystemConfigUpdate(BaseModel):
     system_prompt: str
     temperature: float
+
+# ── Support ──────────────────────────────────
 
 class SupportMessageCreate(BaseModel):
     message: str

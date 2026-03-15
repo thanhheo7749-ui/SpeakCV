@@ -23,45 +23,15 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import toast from "react-hot-toast";
 import { TailorJDModal } from "./index";
+import {
+  HINTS,
+  THEME_MAP,
+  genUid,
+  applyAiCvData,
+  serializeCvDataForBackend,
+} from "./cv-builder-utils";
 
-// 1. SMART HINTS DATA
-const HINTS: any = {
-  summary: {
-    title: "Gợi ý viết Mục tiêu nghề nghiệp",
-    tips: [
-      "Nêu rõ số năm kinh nghiệm và chuyên môn cốt lõi của bạn.",
-      "Mục tiêu ngắn hạn: Mong muốn học hỏi, đóng góp gì cho công ty trong 1-2 năm tới.",
-      "Mục tiêu dài hạn: Định hướng trở thành chuyên gia, quản lý trong 3-5 năm.",
-      "Tránh viết chung chung kiểu 'Muốn tìm môi trường năng động'.",
-    ],
-  },
-  experience: {
-    title: "Gợi ý viết Kinh nghiệm làm việc",
-    tips: [
-      "Bắt đầu bằng các động từ mạnh: Quản lý, Thiết kế, Phân tích, Tối ưu...",
-      "Sử dụng công thức: Làm [Công việc] bằng [Công cụ] dẫn đến [Kết quả/Số liệu].",
-      "Ví dụ: 'Tối ưu hóa chiến dịch quảng cáo Facebook, giúp giảm 20% chi phí chuyển đổi (CPA)'.",
-      "Nên gạch đầu dòng (Sử dụng dấu - ở đầu câu) để dễ đọc.",
-    ],
-  },
-  skills: {
-    title: "Gợi ý viết Kỹ năng",
-    tips: [
-      "Chỉ liệt kê các kỹ năng liên quan trực tiếp đến vị trí ứng tuyển.",
-      "Nên chia thành Kỹ năng cứng (ví dụ: ReactJS, Figma, SQL) và Kỹ năng mềm (Teamwork, Thuyết trình).",
-      "Tránh dùng các thanh đo lường (ví dụ: 80%, 4/5 sao) vì nó rất cảm tính.",
-    ],
-  },
-  education: {
-    title: "Gợi ý viết Học vấn",
-    tips: [
-      "Ghi rõ tên trường, chuyên ngành và thời gian theo học.",
-      "Có thể bổ sung điểm GPA (nếu cao, vd: 3.2/4.0) hoặc các giải thưởng, học bổng nổi bật.",
-    ],
-  },
-};
-
-// 2. HELPER COMPONENT
+// HELPER COMPONENT
 const EditableText = ({
   value,
   onChange,
@@ -106,11 +76,7 @@ const AvatarDisplay = ({ src }: { src?: string }) => {
   );
 };
 
-// 3. UID HELPER — unique keys for array items
-let _uidCounter = 0;
-const genUid = () => `uid_${++_uidCounter}_${Date.now()}`;
-
-// 4. MAIN COMPONENT
+// MAIN COMPONENT
 export default function GenCVModal({ show, onClose, userProfile }: any) {
   const [cvData, setCvData] = useState<any>({
     full_name: "",
@@ -193,90 +159,18 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
 
     try {
       const parsed = JSON.parse(raw);
-      // Support both wrapped { data, theme } and raw CVData format
       const aiData = parsed.data || parsed;
       const draftTheme = parsed.theme || null;
-      const info = aiData.personal_info || {};
 
-      // Helper: split "01/2023 - 06/2025" into start_date / end_date
-      const splitPeriod = (period?: string) => {
-        if (!period) return { start_date: "", end_date: "" };
-        const parts = period.split(/\s*[-\u2013\u2014]\s*/);
-        return {
-          start_date: parts[0]?.trim() || "",
-          end_date: parts[1]?.trim() || "Nay",
-        };
-      };
-
-      setCvData({
-        full_name: info.name || "TÊN CỦA BẠN",
-        position: info.title || "Vị trí ứng tuyển",
-        phone: info.phone || "",
-        email: info.email || "",
-        address: info.location || "",
-        linkedin: info.linkedin || "",
+      setCvData(applyAiCvData(aiData, {
+        ...cvData,
         avatar: userProfile?.info?.avatar || "",
-        summary: info.summary || "",
-        skills: Array.isArray(aiData.skills)
-          ? aiData.skills.map((s: string) => `- ${s}`).join("\n")
-          : aiData.skills || "",
-        experiences:
-          Array.isArray(aiData.experience) && aiData.experience.length > 0
-            ? aiData.experience.map((exp: any) => {
-                const { start_date, end_date } = splitPeriod(exp.period);
-                return {
-                  _uid: genUid(),
-                  company_name: exp.company || "",
-                  position: exp.role || "",
-                  start_date,
-                  end_date,
-                  description: Array.isArray(exp.achievements)
-                    ? exp.achievements.map((a: string) => `- ${a}`).join("\n")
-                    : "",
-                };
-              })
-            : [
-                {
-                  _uid: genUid(),
-                  company_name: "Tên công ty",
-                  position: "Vị trí",
-                  start_date: "01/2023",
-                  end_date: "Nay",
-                  description: "- Mô tả công việc...",
-                },
-              ],
-        educations:
-          Array.isArray(aiData.education) && aiData.education.length > 0
-            ? aiData.education.map((edu: any) => {
-                const { start_date, end_date } = splitPeriod(edu.period);
-                return {
-                  _uid: genUid(),
-                  school_name: edu.school || "",
-                  major: edu.degree || "",
-                  start_date,
-                  end_date,
-                };
-              })
-            : [
-                {
-                  _uid: genUid(),
-                  school_name: "Tên trường",
-                  major: "Tên ngành học",
-                  start_date: "2019",
-                  end_date: "2023",
-                },
-              ],
-      });
+      }));
 
-      // Auto-select the makeover template if the flag was passed
-      if (draftTheme) {
-        changeTheme(draftTheme);
-      }
+      if (draftTheme) changeTheme(draftTheme);
 
       sessionStorage.removeItem("draft_cv_data");
-      toast.success(
-        "Đã tải dữ liệu CV từ AI. Bạn có thể chỉnh sửa theo ý muốn!",
-      );
+      toast.success("Đã tải dữ liệu CV từ AI. Bạn có thể chỉnh sửa theo ý muốn!");
     } catch (err) {
       console.error("Failed to parse draft_cv_data:", err);
       sessionStorage.removeItem("draft_cv_data");
@@ -287,94 +181,23 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
   // --- JD TAILORING LOGIC ---
   const handleTailorSubmit = async (jdText: string) => {
     setIsTailoring(true);
-    setBackupCvData(JSON.parse(JSON.stringify(cvData))); // Backup before modifying
+    setBackupCvData(JSON.parse(JSON.stringify(cvData)));
 
     try {
-      // 1. Serialize cvData state to CVMakeoverData backend schema
-      const masterCvJson = {
-        personal_info: {
-          name: cvData.full_name,
-          title: cvData.position,
-          email: cvData.email,
-          phone: cvData.phone,
-          linkedin: cvData.linkedin,
-          location: cvData.address,
-          summary: cvData.summary,
-        },
-        skills: cvData.skills.split("\n").map((s: string) => s.replace(/^- /, "")).filter(Boolean),
-        experience: cvData.experiences.map((exp: any) => ({
-          company: exp.company_name,
-          role: exp.position,
-          period: `${exp.start_date} - ${exp.end_date}`,
-          achievements: exp.description.split("\n").map((a: string) => a.replace(/^- /, "")).filter(Boolean),
-        })),
-        education: cvData.educations.map((edu: any) => ({
-          school: edu.school_name,
-          degree: edu.major,
-          period: `${edu.start_date} - ${edu.end_date}`,
-        })),
-        projects: [] // Currently not handled in GenCVModal standard fields directly, keep empty or map if added later
-      };
+      const masterCvJson = serializeCvDataForBackend(cvData);
 
-      // 2. Call tailored API
       const res = await fetch("http://localhost:8000/api/cv/tailor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          master_cv_json: masterCvJson,
-          jd_text: jdText
-        }),
+        body: JSON.stringify({ master_cv_json: masterCvJson, jd_text: jdText }),
       });
 
       if (!res.ok) throw new Error("API responded with an error");
 
       const data = await res.json();
-      
-      // 3. Apply changes temporarily to UI
-      const aiData = data.cv_data;
-      
-      const splitPeriod = (period?: string) => {
-        if (!period) return { start_date: "", end_date: "" };
-        const parts = period.split(/\s*[-\u2013\u2014]\s*/);
-        return {
-          start_date: parts[0]?.trim() || "",
-          end_date: parts[1]?.trim() || "Nay",
-        };
-      };
-
-      setCvData({
-        ...cvData, // Keep avatar and other unmapped data safe
-        full_name: aiData.personal_info?.name || cvData.full_name,
-        position: aiData.personal_info?.title || cvData.position,
-        phone: aiData.personal_info?.phone || cvData.phone,
-        email: aiData.personal_info?.email || cvData.email,
-        address: aiData.personal_info?.location || cvData.address,
-        linkedin: aiData.personal_info?.linkedin || cvData.linkedin,
-        summary: aiData.personal_info?.summary || cvData.summary,
-        skills: Array.isArray(aiData.skills)
-          ? aiData.skills.map((s: string) => `- ${s}`).join("\n")
-          : aiData.skills || cvData.skills,
-        experiences:
-          Array.isArray(aiData.experience) && aiData.experience.length > 0
-            ? aiData.experience.map((exp: any) => {
-                const { start_date, end_date } = splitPeriod(exp.period);
-                return {
-                  _uid: genUid(),
-                  company_name: exp.company || "",
-                  position: exp.role || "",
-                  start_date,
-                  end_date,
-                  description: Array.isArray(exp.achievements)
-                    ? exp.achievements.map((a: string) => `- ${a}`).join("\n")
-                    : "",
-                };
-              })
-            : cvData.experiences,
-      });
-
+      setCvData(applyAiCvData(data.cv_data, cvData));
       setTailorSummary(data.tailor_summary);
       toast.success("CV đã được tối ưu! Vui lòng xem kết quả.");
-
     } catch (err) {
       console.error(err);
       toast.error("Có lỗi xảy ra khi tối ưu CV. Vui lòng thử lại.");
@@ -391,9 +214,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
   };
 
   const discardTailoredChanges = () => {
-    if (backupCvData) {
-      setCvData(backupCvData);
-    }
+    if (backupCvData) setCvData(backupCvData);
     setShowTailorModal(false);
     setTailorSummary(null);
     setBackupCvData(null);
@@ -495,28 +316,8 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
     }));
   };
   const changeTheme = (type: string) => {
-    if (type === "topcv")
-      setTheme({ name: "topcv", leftBg: "#42312B", rightPill: "#42312B" });
-    if (type === "antuong")
-      setTheme({ name: "antuong", leftBg: "#465345", rightPill: "#465345" });
-    if (type === "thamvong")
-      setTheme({ name: "thamvong", leftBg: "#1A1A1A", rightPill: "#F39C12" });
-    if (type === "makeover_blue")
-      setTheme({
-        name: "makeover_blue",
-        leftBg: "#1e3a5f",
-        rightPill: "#2563eb",
-      });
-    if (type === "teal")
-      setTheme({ name: "teal", leftBg: "#0d9488", rightPill: "#0d9488" });
-    if (type === "brown")
-      setTheme({ name: "brown", leftBg: "#5D4037", rightPill: "#5D4037" });
-    if (type === "blue_modern")
-      setTheme({
-        name: "blue_modern",
-        leftBg: "#1e40af",
-        rightPill: "#1e40af",
-      });
+    const t = THEME_MAP[type];
+    if (t) setTheme(t);
   };
 
   if (!show) return null;
