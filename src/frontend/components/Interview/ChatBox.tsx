@@ -39,7 +39,7 @@ export const ChatBox = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl h-72 z-10">
       {/* User's panel */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-4 backdrop-blur-md shadow-xl flex flex-col hover:border-blue-500/20 transition-colors relative">
+      <div className="bg-theme-primary/60 border border-theme-border rounded-3xl p-4 backdrop-blur-md shadow-xl flex flex-col hover:border-blue-500/20 transition-colors relative">
         <div className="flex justify-between items-center mb-2 px-2">
           <span className="text-xs font-bold text-blue-500 uppercase tracking-widest flex items-center gap-2">
             Ứng viên (Bạn)
@@ -47,24 +47,24 @@ export const ChatBox = ({
           <div className="flex gap-2">
             <button
               onClick={onClear}
-              className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-500 hover:text-red-400"
+              className="p-1.5 hover:bg-theme-surface rounded-lg text-theme-muted hover:text-red-400"
               title="Xóa"
             >
               <Eraser size={16} />
             </button>
             <button
               onClick={onRefresh}
-              className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-500 hover:text-white"
+              className="p-1.5 hover:bg-theme-surface rounded-lg text-theme-muted hover:text-theme-text"
               title="Làm mới Mic"
             >
               <RefreshCcw size={16} />
             </button>
           </div>
         </div>
-        <div className="flex-1 relative bg-slate-950/30 rounded-xl border border-slate-700/50 overflow-hidden focus-within:border-blue-500/50 transition-colors">
+        <div className="flex-1 relative bg-theme-primary/30 rounded-xl border border-theme-border/50 overflow-hidden focus-within:border-blue-500/50 transition-colors">
           <textarea
             ref={textareaRef}
-            className="w-full h-full bg-transparent p-4 outline-none resize-none text-slate-300 text-lg leading-relaxed custom-scrollbar placeholder:text-slate-700"
+            className="w-full h-full bg-transparent p-4 outline-none resize-none text-theme-text-secondary text-lg leading-relaxed custom-scrollbar placeholder:text-theme-muted"
             placeholder="Nói hoặc gõ câu trả lời..."
             value={userText + (tempText ? " " + tempText : "")}
             onChange={(e) => onUserTextChange(e.target.value)}
@@ -87,12 +87,12 @@ export const ChatBox = ({
       </div>
 
       {/* AI's panel */}
-      <div className="bg-gradient-to-br from-slate-900/80 to-blue-950/20 border border-slate-700/50 rounded-3xl p-6 backdrop-blur-md shadow-xl flex flex-col">
+      <div className="bg-gradient-to-br from-theme-primary/80 to-blue-950/20 border border-theme-border/50 rounded-3xl p-6 backdrop-blur-md shadow-xl flex flex-col">
         <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>{" "}
           AI Phản hồi
         </span>
-        <p className="text-xl text-slate-200 leading-relaxed overflow-y-auto custom-scrollbar flex-1 whitespace-pre-wrap">
+        <p className="text-xl text-theme-text leading-relaxed overflow-y-auto custom-scrollbar flex-1 whitespace-pre-wrap">
           {aiText}
         </p>
       </div>

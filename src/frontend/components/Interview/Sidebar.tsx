@@ -143,7 +143,7 @@ export function Sidebar({
         />
       )}
       <nav
-        className={`w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-40 shadow-2xl transition-transform duration-300 absolute inset-y-0 left-0 md:relative md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`w-72 bg-theme-primary border-r border-theme-border flex flex-col z-40 shadow-2xl transition-transform duration-300 absolute inset-y-0 left-0 md:relative md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* Close Button on Mobile */}
         <div
@@ -151,19 +151,19 @@ export function Sidebar({
         >
           <button
             onClick={onClose}
-            className="p-1.5 bg-slate-800 border-y border-r border-l-0 border-slate-700 rounded-r-xl text-slate-300 hover:text-white transition-colors shadow-lg"
+            className="p-1.5 bg-theme-surface border-y border-r border-l-0 border-theme-border rounded-r-xl text-theme-text-secondary hover:text-theme-text transition-colors shadow-lg"
           >
             <ChevronLeft size={20} />
           </button>
         </div>
 
         {/* 1. AVATAR & USER MENU SECTION */}
-        <div className="p-4 border-b border-slate-800 relative z-50">
+        <div className="p-4 border-b border-theme-border relative z-50">
           {user ? (
             <div>
               <div
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-3 cursor-pointer hover:bg-slate-800 p-2 rounded-xl transition-colors border border-transparent hover:border-slate-700"
+                className="flex items-center gap-3 cursor-pointer hover:bg-theme-surface p-2 rounded-xl transition-colors border border-transparent hover:border-theme-border"
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center overflow-hidden shrink-0 border border-slate-600">
                   {myProfileData?.info?.avatar || myProfileData?.avatar ? (
@@ -183,10 +183,10 @@ export function Sidebar({
                   )}
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <p className="text-white font-bold text-sm truncate">
+                  <p className="text-theme-text font-bold text-sm truncate">
                     {myProfileData?.full_name || user}
                   </p>
-                  <div className="flex text-[11px] items-center gap-1 mt-0.5 font-medium text-slate-400">
+                  <div className="flex text-[11px] items-center gap-1 mt-0.5 font-medium text-theme-text-secondary">
                     <Sparkles size={10} className="text-yellow-400" />
                     <span>
                       Lượt tương tác:{" "}
@@ -259,10 +259,10 @@ export function Sidebar({
         </div>
 
         {/* 2. TOOLS COMBO BOX */}
-        <div className="p-4 border-b border-slate-800">
+        <div className="p-4 border-b border-theme-border">
           <button
             onClick={() => setShowToolsMenu(!showToolsMenu)}
-            className="w-full flex items-center justify-between p-3 bg-slate-950 border border-slate-800 hover:border-slate-600 rounded-xl text-white font-bold transition-colors"
+            className="w-full flex items-center justify-between p-3 bg-theme-primary border border-theme-border hover:border-theme-text-secondary rounded-xl text-theme-text font-bold transition-colors"
           >
             <span className="flex items-center gap-2 text-sm">
               <Briefcase size={18} className="text-yellow-500" /> Công cụ
@@ -275,10 +275,10 @@ export function Sidebar({
           </button>
 
           {showToolsMenu && (
-            <div className="mt-2 space-y-1 bg-slate-950/50 p-2 border border-slate-800 rounded-xl animate-in fade-in">
+            <div className="mt-2 space-y-1 bg-theme-primary/50 p-2 border border-theme-border rounded-xl animate-in fade-in">
               <button
                 onClick={() => toggleModal("cv", true)}
-                className="w-full text-left px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-yellow-400 rounded-lg flex items-center gap-3"
+                className="w-full text-left px-3 py-2.5 text-sm text-theme-text-secondary hover:bg-theme-surface hover:text-yellow-400 rounded-lg flex items-center gap-3"
               >
                 <Sparkles size={16} /> Tạo CV (Demo)
               </button>
@@ -487,23 +487,16 @@ export function Sidebar({
           )}
         </div>
 
-        {/* 4. SETTINGS & THEME & END SESSION (Bottom) */}
-        <div className="p-4 border-t border-slate-800 flex gap-2 bg-slate-900/90 backdrop-blur-md">
+        {/* 4. SETTINGS & END SESSION (Bottom) */}
+        <div className="p-4 border-t border-theme-border flex gap-2 bg-theme-primary/90 backdrop-blur-md">
           <button
             onClick={() => toggleModal("settings", true)}
-            className="flex-1 flex items-center justify-center gap-2 p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors font-bold text-sm"
+            className="flex-1 flex items-center justify-center gap-2 p-3 bg-theme-surface hover:bg-theme-border text-theme-text-secondary hover:text-theme-text rounded-xl transition-colors font-bold text-sm"
             aria-label="Cài đặt"
           >
             <Settings size={18} /> Cài đặt
           </button>
-          <button
-            onClick={toggleTheme}
-            className="w-12 flex flex-shrink-0 items-center justify-center p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl transition-colors"
-            aria-label={theme === "dark" ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
-            title={theme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+
           <button
             onClick={() => handleOpenReport(false)}
             disabled={isGeneratingReport}

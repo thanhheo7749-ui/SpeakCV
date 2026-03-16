@@ -8,7 +8,8 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lightbulb, X, Menu } from "lucide-react";
+import { Lightbulb, X, Menu, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
 import { MicroButton } from "@/components/Interview/MicroButton";
 import { ChatBox } from "@/components/Interview/ChatBox";
@@ -64,6 +65,7 @@ export function InterviewLayout({
   startTimedInterview,
 }: InterviewLayoutProps) {
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
   // Swipe-to-dismiss state for mobile hint modal
   const touchStartY = useRef(0);
   const [swipeOffset, setSwipeOffset] = useState(0);
@@ -86,12 +88,22 @@ export function InterviewLayout({
   };
 
   return (
-    <main className="flex-1 flex flex-col items-center justify-between py-8 px-6 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
+    <main className="flex-1 flex flex-col items-center justify-between py-8 px-6 relative bg-theme-secondary">
+      {/* Theme Toggle - Top Right */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-4 right-4 z-20 p-2.5 bg-theme-surface/80 border border-theme-border rounded-xl text-theme-text-secondary hover:text-yellow-400 backdrop-blur-sm shadow-lg transition-all hover:scale-105"
+        aria-label={theme === "dark" ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
+        title={theme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
+      >
+        {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+      </button>
+
       {/* Mobile Hamburger Menu */}
       <button
         onClick={() => setIsSidebarOpen(true)}
         aria-label="Mở menu"
-        className={`md:hidden absolute top-4 left-4 z-20 p-2 bg-slate-800/80 border border-slate-700 rounded-lg text-slate-300 hover:text-white backdrop-blur-sm shadow-lg transition-opacity duration-300 ${isSidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+        className={`md:hidden absolute top-4 left-4 z-20 p-2 bg-theme-surface/80 border border-theme-border rounded-lg text-theme-text-secondary hover:text-theme-text backdrop-blur-sm shadow-lg transition-opacity duration-300 ${isSidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
         <Menu size={20} />
       </button>
@@ -137,7 +149,7 @@ export function InterviewLayout({
               </button>
             </div>
             {hint.show && (
-              <div className="hidden md:flex absolute left-full top-0 ml-8 z-50 w-[420px] max-h-[220px] flex-col bg-slate-900/95 p-5 rounded-2xl border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] backdrop-blur-md animate-in fade-in slide-in-from-left-5 origin-top-left">
+              <div className="hidden md:flex absolute left-full top-0 ml-8 z-50 w-[420px] max-h-[220px] flex-col bg-theme-primary/95 p-5 rounded-2xl border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] backdrop-blur-md animate-in fade-in slide-in-from-left-5 origin-top-left">
                 <button
                   onClick={() => setHint({ show: false, content: "" })}
                   aria-label="Đóng gợi ý"
@@ -176,7 +188,7 @@ export function InterviewLayout({
                 onClick={() => setHint({ show: false, content: "" })}
               />
               <div
-                className="relative w-full max-w-sm max-h-[80vh] flex flex-col bg-slate-900 border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] rounded-2xl p-5 animate-in zoom-in-95"
+                className="relative w-full max-w-sm max-h-[80vh] flex flex-col bg-theme-primary border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] rounded-2xl p-5 animate-in zoom-in-95"
                 style={{ transform: `translateY(${swipeOffset}px)`, opacity: swipeOffset > 60 ? 0.5 : 1, transition: swipeOffset === 0 ? 'transform 0.2s, opacity 0.2s' : 'none' }}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
