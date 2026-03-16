@@ -31,7 +31,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const [tokens, setTokens] = useState(50);
 
   const refreshSubscription = useCallback(async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       // Not logged in — reset to free defaults
       setPlan("free");

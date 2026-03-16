@@ -33,9 +33,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("userName");
-    const storedRole = localStorage.getItem("userRole");
+    const storedToken = sessionStorage.getItem("token");
+    const storedUser = sessionStorage.getItem("userName");
+    const storedRole = sessionStorage.getItem("userRole");
 
     if (storedToken && storedUser) {
       setToken(storedToken);
@@ -47,9 +47,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (newToken: string, newName: string, newRole: string) => {
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("userName", newName);
-    localStorage.setItem("userRole", newRole);
+    sessionStorage.setItem("token", newToken);
+    sessionStorage.setItem("userName", newName);
+    sessionStorage.setItem("userRole", newRole);
 
     setToken(newToken);
     setUser(newName);
@@ -64,9 +64,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userRole");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userName");
+    sessionStorage.removeItem("userRole");
     setUser(null);
     setRole(null);
     setToken(null);

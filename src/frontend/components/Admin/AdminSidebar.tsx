@@ -39,7 +39,7 @@ export function AdminSidebar({
   useEffect(() => {
     const fetchUnread = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) return;
         const apiUrl =
           process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";

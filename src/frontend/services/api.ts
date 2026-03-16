@@ -37,7 +37,7 @@ export const endInterview = async (
   questionLimit?: number,
   timeLimit?: number
 ) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const bodyData: any = { 
     history, 
     jd_text: jdText, 
@@ -71,7 +71,7 @@ export const getHint = async (lastQuestion: string, jdText: string) => {
 };
 
 export const upgradeToPro = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await apiRequest(`${API_URL}/upgrade-pro`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
@@ -150,7 +150,7 @@ export const loginGoogle = async (token: string) => {
 // --- PROFILE APIs ---
 
 const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     return { 
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -196,7 +196,7 @@ export const deleteExperience = async (id: number) => {
 
 // --- GET HISTORY ---
 export const getHistory = async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const res = await apiRequest(`${API_URL}/history`, {
         headers: { Authorization: `Bearer ${token}` },
     });
@@ -204,7 +204,7 @@ export const getHistory = async () => {
 };
 
 export const renameInterview = async (id: number, title: string) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const res = await fetch(`${API_URL}/history/${id}`, {
         method: "PUT",
         headers: { 
@@ -218,7 +218,7 @@ export const renameInterview = async (id: number, title: string) => {
 };
 
 export const deleteInterview = async (id: number) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const res = await fetch(`${API_URL}/history/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -231,7 +231,7 @@ export const updateInterviewConfig = async (
     historyId: number,
     data: { interview_type: string; question_limit: number; time_limit: number }
 ) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const res = await fetch(`${API_URL}/history/${historyId}/config`, {
         method: "PATCH",
         headers: {
@@ -246,7 +246,7 @@ export const updateInterviewConfig = async (
 
 // --- API ADMIN ---
 export const getAdminDashboard = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/dashboard`, {
       headers: { Authorization: `Bearer ${token}` },
   });
@@ -255,7 +255,7 @@ export const getAdminDashboard = async () => {
 };
 
 export const getSystemLogs = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/interviews`, {
       headers: { Authorization: `Bearer ${token}` },
   });
@@ -264,7 +264,7 @@ export const getSystemLogs = async () => {
 };
 
 export const getSystemConfig = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/config`, {
       headers: { Authorization: `Bearer ${token}` },
   });
@@ -273,7 +273,7 @@ export const getSystemConfig = async () => {
 };
 
 export const updateSystemConfig = async (systemPrompt: string, temperature: number) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/config`, {
       method: "PUT",
       headers: { 
@@ -288,7 +288,7 @@ export const updateSystemConfig = async (systemPrompt: string, temperature: numb
 
 // Add credits for a user (Admin only)
 export const addUserCredits = async (userId: number, amount: number) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/users/${userId}/add-credits`, {
     method: "POST",
     headers: { 
@@ -306,7 +306,7 @@ export const addUserCredits = async (userId: number, amount: number) => {
 
 // Get transaction history (Admin)
 export const getTransactionLogs = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/transactions`, {
       headers: { Authorization: `Bearer ${token}` },
   });
@@ -340,7 +340,7 @@ export const getJdTemplates = async () => {
 
 // Create a new JD template
 export const createJdTemplate = async (data: { title: string; description: string }) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/templates`, {
     method: "POST",
     headers: {
@@ -355,7 +355,7 @@ export const createJdTemplate = async (data: { title: string; description: strin
 
 // Update a JD template
 export const updateJdTemplate = async (id: number, data: { title: string; description: string }) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/templates/${id}`, {
     method: "PUT",
     headers: {
@@ -370,7 +370,7 @@ export const updateJdTemplate = async (id: number, data: { title: string; descri
 
 // Delete a JD template
 export const deleteJdTemplate = async (id: number) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/templates/${id}`, {
     method: "DELETE",
     headers: { 
@@ -383,7 +383,7 @@ export const deleteJdTemplate = async (id: number) => {
 
 // Delete a user
 export const deleteUser = async (userId: number) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/users/${userId}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
@@ -397,7 +397,7 @@ export const deleteUser = async (userId: number) => {
 
 // Create a user (Admin only)
 export const createUserAsAdmin = async (data: any) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/users`, {
     method: "POST",
     headers: {
@@ -415,7 +415,7 @@ export const createUserAsAdmin = async (data: any) => {
 
 // Update a user (Admin only)
 export const updateUserAsAdmin = async (userId: number, data: any) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/users/${userId}`, {
     method: "PUT",
     headers: {
@@ -433,7 +433,7 @@ export const updateUserAsAdmin = async (userId: number, data: any) => {
 
 // Get user detail (Admin only)
 export const getUserDetail = async (userId: number) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const res = await fetch(`${API_URL}/admin/users/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });

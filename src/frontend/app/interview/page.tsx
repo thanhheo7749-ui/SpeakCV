@@ -195,7 +195,7 @@ export default function InterviewRoom() {
     if (user) {
       getMyProfile()
         .then((data) => {
-          data.full_name = localStorage.getItem("userName") || data.full_name;
+          data.full_name = sessionStorage.getItem("userName") || data.full_name;
           setMyProfileData(data);
         })
         .catch(() => {});

@@ -52,7 +52,7 @@ export default function ProfilePage() {
 
   // Load data when page opens
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       router.push("/login");
       return;
@@ -112,7 +112,7 @@ export default function ProfilePage() {
     setSaving(true);
     try {
       await updateProfileInfo(info);
-      if (info.full_name) localStorage.setItem("userName", info.full_name);
+      if (info.full_name) sessionStorage.setItem("userName", info.full_name);
       alert("🎉 Đã lưu thông tin thành công!");
       window.location.reload();
     } catch {
