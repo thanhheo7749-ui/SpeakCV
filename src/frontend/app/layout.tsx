@@ -9,12 +9,46 @@ import { AuthProvider } from "@/context/AuthContext";
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { Toaster } from "react-hot-toast";
 import type { Metadata } from "next";
+import { Be_Vietnam_Pro } from "next/font/google";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ["vietnamese", "latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-be-vietnam-pro",
+});
+
 export const metadata: Metadata = {
-  title: "SpeakCV",
-  description: "SpeakCV - AI Interview & CV Review Platform",
+  title: "SpeakCV – Phỏng vấn AI & Tạo CV chuyên nghiệp",
+  description:
+    "Luyện tập phỏng vấn thực tế với AI, nhận chấm điểm chi tiết tức thì và tạo CV chuyên nghiệp tự động. Nền tảng phỏng vấn AI hàng đầu Việt Nam.",
+  keywords: [
+    "phỏng vấn AI",
+    "luyện phỏng vấn",
+    "tạo CV",
+    "SpeakCV",
+    "AI interview",
+    "CV builder",
+    "mock interview",
+    "chấm điểm phỏng vấn",
+  ],
+  authors: [{ name: "SpeakCV Team" }],
+  openGraph: {
+    title: "SpeakCV – Phỏng vấn AI & Tạo CV chuyên nghiệp",
+    description:
+      "Luyện tập phỏng vấn thực tế với AI, nhận chấm điểm chi tiết và tạo CV chuyên nghiệp tự động.",
+    type: "website",
+    locale: "vi_VN",
+    siteName: "SpeakCV",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SpeakCV – Phỏng vấn AI & Tạo CV chuyên nghiệp",
+    description:
+      "Luyện tập phỏng vấn thực tế với AI, nhận chấm điểm chi tiết và tạo CV chuyên nghiệp tự động.",
+  },
   icons: {
     icon: [
       { url: "/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -51,7 +85,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
-      <body>
+      <body className={beVietnamPro.className}>
         <GoogleOAuthProvider
           clientId={
             process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID"
