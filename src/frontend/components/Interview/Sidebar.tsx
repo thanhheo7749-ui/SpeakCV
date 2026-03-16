@@ -198,21 +198,21 @@ export function Sidebar({
                   </div>
                 </div>
                 {showUserMenu ? (
-                  <ChevronUp size={16} className="text-slate-400" />
+                  <ChevronUp size={16} className="text-theme-text-secondary" />
                 ) : (
-                  <ChevronDown size={16} className="text-slate-400" />
+                  <ChevronDown size={16} className="text-theme-text-secondary" />
                 )}
               </div>
 
               {/* Dropdown User */}
               {showUserMenu && (
-                <div className="absolute top-[105%] left-4 right-4 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 animate-in slide-in-from-top-2">
+                <div className="absolute top-[105%] left-4 right-4 bg-theme-surface border border-theme-border rounded-xl shadow-2xl p-2 animate-in slide-in-from-top-2">
                   <button
                     onClick={() => {
                       router.push("/profile");
                       setShowUserMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700 hover:text-white rounded-lg flex items-center gap-3"
+                    className="w-full text-left px-4 py-2 text-sm text-theme-text hover:bg-theme-border hover:text-theme-accent rounded-lg flex items-center gap-3"
                   >
                     <User size={16} /> Hồ sơ cá nhân
                   </button>
@@ -221,7 +221,7 @@ export function Sidebar({
                       if (onOpenSubscription) onOpenSubscription();
                       setShowUserMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700 hover:text-cyan-400 rounded-lg flex items-center gap-3"
+                    className="w-full text-left px-4 py-2 text-sm text-theme-text hover:bg-theme-border hover:text-cyan-400 rounded-lg flex items-center gap-3"
                   >
                     <CreditCard size={16} /> Gói cước của tôi
                   </button>
@@ -231,7 +231,7 @@ export function Sidebar({
                         router.push("/admin");
                         setShowUserMenu(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-orange-400 hover:bg-slate-700 rounded-lg flex items-center gap-3"
+                      className="w-full text-left px-4 py-2 text-sm text-orange-400 hover:bg-theme-border rounded-lg flex items-center gap-3"
                     >
                       <ShieldCheck size={16} /> Trang Quản Trị
                     </button>
@@ -241,7 +241,7 @@ export function Sidebar({
                       logout();
                       setShowUserMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 rounded-lg flex items-center gap-3 mt-1"
+                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-theme-border rounded-lg flex items-center gap-3 mt-1"
                   >
                     <LogOut size={16} /> Đăng xuất
                   </button>
@@ -301,8 +301,8 @@ export function Sidebar({
 
         {/* 3. INTERVIEW HISTORY SECTION */}
         <div className="flex-1 overflow-y-auto custom-scrollbar relative">
-          <div className="flex justify-between items-center sticky top-0 bg-slate-900 px-4 pt-4 pb-3 z-10 border-b border-slate-800/50">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+          <div className="flex justify-between items-center sticky top-0 bg-theme-primary px-4 pt-4 pb-3 z-10 border-b border-theme-border/50">
+            <h3 className="text-xs font-black text-theme-muted uppercase tracking-widest">
               Lịch sử Luyện tập
             </h3>
             <button
@@ -345,7 +345,7 @@ export function Sidebar({
 
                   return groups.map((group) => (
                     <div key={group.label} className="mb-3">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1 py-2">
+                      <p className="text-[10px] font-black text-theme-muted uppercase tracking-widest px-1 py-2">
                         {group.label}
                       </p>
                       <div className="space-y-2">
@@ -353,10 +353,10 @@ export function Sidebar({
                   <div
                     key={h.id || i}
                     onClick={() => handleLoadOldInterview(h)}
-                    className={`p-3 bg-slate-950 border rounded-xl transition-all group relative cursor-pointer ${
+                    className={`p-3 bg-theme-primary border rounded-xl transition-all group relative cursor-pointer ${
                       currentHistoryId === h.id
-                        ? "border-blue-500 bg-slate-800/80 ring-1 ring-blue-500/30"
-                        : "border-slate-800 hover:border-blue-500/50 hover:bg-slate-800/50"
+                        ? "border-blue-500 bg-theme-surface/80 ring-1 ring-blue-500/30"
+                        : "border-theme-border hover:border-blue-500/50 hover:bg-theme-surface/50"
                     }`}
                   >
                     {/* Top row: Title + Score + Menu */}
@@ -371,12 +371,12 @@ export function Sidebar({
                             if (e.key === "Enter") handleRename(h.id);
                             if (e.key === "Escape") setEditingId(null);
                           }}
-                          className="flex-1 bg-slate-900 text-white text-sm px-2 py-1 rounded outline-none border border-blue-500 cursor-text"
+                          className="flex-1 bg-theme-secondary text-theme-text text-sm px-2 py-1 rounded outline-none border border-blue-500 cursor-text"
                           onClick={(e) => e.stopPropagation()}
                         />
                       ) : (
                         <span
-                          className="font-bold text-sm truncate flex-1 text-white group-hover:text-blue-400 transition-colors leading-snug"
+                          className="font-bold text-sm truncate flex-1 text-theme-text group-hover:text-blue-400 transition-colors leading-snug"
                           title={h.title || h.position}
                         >
                           {h.title || h.position || "Phỏng vấn mới"}
@@ -400,7 +400,7 @@ export function Sidebar({
                             e.stopPropagation();
                             setOpenMenuId(openMenuId === h.id ? null : h.id);
                           }}
-                          className="text-slate-500 hover:text-white p-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="text-theme-muted hover:text-theme-text p-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <MoreVertical size={14} />
                         </button>
@@ -409,17 +409,17 @@ export function Sidebar({
 
                     {/* Bottom row: Mode badge + Date + Action */}
                     <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                      <div className="flex items-center gap-1.5 text-[10px] text-theme-text-secondary">
                         <span
                           className={`font-bold px-1.5 py-0.5 rounded text-[10px] truncate max-w-[90px] transition-all duration-300 ${
                             h.interview_type === "timed"
                               ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                              : "bg-slate-800/80 text-slate-400 border border-slate-700/50"
+                              : "bg-theme-surface/80 text-theme-text-secondary border border-theme-border/50"
                           }`}
                         >
                           {h.interview_type === "timed" ? "⚡ Áp lực" : "Tự do"}
                         </span>
-                        <span className="text-slate-600">•</span>
+                        <span className="text-theme-muted">•</span>
                         <span>
                           {new Date(h.created_at).toLocaleDateString("vi-VN")}
                         </span>
@@ -439,7 +439,7 @@ export function Sidebar({
                     {/* Context menu */}
                     {openMenuId === h.id && (
                       <div
-                        className="absolute right-2 top-10 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 py-1 w-32"
+                        className="absolute right-2 top-10 bg-theme-surface border border-theme-border rounded-lg shadow-xl z-50 py-1 w-32"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <button
@@ -450,7 +450,7 @@ export function Sidebar({
                             setEditingId(h.id);
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-3 py-1.5 text-xs text-white hover:bg-slate-700 flex items-center gap-2"
+                          className="w-full text-left px-3 py-1.5 text-xs text-theme-text hover:bg-theme-border flex items-center gap-2"
                         >
                           <Edit2 size={12} /> Đổi tên
                         </button>
@@ -459,7 +459,7 @@ export function Sidebar({
                             handleDelete(h.id);
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-3 py-1.5 text-xs text-red-400 hover:bg-slate-700 flex items-center gap-2"
+                          className="w-full text-left px-3 py-1.5 text-xs text-red-400 hover:bg-theme-border flex items-center gap-2"
                         >
                           <Trash2 size={12} /> Xóa
                         </button>
@@ -473,7 +473,7 @@ export function Sidebar({
                 })()}
               </div>
             ) : (
-              <div className="text-center text-slate-600 text-sm mt-10 italic">
+              <div className="text-center text-theme-muted text-sm mt-10 italic">
                 Chưa có lịch sử nào.
                 <br />
                 Hãy bắt đầu bài test đầu tiên!
