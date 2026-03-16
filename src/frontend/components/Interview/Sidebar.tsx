@@ -82,37 +82,47 @@ export function Sidebar({
 
   const handleRename = async (id: number) => {
     if (!editTitle.trim()) return;
+    // Optimistic: update UI immediately
+    const previousHistories = [...interviewHistories];
+    const newHistories = interviewHistories.map((h) =>
+      h.id === id
+        ? {
+            ...h,
+            title: editTitle,
+            position: editTitle.replace("Phỏng vấn ", ""),
+          }
+        : h,
+    );
+    setInterviewHistories(newHistories);
+    setEditingId(null);
+    toast.success("Đổi tên thành công!");
+
     try {
       await renameInterview(id, editTitle);
-      const newHistories = interviewHistories.map((h) =>
-        h.id === id
-          ? {
-              ...h,
-              title: editTitle,
-              position: editTitle.replace("Phỏng vấn ", ""),
-            }
-          : h,
-      );
-      setInterviewHistories(newHistories);
-      setEditingId(null);
-      toast.success("Đổi tên thành công!");
     } catch {
-      toast.error("Lỗi khi đổi tên!");
+      // Rollback on failure
+      setInterviewHistories(previousHistories);
+      toast.error("Lỗi khi đổi tên! Đã khôi phục lại.");
     }
   };
 
   const handleDelete = async (id: number) => {
     if (!confirm("Bạn có chắc chắn muốn xóa lịch sử này?")) return;
+    // Optimistic: remove item immediately
+    const previousHistories = [...interviewHistories];
+    const newHistories = interviewHistories.filter((h) => h.id !== id);
+    setInterviewHistories(newHistories);
+    toast.success("Xóa thành công!");
+    if (currentHistoryId === id) {
+      handleRetry();
+    }
+
     try {
       await deleteInterview(id);
-      const newHistories = interviewHistories.filter((h) => h.id !== id);
-      setInterviewHistories(newHistories);
-      toast.success("Xóa thành công!");
-      if (currentHistoryId === id) {
-        handleRetry();
-      }
     } catch {
-      toast.error("Lỗi khi xóa!");
+      // Rollback on failure
+      setInterviewHistories(previousHistories);
+      toast.error("Lỗi khi xóa! Đã khôi phục lại.");
     }
   };
 
