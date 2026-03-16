@@ -11,39 +11,39 @@
 /* --- DARK THEME (default) --- */
 :root,
 [data-theme="dark"] {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --bg-primary: #020617;
-  --bg-secondary: #0f172a;
-  --bg-surface: #1e293b;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border: #1e293b;
-  --border-light: #334155;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
+  --background: 15 23 42;
+  --foreground: 248 250 252;
+  --bg-primary: 2 6 23;
+  --bg-secondary: 15 23 42;
+  --bg-surface: 30 41 59;
+  --text-primary: 248 250 252;
+  --text-secondary: 148 163 184;
+  --text-muted: 100 116 139;
+  --border: 30 41 59;
+  --border-light: 51 65 85;
+  --accent: 59 130 246;
+  --accent-hover: 37 99 235;
 }
 
 /* --- LIGHT THEME --- */
 [data-theme="light"] {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f1f5f9;
-  --bg-surface: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --border: #cbd5e1;
-  --border-light: #e2e8f0;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
+  --background: 248 250 252;
+  --foreground: 15 23 42;
+  --bg-primary: 255 255 255;
+  --bg-secondary: 241 245 249;
+  --bg-surface: 226 232 240;
+  --text-primary: 15 23 42;
+  --text-secondary: 71 85 105;
+  --text-muted: 148 163 184;
+  --border: 203 213 225;
+  --border-light: 226 232 240;
+  --accent: 37 99 235;
+  --accent-hover: 29 78 216;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
 }
 
 /* --- HIỆU ỨNG SÓNG ÂM (Giữ lại CSS thuần cho mượt) --- */
