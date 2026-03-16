@@ -356,7 +356,7 @@ export function Sidebar({
                     className={`p-3 bg-theme-primary border rounded-xl transition-all group relative cursor-pointer ${
                       currentHistoryId === h.id
                         ? "border-blue-500 bg-theme-surface/80 ring-1 ring-blue-500/30"
-                        : "border-theme-border hover:border-blue-500/50 hover:bg-theme-surface/50"
+                        : "border-theme-border/40 hover:border-blue-500/50 hover:bg-theme-surface/50"
                     }`}
                   >
                     {/* Top row: Title + Score + Menu */}
