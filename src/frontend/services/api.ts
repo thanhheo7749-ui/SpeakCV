@@ -6,6 +6,16 @@
 
 export const API_URL = `${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"}/api`;
 
+// --- API REQUEST WRAPPER ---
+export async function apiRequest(url: string, options?: RequestInit): Promise<Response> {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ detail: 'Unknown error' }));
+    throw new Error(error.detail || `HTTP ${res.status}`);
+  }
+  return res;
+}
+
 export const chatWithAI = async (text: string, jd: string, voice: string, mode: string, chatHistory: any[], signal: AbortSignal) => {
   const res = await fetch(`${API_URL}/chat`, {
     method: "POST",
@@ -39,7 +49,7 @@ export const endInterview = async (
   if (historyId) {
     bodyData.history_id = historyId;
   }
-  const res = await fetch(`${API_URL}/end-interview`, {
+  const res = await apiRequest(`${API_URL}/end-interview`, {
     method: "POST",
     headers: { 
         "Content-Type": "application/json",
@@ -52,7 +62,7 @@ export const endInterview = async (
 
 // --- GET HINT ---
 export const getHint = async (lastQuestion: string, jdText: string) => {
-  const res = await fetch(`${API_URL}/hint`, {
+  const res = await apiRequest(`${API_URL}/hint`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ last_question: lastQuestion, jd_text: jdText }),
@@ -62,7 +72,7 @@ export const getHint = async (lastQuestion: string, jdText: string) => {
 
 export const upgradeToPro = async () => {
   const token = localStorage.getItem("token");
-  const res = await fetch(`${API_URL}/upgrade-pro`, {
+  const res = await apiRequest(`${API_URL}/upgrade-pro`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -77,7 +87,7 @@ export const generateCV = async (userProfile: any, position: string, company: st
         ? "Style: Creative, Colorful, standout layout."
         : "Style: Classic, Harvard format, professional.";
 
-    const res = await fetch(`${API_URL}/generate-cv`, {
+    const res = await apiRequest(`${API_URL}/generate-cv`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -187,7 +197,7 @@ export const deleteExperience = async (id: number) => {
 // --- GET HISTORY ---
 export const getHistory = async () => {
     const token = localStorage.getItem("token");
-    const res = await fetch(`${API_URL}/history`, {
+    const res = await apiRequest(`${API_URL}/history`, {
         headers: { Authorization: `Bearer ${token}` },
     });
     return res.json();
@@ -314,7 +324,7 @@ export const transcribeAudio = async (audioBlob: Blob, position: string = "", la
 
   const fetchUrl = `${API_URL}/transcribe`;
 
-  const res = await fetch(fetchUrl, {
+  const res = await apiRequest(fetchUrl, {
     method: "POST",
     body: formData,
   });
