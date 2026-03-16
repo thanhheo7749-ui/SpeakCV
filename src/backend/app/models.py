@@ -149,6 +149,13 @@ class SupportMessageResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class QuotaResponse(BaseModel):
+    remaining: int  # -1 = unlimited (pro)
+    limit: int      # -1 = unlimited (pro)
+
+class UnreadCountResponse(BaseModel):
+    unread_count: int
+
 
 # --- CV Makeover JSON Schema ---
 class CVPersonalInfo(BaseModel):

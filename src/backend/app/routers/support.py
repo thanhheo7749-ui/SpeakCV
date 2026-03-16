@@ -6,11 +6,13 @@ import json
 from typing import Dict, List, Optional
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 
 from ..database import database, sql_models
 from .. import models
-from datetime import datetime
+from datetime import datetime, date
+
+FREE_DAILY_LIMIT = 5
 
 router = APIRouter(
     prefix="/api/support",
@@ -79,6 +81,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, db: Session =
             return
             
     await manager.connect(websocket, user_id, is_admin)
+    auto_replied_this_session = False  # Track auto-reply per session
     try:
         while True:
             data = await websocket.receive_text()
@@ -88,6 +91,29 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, db: Session =
                 
                 if not text_msg.strip():
                     continue
+                
+                # --- Rate limiting for free users ---
+                if not is_admin and user_id:
+                    user = db.query(sql_models.User).filter(sql_models.User.id == user_id).first()
+                    if user and user.plan == "free":
+                        today_start = datetime.combine(date.today(), datetime.min.time())
+                        today_count = db.query(func.count(sql_models.SupportMessage.id)).filter(
+                            sql_models.SupportMessage.user_id == user_id,
+                            sql_models.SupportMessage.sender_type == "user",
+                            sql_models.SupportMessage.created_at >= today_start
+                        ).scalar() or 0
+                        if today_count >= FREE_DAILY_LIMIT:
+                            await manager.send_personal_message({
+                                "id": -1,
+                                "user_id": user_id,
+                                "admin_id": None,
+                                "message": f"Bạn đã hết {FREE_DAILY_LIMIT} lượt chat hôm nay. Nâng cấp Pro để chat không giới hạn!",
+                                "sender_type": "system",
+                                "is_read": True,
+                                "created_at": datetime.now().isoformat(),
+                                "quota_exceeded": True
+                            }, websocket)
+                            continue
                 
                 db_message = sql_models.SupportMessage(
                     user_id=user_id if not is_admin else payload.get("target_user_id"),
@@ -116,6 +142,30 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, db: Session =
                 else:
                     await manager.broadcast_to_user(user_id, msg_dict)
                     await manager.broadcast_to_admins(msg_dict)
+                    
+                    # --- Auto-reply when no admin is online ---
+                    if not auto_replied_this_session and len(manager.admin_connections) == 0:
+                        auto_replied_this_session = True
+                        auto_msg = sql_models.SupportMessage(
+                            user_id=user_id,
+                            admin_id=None,
+                            message="Admin hiện không online. Chúng tôi sẽ phản hồi sớm nhất khi có mặt! 🙏",
+                            sender_type="system",
+                            is_read=True
+                        )
+                        db.add(auto_msg)
+                        db.commit()
+                        db.refresh(auto_msg)
+                        auto_dict = {
+                            "id": auto_msg.id,
+                            "user_id": auto_msg.user_id,
+                            "admin_id": None,
+                            "message": auto_msg.message,
+                            "sender_type": "system",
+                            "is_read": True,
+                            "created_at": auto_msg.created_at.isoformat() if auto_msg.created_at else str(datetime.now())
+                        }
+                        await manager.broadcast_to_user(user_id, auto_dict)
                     
             except json.JSONDecodeError:
                 pass
@@ -175,11 +225,41 @@ def get_active_chats(db: Session = Depends(database.get_db)):
 
 @router.post("/messages/{user_id}/read")
 def mark_messages_as_read(user_id: int, db: Session = Depends(database.get_db)):
-    """Mark all user messages as read (called by admin)"""
+    """Mark all admin/system messages as read (called by user when opening widget)"""
     db.query(sql_models.SupportMessage).filter(
         sql_models.SupportMessage.user_id == user_id,
-        sql_models.SupportMessage.sender_type == 'user',
+        sql_models.SupportMessage.sender_type.in_(['admin', 'system']),
         sql_models.SupportMessage.is_read == False
-    ).update({"is_read": True})
+    ).update({"is_read": True}, synchronize_session='fetch')
     db.commit()
     return {"status": "success"}
+
+@router.get("/quota/{user_id}", response_model=models.QuotaResponse)
+def get_user_quota(user_id: int, db: Session = Depends(database.get_db)):
+    """Get remaining daily message quota for a user"""
+    user = db.query(sql_models.User).filter(sql_models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.plan == "pro":
+        return models.QuotaResponse(remaining=-1, limit=-1)
+    
+    today_start = datetime.combine(date.today(), datetime.min.time())
+    today_count = db.query(func.count(sql_models.SupportMessage.id)).filter(
+        sql_models.SupportMessage.user_id == user_id,
+        sql_models.SupportMessage.sender_type == "user",
+        sql_models.SupportMessage.created_at >= today_start
+    ).scalar() or 0
+    
+    remaining = max(0, FREE_DAILY_LIMIT - today_count)
+    return models.QuotaResponse(remaining=remaining, limit=FREE_DAILY_LIMIT)
+
+@router.get("/unread-count/{user_id}", response_model=models.UnreadCountResponse)
+def get_unread_count(user_id: int, db: Session = Depends(database.get_db)):
+    """Get count of unread messages from admin/system for a user"""
+    count = db.query(func.count(sql_models.SupportMessage.id)).filter(
+        sql_models.SupportMessage.user_id == user_id,
+        sql_models.SupportMessage.sender_type.in_(['admin', 'system']),
+        sql_models.SupportMessage.is_read == False
+    ).scalar() or 0
+    return models.UnreadCountResponse(unread_count=count)
