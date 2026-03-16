@@ -24,7 +24,10 @@ export default function SupportChatWidget() {
   const [inputMessage, setInputMessage] = useState("");
   const [userId, setUserId] = useState<number | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [quota, setQuota] = useState<{ remaining: number; limit: number } | null>(null);
+  const [quota, setQuota] = useState<{
+    remaining: number;
+    limit: number;
+  } | null>(null);
   const [showGuestPrompt, setShowGuestPrompt] = useState(false);
 
   const ws = useRef<WebSocket | null>(null);
@@ -107,7 +110,7 @@ export default function SupportChatWidget() {
   // --- Polling for unread count ---
   const startPolling = (uId: number) => {
     if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-    
+
     const poll = async () => {
       if (document.hidden) return; // Don't poll when tab is inactive
       try {
@@ -118,7 +121,7 @@ export default function SupportChatWidget() {
         }
       } catch {}
     };
-    
+
     poll(); // Initial fetch
     pollIntervalRef.current = setInterval(poll, 30000);
   };
@@ -169,7 +172,7 @@ export default function SupportChatWidget() {
           setQuota((prev) =>
             prev && prev.remaining > 0
               ? { ...prev, remaining: prev.remaining - 1 }
-              : prev
+              : prev,
           );
         }
       } catch (e) {
@@ -228,7 +231,8 @@ export default function SupportChatWidget() {
     setShowGuestPrompt(false);
   };
 
-  const isQuotaExceeded = quota !== null && quota.limit > 0 && quota.remaining <= 0;
+  const isQuotaExceeded =
+    quota !== null && quota.limit > 0 && quota.remaining <= 0;
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -261,8 +265,8 @@ export default function SupportChatWidget() {
               <div className="flex-1 overflow-y-auto space-y-3 pb-2 scrollbar-thin scrollbar-thumb-gray-300">
                 {messages.length === 0 && (
                   <div className="text-center text-sm text-gray-400 mt-10">
-                    Hãy gửi tin nhắn đầu tiên của bạn. Admin sẽ trả lời sớm
-                    nhất có thể.
+                    Hãy gửi tin nhắn đầu tiên của bạn. Admin sẽ trả lời sớm nhất
+                    có thể.
                   </div>
                 )}
                 {messages.map((m, idx) => {
@@ -306,7 +310,7 @@ export default function SupportChatWidget() {
                     onClick={() => (window.location.href = "/#pricing")}
                     className="mt-1 text-xs bg-indigo-600 text-white px-3 py-1 rounded-full font-semibold hover:bg-indigo-700 transition-colors"
                   >
-                    Nâng cấp Pro – Chat thả ga
+                    Nâng cấp Pro để Chat thả ga
                   </button>
                 </div>
               )}
