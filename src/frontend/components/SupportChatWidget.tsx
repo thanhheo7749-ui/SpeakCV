@@ -211,7 +211,7 @@ export default function SupportChatWidget() {
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                    className="flex-1 bg-blue-500 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="flex-1 bg-white border border-gray-300 rounded-full px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Nhập tin nhắn..."
                   />
                   <button
