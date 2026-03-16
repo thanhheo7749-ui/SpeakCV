@@ -31,6 +31,7 @@ import { useSubscription } from "@/context/SubscriptionContext";
 import { useInterviewTimer } from "@/hooks/useInterviewTimer";
 import { useInterviewState } from "@/hooks/useInterviewState";
 import { useInterviewActions } from "@/hooks/useInterviewActions";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 export default function InterviewRoom() {
   const router = useRouter();
@@ -148,6 +149,25 @@ export default function InterviewRoom() {
     setQuestionCount,
     resetTimer,
     advanceQuestion,
+  });
+
+  // Keyboard shortcuts
+  const hasOpenModal = Object.values(modals).some(Boolean) || showSubscription || showCheckout;
+  useKeyboardShortcuts({
+    onToggleMic: actions.onMicClick,
+    onNewInterview: actions.handleNewChat,
+    onOpenReport: () => actions.handleOpenReport(false),
+    onOpenSettings: () => toggleModal("settings", true),
+    onCloseModal: () => {
+      if (showCheckout) setShowCheckout(false);
+      else if (showSubscription) setShowSubscription(false);
+      else {
+        // Close the first open modal
+        const openKey = Object.entries(modals).find(([, v]) => v)?.[0];
+        if (openKey) toggleModal(openKey, false);
+      }
+    },
+    hasOpenModal,
   });
 
   // Load initial data when user changes
