@@ -20,6 +20,10 @@ import {
   PlayCircle,
   CheckCircle2,
   Sparkles,
+  Upload,
+  MessageSquare,
+  Award,
+  ArrowRight,
 } from "lucide-react";
 
 function ScrollReveal({
@@ -279,6 +283,88 @@ export default function LandingPage() {
               </div>
             </div>
           </ScrollReveal>
+        </div>
+      </section>
+
+      {/* 2.5. HOW IT WORKS SECTION (3 Steps) */}
+      <section className="py-24 relative">
+        <div className="max-w-7xl mx-auto px-6">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-5xl font-black text-white mb-6">
+                Chỉ 3 bước đơn giản
+              </h2>
+              <p className="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto">
+                Bắt đầu hành trình chinh phục phỏng vấn trong vài phút.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 relative">
+            {/* Step 1 */}
+            <ScrollReveal delay={0}>
+              <div className="relative flex flex-col items-center text-center p-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/25">
+                  <Upload className="text-white" size={36} />
+                </div>
+                <div className="absolute -top-2 -left-2 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
+                  1
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">
+                  Nhập JD & Vị trí
+                </h3>
+                <p className="text-slate-400 leading-relaxed text-sm">
+                  Dán mô tả công việc (JD) hoặc chọn từ mẫu có sẵn. Chọn phong cách phỏng vấn phù hợp.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            {/* Arrow 1→2 (desktop only) */}
+            <div className="hidden md:flex absolute left-[33%] top-[60px] -translate-x-1/2 z-20">
+              <ArrowRight className="text-slate-700" size={28} />
+            </div>
+
+            {/* Step 2 */}
+            <ScrollReveal delay={150}>
+              <div className="relative flex flex-col items-center text-center p-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-400 rounded-3xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/25">
+                  <MessageSquare className="text-white" size={36} />
+                </div>
+                <div className="absolute -top-2 -left-2 w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
+                  2
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">
+                  Phỏng vấn cùng AI
+                </h3>
+                <p className="text-slate-400 leading-relaxed text-sm">
+                  Trò chuyện bằng giọng nói với AI interviewer. Hệ thống hỏi đáp như phỏng vấn thực tế.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            {/* Arrow 2→3 (desktop only) */}
+            <div className="hidden md:flex absolute left-[67%] top-[60px] -translate-x-1/2 z-20">
+              <ArrowRight className="text-slate-700" size={28} />
+            </div>
+
+            {/* Step 3 */}
+            <ScrollReveal delay={300}>
+              <div className="relative flex flex-col items-center text-center p-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-3xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/25">
+                  <Award className="text-white" size={36} />
+                </div>
+                <div className="absolute -top-2 -left-2 w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
+                  3
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">
+                  Nhận kết quả & CV
+                </h3>
+                <p className="text-slate-400 leading-relaxed text-sm">
+                  Xem điểm số chi tiết, nhận xét từ AI và tạo CV chuyên nghiệp tự động từ câu trả lời.
+                </p>
+              </div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
