@@ -47,7 +47,7 @@ export default function SettingsModal({
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Cài đặt phỏng vấn">
       <div className="bg-slate-900 w-full max-w-xl rounded-3xl border border-slate-700 shadow-2xl overflow-hidden animate-in zoom-in-95">
         <div className="flex justify-between items-center px-6 py-4 border-b border-slate-800 bg-slate-800/50">
           <h2 className="text-xl font-bold flex items-center gap-2 text-white">

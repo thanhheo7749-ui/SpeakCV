@@ -33,7 +33,7 @@ export default function ReportModal({
   // 1. CASE: NO INTERVIEW HISTORY YET
   if (!hasHistory) {
     return (
-      <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Báo cáo phỏng vấn">
         <div className="bg-slate-900 w-full max-w-lg p-10 rounded-3xl border border-slate-700 flex flex-col items-center text-center shadow-2xl animate-in zoom-in-95">
           <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mb-6">
             <Mic size={40} className="text-blue-400" />

@@ -305,7 +305,7 @@ export default function CVMakeover({
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="CV Makeover">
       <div className="bg-slate-900 w-full max-w-7xl h-[90vh] rounded-3xl border border-slate-700/50 flex flex-col shadow-2xl shadow-purple-500/5 overflow-hidden">
         {/* ===== HEADER ===== */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-slate-800 shrink-0">

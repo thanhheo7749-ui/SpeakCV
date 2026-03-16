@@ -323,7 +323,7 @@ export default function GenCVModal({ show, onClose, userProfile }: any) {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Tạo CV">
       <div className="bg-slate-900 w-full max-w-7xl h-[95vh] rounded-3xl border border-slate-700 flex flex-col p-6 shadow-2xl">
         {/* HEADER */}
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">

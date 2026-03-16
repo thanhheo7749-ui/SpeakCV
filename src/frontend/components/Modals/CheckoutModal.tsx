@@ -144,6 +144,7 @@ export default function CheckoutModal({
   return (
     <div
       className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+      role="dialog" aria-modal="true" aria-label="Thanh toán"
       onClick={handleClose}
     >
       <div

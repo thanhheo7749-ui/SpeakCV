@@ -169,7 +169,7 @@ export function Sidebar({
                   {myProfileData?.info?.avatar || myProfileData?.avatar ? (
                     <img
                       src={myProfileData?.info?.avatar || myProfileData?.avatar}
-                      alt="Avatar"
+                      alt={`Ảnh đại diện của ${myProfileData?.full_name || "người dùng"}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const name = encodeURIComponent(
