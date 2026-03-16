@@ -9,7 +9,7 @@ import { Mic } from "lucide-react";
 
 export const AudioWave = ({ state }: { state: string }) => {
   if (state === "idle")
-    return <Mic size={48} className="text-white opacity-80" />;
+    return <Mic size={48} className="text-theme-text opacity-80" />;
   const barColor = state === "listening" ? "bg-red-500" : "bg-blue-500";
 
   return (
