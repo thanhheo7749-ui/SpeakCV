@@ -6,6 +6,7 @@
 
 "use client";
 
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lightbulb, X, Menu } from "lucide-react";
 
@@ -63,6 +64,26 @@ export function InterviewLayout({
   startTimedInterview,
 }: InterviewLayoutProps) {
   const router = useRouter();
+  // Swipe-to-dismiss state for mobile hint modal
+  const touchStartY = useRef(0);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    setSwipeOffset(0);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta > 0) setSwipeOffset(delta);
+  };
+
+  const handleTouchEnd = () => {
+    if (swipeOffset > 80) {
+      setHint({ show: false, content: "" });
+    }
+    setSwipeOffset(0);
+  };
 
   return (
     <main className="flex-1 flex flex-col items-center justify-between py-8 px-6 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
@@ -154,7 +175,13 @@ export function InterviewLayout({
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={() => setHint({ show: false, content: "" })}
               />
-              <div className="relative w-full max-w-sm max-h-[80vh] flex flex-col bg-slate-900 border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] rounded-2xl p-5 animate-in zoom-in-95">
+              <div
+                className="relative w-full max-w-sm max-h-[80vh] flex flex-col bg-slate-900 border border-yellow-500/50 shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] rounded-2xl p-5 animate-in zoom-in-95"
+                style={{ transform: `translateY(${swipeOffset}px)`, opacity: swipeOffset > 60 ? 0.5 : 1, transition: swipeOffset === 0 ? 'transform 0.2s, opacity 0.2s' : 'none' }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
                 <button
                   onClick={() => setHint({ show: false, content: "" })}
                   aria-label="Đóng gợi ý"

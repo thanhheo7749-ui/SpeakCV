@@ -3,6 +3,7 @@
  * This project is licensed under the MIT License.
  * See the LICENSE file in the project root for more information.
  */
+import { useRef } from "react";
 import { RefreshCcw, Eraser, Send } from "lucide-react";
 
 interface ChatBoxProps {
@@ -26,6 +27,15 @@ export const ChatBox = ({
   onClear,
   onRefresh,
 }: ChatBoxProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleFocus = () => {
+    // On mobile, scroll textarea into view when keyboard opens
+    setTimeout(() => {
+      textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 300);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl h-72 z-10">
       {/* User's panel */}
@@ -53,10 +63,12 @@ export const ChatBox = ({
         </div>
         <div className="flex-1 relative bg-slate-950/30 rounded-xl border border-slate-700/50 overflow-hidden focus-within:border-blue-500/50 transition-colors">
           <textarea
+            ref={textareaRef}
             className="w-full h-full bg-transparent p-4 outline-none resize-none text-slate-300 text-lg leading-relaxed custom-scrollbar placeholder:text-slate-700"
             placeholder="Nói hoặc gõ câu trả lời..."
             value={userText + (tempText ? " " + tempText : "")}
             onChange={(e) => onUserTextChange(e.target.value)}
+            onFocus={handleFocus}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
