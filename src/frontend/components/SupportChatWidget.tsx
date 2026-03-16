@@ -40,12 +40,6 @@ export default function SupportChatWidget() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
   // --- Fetch user ID once on mount ---
-  useEffect(() => {
-    if (token && !userId) {
-      fetchUserId();
-    }
-  }, [token]);
-
   const fetchUserId = async () => {
     try {
       const res = await fetch(`${apiUrl}/api/my-profile`, {
@@ -60,59 +54,12 @@ export default function SupportChatWidget() {
     }
   };
 
-  // --- Open/close widget logic ---
-  useEffect(() => {
-    isOpenRef.current = isOpen;
-
-    if (isOpen && token && userId) {
-      reconnectAttempts.current = 0;
-      connectWebSocket(userId);
-      fetchHistory(userId);
-      fetchQuota(userId);
-      markAsRead(userId);
-      setUnreadCount(0);
-      // Stop polling when widget is open
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-        pollIntervalRef.current = null;
-      }
-    }
-
-    if (!isOpen && ws.current) {
-      ws.current.onclose = null;
-      ws.current.close();
-      ws.current = null;
-    }
-
-    // Start polling when widget is closed & user logged in
-    if (!isOpen && token && userId) {
-      startPolling(userId);
-    }
-
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-        pollIntervalRef.current = null;
-      }
-    };
-  }, [isOpen, token, userId]);
-
-  // --- Auto scroll ---
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
-
-  // Hide widget for admins
-  if (role === "admin") return null;
-
   // --- Polling for unread count ---
   const startPolling = (uId: number) => {
     if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
 
     const poll = async () => {
-      if (document.hidden) return; // Don't poll when tab is inactive
+      if (document.hidden) return;
       try {
         const res = await fetch(`${apiUrl}/api/support/unread-count/${uId}`);
         if (res.ok) {
@@ -122,7 +69,7 @@ export default function SupportChatWidget() {
       } catch {}
     };
 
-    poll(); // Initial fetch
+    poll();
     pollIntervalRef.current = setInterval(poll, 30000);
   };
 
@@ -163,11 +110,9 @@ export default function SupportChatWidget() {
       try {
         const msg: ChatMessage = JSON.parse(event.data);
         setMessages((prev) => [...prev, msg]);
-        // If quota exceeded, refresh quota
         if (msg.quota_exceeded) {
           fetchQuota(uId);
         }
-        // If it's a normal user message, decrement local quota
         if (msg.sender_type === "user" && quota && quota.remaining > 0) {
           setQuota((prev) =>
             prev && prev.remaining > 0
@@ -204,6 +149,57 @@ export default function SupportChatWidget() {
       console.error("Lỗi fetch lịch sử", e);
     }
   };
+
+  useEffect(() => {
+    if (token && !userId) {
+      fetchUserId();
+    }
+  }, [token]);
+
+  // --- Open/close widget logic ---
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+
+    if (isOpen && token && userId) {
+      reconnectAttempts.current = 0;
+      connectWebSocket(userId);
+      fetchHistory(userId);
+      fetchQuota(userId);
+      markAsRead(userId);
+      setUnreadCount(0);
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    }
+
+    if (!isOpen && ws.current) {
+      ws.current.onclose = null;
+      ws.current.close();
+      ws.current = null;
+    }
+
+    if (!isOpen && token && userId) {
+      startPolling(userId);
+    }
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
+  }, [isOpen, token, userId]);
+
+  // --- Auto scroll ---
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  // Hide widget for admins
+  if (role === "admin") return null;
 
   // --- Send message ---
   const sendMessage = () => {
