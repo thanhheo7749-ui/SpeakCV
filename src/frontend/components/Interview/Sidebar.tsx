@@ -299,10 +299,42 @@ export function Sidebar({
 
           {user ? (
             interviewHistories.length > 0 ? (
-              <div className="space-y-2 px-4 pt-3 pb-10">
-                {interviewHistories.map((h, i) => (
+              <div className="space-y-1 px-4 pt-3 pb-10">
+                {(() => {
+                  // Group histories by date category
+                  const groups: { label: string; items: any[] }[] = [];
+                  const now = new Date();
+                  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                  const yesterday = new Date(today.getTime() - 86400000);
+                  const weekAgo = new Date(today.getTime() - 7 * 86400000);
+
+                  const todayItems: any[] = [];
+                  const yesterdayItems: any[] = [];
+                  const weekItems: any[] = [];
+                  const olderItems: any[] = [];
+
+                  interviewHistories.forEach((h: any) => {
+                    const d = new Date(h.created_at);
+                    if (d >= today) todayItems.push(h);
+                    else if (d >= yesterday) yesterdayItems.push(h);
+                    else if (d >= weekAgo) weekItems.push(h);
+                    else olderItems.push(h);
+                  });
+
+                  if (todayItems.length) groups.push({ label: "Hôm nay", items: todayItems });
+                  if (yesterdayItems.length) groups.push({ label: "Hôm qua", items: yesterdayItems });
+                  if (weekItems.length) groups.push({ label: "Tuần trước", items: weekItems });
+                  if (olderItems.length) groups.push({ label: "Cũ hơn", items: olderItems });
+
+                  return groups.map((group) => (
+                    <div key={group.label} className="mb-3">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1 py-2">
+                        {group.label}
+                      </p>
+                      <div className="space-y-2">
+                        {group.items.map((h: any, i: number) => (
                   <div
-                    key={i}
+                    key={h.id || i}
                     onClick={() => handleLoadOldInterview(h)}
                     className={`p-3 bg-slate-950 border rounded-xl transition-all group relative cursor-pointer ${
                       currentHistoryId === h.id
@@ -417,7 +449,11 @@ export function Sidebar({
                       </div>
                     )}
                   </div>
-                ))}
+                        ))}
+                      </div>
+                    </div>
+                  ));
+                })()}
               </div>
             ) : (
               <div className="text-center text-slate-600 text-sm mt-10 italic">
