@@ -7,6 +7,7 @@
 import "@/components/css/globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "react-hot-toast";
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
@@ -91,10 +92,12 @@ export default function RootLayout({
             process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID"
           }
         >
-          <AuthProvider>
+        <AuthProvider>
             <SubscriptionProvider>
-              <Toaster position="top-right" />
-              {children}
+              <ThemeProvider>
+                <Toaster position="top-right" />
+                {children}
+              </ThemeProvider>
             </SubscriptionProvider>
           </AuthProvider>
         </GoogleOAuthProvider>

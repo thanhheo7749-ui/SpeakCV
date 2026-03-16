@@ -9,26 +9,32 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  User,
-  Briefcase,
-  ChevronDown,
-  ChevronUp,
-  LogOut,
-  LogIn,
-  Sparkles,
-  FileText,
-  ShieldCheck,
-  PlusCircle,
-  Calendar,
   Settings,
   Flag,
+  PlusCircle,
+  ChevronLeft,
+  ChevronUp,
+  ChevronDown,
+  User,
+  Sparkles,
+  LogOut,
+  LogIn,
+  MoreHorizontal,
   MoreVertical,
   Edit2,
+  Edit3,
   Trash2,
+  Check,
+  Briefcase,
+  Sun,
+  Moon,
   CreditCard,
-  ChevronLeft,
+  ShieldCheck,
+  FileText,
   Wand2,
+  Calendar,
 } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
 import { renameInterview, deleteInterview } from "@/services/api";
 import toast from "react-hot-toast";
@@ -79,6 +85,7 @@ export function Sidebar({
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const { tokens, plan } = useSubscription();
+  const { theme, toggleTheme } = useTheme();
 
   const handleRename = async (id: number) => {
     if (!editTitle.trim()) return;
@@ -480,19 +487,29 @@ export function Sidebar({
           )}
         </div>
 
-        {/* 4. SETTINGS & END SESSION (Bottom) */}
+        {/* 4. SETTINGS & THEME & END SESSION (Bottom) */}
         <div className="p-4 border-t border-slate-800 flex gap-2 bg-slate-900/90 backdrop-blur-md">
           <button
             onClick={() => toggleModal("settings", true)}
             className="flex-1 flex items-center justify-center gap-2 p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors font-bold text-sm"
+            aria-label="Cài đặt"
           >
             <Settings size={18} /> Cài đặt
+          </button>
+          <button
+            onClick={toggleTheme}
+            className="w-12 flex flex-shrink-0 items-center justify-center p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl transition-colors"
+            aria-label={theme === "dark" ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
+            title={theme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <button
             onClick={() => handleOpenReport(false)}
             disabled={isGeneratingReport}
             className={`w-12 flex flex-shrink-0 items-center justify-center p-3 rounded-xl transition-all ${isGeneratingReport ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white"}`}
             title="Kết thúc & Chấm điểm"
+            aria-label="Kết thúc và chấm điểm"
           >
             {isGeneratingReport ? (
               <div className="w-5 h-5 border-2 border-slate-500 border-t-white rounded-full animate-spin" />

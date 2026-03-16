@@ -8,9 +8,37 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* --- DARK THEME (default) --- */
+:root,
+[data-theme="dark"] {
   --background: #0f172a;
   --foreground: #f8fafc;
+  --bg-primary: #020617;
+  --bg-secondary: #0f172a;
+  --bg-surface: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: #334155;
+  --border-light: #1e293b;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+}
+
+/* --- LIGHT THEME --- */
+[data-theme="light"] {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f1f5f9;
+  --bg-surface: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
 }
 
 body {
