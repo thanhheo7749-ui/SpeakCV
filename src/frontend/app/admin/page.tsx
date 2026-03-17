@@ -64,7 +64,7 @@ export default function AdminPage() {
     );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 flex font-sans">
+    <div className="h-screen overflow-hidden bg-slate-950 text-slate-200 flex font-sans">
       {/* Mobile Hamburger Menu */}
       <button
         onClick={() => setIsSidebarOpen(true)}

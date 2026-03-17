@@ -208,7 +208,7 @@ export function AdminSidebar({
 
           <button
             onClick={() => router.push("/interview")}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-700 rounded-xl font-bold transition-colors mt-4"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-700 rounded-xl font-bold transition-colors mt-50"
           >
             <ArrowLeft size={18} /> Về Trang Phỏng Vấn
           </button>
