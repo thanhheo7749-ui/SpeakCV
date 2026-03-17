@@ -196,8 +196,8 @@ export default function DashboardPage() {
                       borderRadius: "12px",
                       color: "#fff",
                     }}
-                    formatter={(value: number) => [`${value}/10`, "Điểm"]}
-                    labelFormatter={(label: string) => `Ngày: ${label}`}
+                    formatter={(value: any) => [`${value}/10`, "Điểm"]}
+                    labelFormatter={(label: any) => `Ngày: ${label}`}
                   />
                   <Line
                     type="monotone"
