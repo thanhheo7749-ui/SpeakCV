@@ -121,7 +121,7 @@ export function OverviewTab({ stats }: { stats: any }) {
                 <LazyTooltip
                   contentStyle={{ background: "#1e293b", border: "1px solid #475569", borderRadius: "12px", color: "#e2e8f0" }}
                   labelStyle={{ color: "#94a3b8" }}
-                  formatter={(value: number) => [`${value} lượt`, "Phỏng vấn"]}
+                  formatter={(value: any) => [`${value} lượt`, "Phỏng vấn"]}
                 />
                 <LazyBar dataKey="count" fill="#3b82f6" radius={[6, 6, 0, 0]} />
               </LazyBarChart>
