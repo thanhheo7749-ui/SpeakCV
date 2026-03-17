@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from .routers import profile, auth, cv, admin, interview, support, payment, jobs
+from .routers import profile, auth, cv, admin, interview, support, payment, jobs, stats, questions
 from .database import sql_models          
 from .database.database import engine
 
@@ -43,3 +43,5 @@ app.include_router(interview.router)
 app.include_router(support.router)
 app.include_router(payment.router)
 app.include_router(jobs.router)
+app.include_router(stats.router)
+app.include_router(questions.router)

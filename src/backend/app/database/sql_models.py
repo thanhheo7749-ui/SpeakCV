@@ -127,3 +127,15 @@ class Transaction(Base):
     status = Column(String(50), default="pending") # 'pending', 'success', 'failed'
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+# 11. Company Questions table (crowdsourced interview questions)
+class CompanyQuestion(Base):
+    __tablename__ = "company_questions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_name = Column(String(200), index=True)
+    position = Column(String(200))
+    question_text = Column(Text)
+    difficulty = Column(String(50), default="medium")  # easy, medium, hard
+    submitted_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    is_approved = Column(Boolean, default=False, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

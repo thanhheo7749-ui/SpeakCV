@@ -33,6 +33,8 @@ import {
   FileText,
   Wand2,
   Calendar,
+  BarChart3,
+  HelpCircle,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 
@@ -295,6 +297,23 @@ export function Sidebar({
               >
                 <Wand2 size={16} /> Chỉnh sửa CV
               </button>
+              {user && (
+                <>
+                  <div className="border-t border-theme-border/50 my-1" />
+                  <button
+                    onClick={() => router.push("/dashboard")}
+                    className="w-full text-left px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-blue-400 rounded-lg flex items-center gap-3"
+                  >
+                    <BarChart3 size={16} /> Thống kê cá nhân
+                  </button>
+                  <button
+                    onClick={() => router.push("/questions")}
+                    className="w-full text-left px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 rounded-lg flex items-center gap-3"
+                  >
+                    <HelpCircle size={16} /> Ngân hàng câu hỏi
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>

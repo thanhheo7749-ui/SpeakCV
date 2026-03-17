@@ -476,3 +476,43 @@ export const uploadMakeoverCV = async (file: File, industry: string) => {
   }
   return res.json();
 };
+
+// --- PERSONAL DASHBOARD STATS ---
+export const getMyStats = async () => {
+  const token = sessionStorage.getItem("token");
+  const res = await fetch(`${API_URL}/my-stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to load stats");
+  return res.json();
+};
+
+// --- COMPANY QUESTION BANK ---
+export const getQuestions = async (company?: string) => {
+  const params = company ? `?company=${encodeURIComponent(company)}` : "";
+  const res = await fetch(`${API_URL}/questions${params}`);
+  if (!res.ok) throw new Error("Failed to load questions");
+  return res.json();
+};
+
+export const submitQuestion = async (data: {
+  company_name: string;
+  position: string;
+  question_text: string;
+  difficulty: string;
+}) => {
+  const token = sessionStorage.getItem("token");
+  const res = await fetch(`${API_URL}/questions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Submit failed" }));
+    throw new Error(err.detail || "Submit failed");
+  }
+  return res.json();
+};
