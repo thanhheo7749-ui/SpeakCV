@@ -11,7 +11,6 @@ import { loginUser, loginGoogle } from "@/services/api";
 import { useGoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -20,7 +19,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const { login } = useAuth();
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,9 +26,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const data = await loginUser(email, password);
-      // Save token to Context
+      // Save token to Context — AuthContext.login() handles navigation
       login(data.access_token, data.user_name, data.role || "user");
-      router.push("/interview");
     } catch (err: any) {
       setError(err.message || "Sai email hoặc mật khẩu!");
     } finally {
@@ -44,8 +41,8 @@ export default function LoginPage() {
         setLoading(true);
         setError("");
         const data = await loginGoogle(tokenResponse.access_token);
+        // AuthContext.login() handles navigation based on role
         login(data.access_token, data.user_name, data.role || "user");
-        router.push("/interview");
       } catch (err: any) {
         setError(err.message || "Lỗi đăng nhập qua Google!");
         setLoading(false);
