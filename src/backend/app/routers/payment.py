@@ -59,17 +59,12 @@ def create_payment_url(request: Request, db: Session = Depends(get_db), current_
     if request.headers.get("x-forwarded-for"):
         ip_address = request.headers.get("x-forwarded-for").split(",")[0]
         
-    # 3. Create VNPay URL
-    tmn_code = "3E9ZED04"
-    hash_secret = "U0J3OO0YZVAXCQ8DWLGM3MJKOZ7LNTQB"
-    payment_url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    return_url = "https://hoangthanhzzz.id.vn/upgrade/success"
-
+    # 3. Create VNPay URL (credentials from .env via settings)
     vnp = VnPay(
-        tmn_code=tmn_code,
-        secret_key=hash_secret,
-        return_url=return_url,
-        vnpay_payment_url=payment_url
+        tmn_code=settings.VNPAY_TMN_CODE,
+        secret_key=settings.VNPAY_HASH_SECRET,
+        return_url=settings.VNPAY_RETURN_URL,
+        vnpay_payment_url=settings.VNPAY_PAYMENT_URL
     )
     
     payment_url = vnp.get_payment_url(
@@ -85,16 +80,12 @@ def create_payment_url(request: Request, db: Session = Depends(get_db), current_
 def vnpay_ipn(request: Request, db: Session = Depends(get_db)):
     vnp_Params = dict(request.query_params)
     
-    tmn_code = "3E9ZED04"
-    hash_secret = "U0J3OO0YZVAXCQ8DWLGM3MJKOZ7LNTQB"
-    payment_url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    return_url = "https://hoangthanhzzz.id.vn/upgrade/success"
-
+    # Credentials from .env via settings
     vnp = VnPay(
-        tmn_code=tmn_code,
-        secret_key=hash_secret,
-        return_url=return_url,
-        vnpay_payment_url=payment_url
+        tmn_code=settings.VNPAY_TMN_CODE,
+        secret_key=settings.VNPAY_HASH_SECRET,
+        return_url=settings.VNPAY_RETURN_URL,
+        vnpay_payment_url=settings.VNPAY_PAYMENT_URL
     )
     
     if vnp.validate_response(vnp_Params):
