@@ -103,7 +103,7 @@ export function SupportTab() {
   const markMessagesAsRead = async (userId: number) => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-      await fetch(`${apiUrl}/api/support/messages/${userId}/read`, {
+      await fetch(`${apiUrl}/api/support/messages/${userId}/admin-read`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -17,6 +17,7 @@ import {
   LayoutDashboard,
   MessageCircle,
   ChevronLeft,
+  HelpCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -35,6 +36,7 @@ export function AdminSidebar({
 }: AdminSidebarProps) {
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [pendingQCount, setPendingQCount] = useState(0);
 
   useEffect(() => {
     const fetchUnread = async () => {
@@ -53,6 +55,14 @@ export function AdminSidebar({
             0,
           );
           setUnreadCount(count);
+        }
+        // Pending questions count
+        const qRes = await fetch(`${apiUrl}/api/admin/questions/pending`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (qRes.ok) {
+          const qData = await qRes.json();
+          setPendingQCount(qData.questions?.length || 0);
         }
       } catch (e) {}
     };
@@ -86,14 +96,14 @@ export function AdminSidebar({
           </button>
         </div>
 
-        <div className="mb-10 mt-2 flex items-center gap-2">
+        <div className="mb-6 mt-2 flex items-center gap-2">
           <ShieldCheck className="text-red-500" size={32} />
           <h1 className="text-2xl font-black italic text-white tracking-tight">
             Speak<span className="text-blue-500">CV</span>
           </h1>
         </div>
 
-        <div className="flex-1 space-y-3">
+        <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
           <button
             onClick={() => setActiveTab("overview")}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
@@ -174,6 +184,24 @@ export function AdminSidebar({
             {unreadCount > 0 && (
               <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm shadow-red-500/50 animate-pulse">
                 {unreadCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab("questions")}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all ${
+              activeTab === "questions"
+                ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 shadow-lg shadow-emerald-900/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <HelpCircle size={20} /> Câu hỏi
+            </div>
+            {pendingQCount > 0 && (
+              <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm shadow-orange-500/50 animate-pulse">
+                {pendingQCount}
               </span>
             )}
           </button>

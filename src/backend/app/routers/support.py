@@ -234,6 +234,17 @@ def mark_messages_as_read(user_id: int, db: Session = Depends(database.get_db)):
     db.commit()
     return {"status": "success"}
 
+@router.post("/messages/{user_id}/admin-read")
+def mark_user_messages_as_read(user_id: int, db: Session = Depends(database.get_db)):
+    """Mark all user-sent messages as read (called by admin when opening a chat)"""
+    db.query(sql_models.SupportMessage).filter(
+        sql_models.SupportMessage.user_id == user_id,
+        sql_models.SupportMessage.sender_type == "user",
+        sql_models.SupportMessage.is_read == False
+    ).update({"is_read": True}, synchronize_session='fetch')
+    db.commit()
+    return {"status": "success"}
+
 @router.get("/quota/{user_id}", response_model=models.QuotaResponse)
 def get_user_quota(user_id: int, db: Session = Depends(database.get_db)):
     """Get remaining daily message quota for a user"""
