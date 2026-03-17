@@ -18,17 +18,89 @@ async def get_admin_dashboard(current_user: sql_models.User = Depends(get_curren
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Access denied")
 
+    from sqlalchemy import func, cast, Date
+    from datetime import datetime, timedelta
+
     total_users = db.query(sql_models.User).count()
     total_interviews = db.query(sql_models.InterviewHistory).count()
-    
-    estimated_total_tokens = total_interviews * 2500 
-    
+    estimated_total_tokens = total_interviews * 2500
+    pro_users = db.query(sql_models.User).filter(sql_models.User.plan == "pro").count()
+
+    # Pending questions count
+    pending_questions = 0
+    try:
+        pending_questions = db.query(sql_models.CompanyQuestion).filter(
+            sql_models.CompanyQuestion.is_approved == False
+        ).count()
+    except Exception:
+        pass
+
+    # Interviews per day (last 7 days)
+    interviews_by_day = []
+    for i in range(6, -1, -1):
+        day = datetime.now().date() - timedelta(days=i)
+        day_start = datetime.combine(day, datetime.min.time())
+        day_end = datetime.combine(day, datetime.max.time())
+        count = db.query(sql_models.InterviewHistory).filter(
+            sql_models.InterviewHistory.created_at >= day_start,
+            sql_models.InterviewHistory.created_at <= day_end
+        ).count()
+        interviews_by_day.append({
+            "date": day.strftime("%d/%m"),
+            "count": count
+        })
+
+    # Top 5 users by interview count
+    top_users_query = db.query(
+        sql_models.User.id,
+        sql_models.User.full_name,
+        sql_models.User.email,
+        sql_models.User.plan,
+        func.count(sql_models.InterviewHistory.id).label("interview_count")
+    ).join(
+        sql_models.InterviewHistory,
+        sql_models.InterviewHistory.user_id == sql_models.User.id
+    ).group_by(
+        sql_models.User.id
+    ).order_by(
+        func.count(sql_models.InterviewHistory.id).desc()
+    ).limit(5).all()
+
+    top_users = [
+        {
+            "id": u[0], "full_name": u[1], "email": u[2],
+            "plan": u[3], "interview_count": u[4]
+        }
+        for u in top_users_query
+    ]
+
+    # 5 most recent interviews
+    recent_interviews_query = db.query(
+        sql_models.InterviewHistory,
+        sql_models.User.full_name,
+        sql_models.User.email
+    ).join(
+        sql_models.User,
+        sql_models.User.id == sql_models.InterviewHistory.user_id
+    ).order_by(
+        sql_models.InterviewHistory.created_at.desc()
+    ).limit(5).all()
+
+    recent_interviews = [
+        {
+            "id": h.id, "user_name": name, "user_email": email,
+            "position": h.position, "score": h.score, "title": h.title,
+            "interview_type": h.interview_type,
+            "created_at": h.created_at.isoformat() if h.created_at else None
+        }
+        for h, name, email in recent_interviews_query
+    ]
+
+    # User list (existing)
     users = db.query(sql_models.User).order_by(sql_models.User.id.desc()).all()
     user_list = []
-    
     for u in users:
         user_interview_count = db.query(sql_models.InterviewHistory).filter(sql_models.InterviewHistory.user_id == u.id).count()
-        
         user_list.append({
             "id": u.id,
             "email": u.email,
@@ -44,7 +116,12 @@ async def get_admin_dashboard(current_user: sql_models.User = Depends(get_curren
         "stats": {
             "total_users": total_users,
             "total_interviews": total_interviews,
-            "total_tokens": estimated_total_tokens 
+            "total_tokens": estimated_total_tokens,
+            "pro_users": pro_users,
+            "pending_questions": pending_questions,
+            "interviews_by_day": interviews_by_day,
+            "top_users": top_users,
+            "recent_interviews": recent_interviews,
         },
         "users": user_list
     }
