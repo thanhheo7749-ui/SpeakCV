@@ -67,6 +67,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("userName");
     sessionStorage.removeItem("userRole");
+    // Clear user-specific localStorage to prevent data leaking to next login
+    localStorage.removeItem("userProfile");
+    localStorage.removeItem("guest_msg_count");
     setUser(null);
     setRole(null);
     setToken(null);

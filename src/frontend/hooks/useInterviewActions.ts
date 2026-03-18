@@ -379,7 +379,6 @@ export function useInterviewActions(params: UseInterviewActionsParams) {
     if (user) {
       getMyProfile()
         .then((data) => {
-          data.full_name = sessionStorage.getItem("userName") || data.full_name;
           setMyProfileData(data);
         })
         .catch(() => {});
