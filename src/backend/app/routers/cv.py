@@ -210,13 +210,22 @@ async def tailor_cv(request: models.CVTailorRequest):
         )
         
         try:
-            cv_data = parse_and_validate_cv(result)
-            tailor_summary = cv_data.get("analysis_feedback", {})
+            cleaned = strip_markdown_wrapper(result)
+            raw_json = json.loads(cleaned)
+            
+            # Extract analysis data from raw response BEFORE Pydantic validation
+            # (Pydantic defaults empty fields, which would lose the AI's actual scores)
+            tailor_summary = raw_json.get("analysis_feedback") or raw_json.get("tailor_summary") or {}
+            
+            # Validate and normalize CV data via Pydantic model
+            validated = models.CVMakeoverData(**raw_json)
+            cv_data = validated.model_dump()
         except (json.JSONDecodeError, Exception) as parse_err:
             print(f"⚠️ JSON parse/validation error during tailoring: {parse_err}")
+            print(f"Raw AI response: {result[:500]}")
             raise HTTPException(status_code=500, detail="AI trả về JSON không hợp lệ. Vui lòng thử lại.")
             
-        print("✅ CV tailor completed!")
+        print(f"✅ CV tailor completed! Score: {tailor_summary.get('overall_score', 'N/A')}%")
         return {"cv_data": cv_data, "tailor_summary": tailor_summary}
         
     except HTTPException:

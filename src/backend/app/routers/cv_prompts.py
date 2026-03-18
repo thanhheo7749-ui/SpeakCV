@@ -136,8 +136,8 @@ Schema JSON bắt buộc (Tương tự CV gốc, CHỈ THAY ĐỔI phần analys
   "projects": [ ...giữ nguyên hoặc tinh chỉnh mô tả... ]
 }
 
-LƯU Ý: Thay vì nhận xét chung chung ở `analysis_feedback`, hãy biến nó thành `tailor_summary` với:
-- strengths: Những thay đổi chính bạn đã làm (ví dụ: "Đã làm nổi bật kinh nghiệm ReactJS", "Đưa kỹ năng Quản lý dự án lên đầu")
-- weaknesses: Những từ khóa/yêu cầu quan trọng trong JD mà CV CÒN THIẾU (để báo cho ứng viên biết mức độ match)
-- overall_score: Độ match của CV (sau khi tối ưu) với JD (0-100)
+LƯU Ý QUAN TRỌNG cho `analysis_feedback`:
+- strengths: Liệt kê những thay đổi chính bạn đã làm (ví dụ: "Đã làm nổi bật kinh nghiệm ReactJS", "Đưa kỹ năng Quản lý dự án lên đầu"). PHẢI có ít nhất 1-3 mục.
+- weaknesses: Liệt kê những từ khóa/yêu cầu quan trọng trong JD mà CV CÒN THIẾU (để báo cho ứng viên biết). PHẢI có ít nhất 1-2 mục nếu CV chưa hoàn hảo.
+- overall_score: Độ match thực tế của CV (sau khi tối ưu) với JD, từ 0-100. KHÔNG ĐƯỢC để 0 — phải đánh giá trung thực dựa trên mức độ phù hợp thực tế.
 """
